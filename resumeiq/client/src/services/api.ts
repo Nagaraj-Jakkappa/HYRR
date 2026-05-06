@@ -2,16 +2,18 @@ import axios from 'axios';
 
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL || 'http://localhost:5000/api',
-  headers: { 'Content-Type': 'application/json' }
 });
 
 // Request Interceptor for Auth
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem('accessToken');
   if (token) {
+    // Ensures the "Bearer " prefix is sent for every request
     config.headers.Authorization = `Bearer ${token}`;
   }
   return config;
+}, (error) => {
+  return Promise.reject(error);
 });
 
 // Response Interceptor for Token Refresh
@@ -19,19 +21,33 @@ api.interceptors.response.use(
   (res) => res,
   async (err) => {
     const originalRequest = err.config;
+    
     if (!err.response) return Promise.reject(err);
 
+    // If unauthorized and we haven't tried to refresh yet
     if (err.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
+      
       try {
         const refreshToken = localStorage.getItem('refreshToken');
-        const { data } = await axios.post(`${api.defaults.baseURL}/auth/refresh`, { refreshToken });
-        localStorage.setItem('accessToken', data.data.accessToken);
+        if (!refreshToken) throw new Error('No refresh token available');
 
-        originalRequest.headers.Authorization = `Bearer ${data.data.accessToken}`;
-        return api(originalRequest);
+        // Call refresh endpoint
+        const response = await axios.post(`${api.defaults.baseURL}/auth/refresh`, { refreshToken });
+        
+        // Handle different possible backend response structures
+        const newAccessToken = response.data?.data?.accessToken || response.data?.accessToken;
+
+        if (newAccessToken) {
+          localStorage.setItem('accessToken', newAccessToken);
+          // Update the original request with the new token
+          originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
+          return api(originalRequest);
+        }
       } catch (refreshError) {
-        localStorage.clear();
+        // If refresh fails, clear everything and kick to login
+        localStorage.removeItem('accessToken');
+        localStorage.removeItem('refreshToken');
         window.location.href = '/login';
         return Promise.reject(refreshError);
       }
