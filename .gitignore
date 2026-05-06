@@ -1,0 +1,16 @@
+# Root dependencies
+node_modules/
+
+# Client secrets and builds
+resumeiq/client/node_modules/
+resumeiq/client/dist/
+resumeiq/client/.env
+
+# Server secrets
+resumeiq/server/node_modules/
+resumeiq/server/.env
+
+# General
+.env
+*.log
+.DS_Store

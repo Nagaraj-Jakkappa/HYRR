@@ -1,0 +1,93 @@
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { Toaster } from 'react-hot-toast';
+import { AuthProvider, useAuth } from './context/AuthContext';
+
+// Pages
+import LandingPage from './pages/LandingPage';
+import LoginPage from './pages/LoginPage';
+import RegisterPage from './pages/RegisterPage';
+import DashboardPage from './pages/DashboardPage';
+import ResumesPage from './pages/ResumesPage';
+import ScanPage from './pages/ScanPage';
+import ScanResultPage from './pages/ScanResultPage';
+import AdminPage from './pages/AdminPage';
+import HistoryPage from './pages/HistoryPage';
+import ComparePage from './pages/ComparePage';
+import SettingsPage from './pages/SettingsPage';
+import ReportPage from './pages/ReportPage'; // NEW: Public Report Import
+import NotFoundPage from './pages/NotFoundPage';
+
+// Components
+import Layout from './components/ui/Layout';
+
+const Protected = ({ children, adminOnly = false }: { children: any; adminOnly?: boolean }) => {
+  const { user, loading } = useAuth();
+
+  if (loading) return (
+    <div className="flex items-center justify-center min-h-screen bg-[#0A0A0F]">
+      <div className="w-8 h-8 border-2 border-[#5B5FEF] border-t-transparent rounded-full animate-spin" />
+    </div>
+  );
+
+  if (!user) return <Navigate to="/login" replace />;
+  if (adminOnly && user.role !== 'admin') return <Navigate to="/dashboard" replace />;
+
+  return children;
+};
+
+const App = () => (
+  <AuthProvider>
+    <BrowserRouter
+      future={{
+        v7_startTransition: true,
+        v7_relativeSplatPath: true
+      }}
+    >
+      <Toaster
+        position="top-right"
+        toastOptions={{
+          style: {
+            background: '#1a1a1a',
+            color: '#f1f1f1',
+            border: '1px solid rgba(255,255,255,0.08)'
+          }
+        }}
+      />
+      <Routes>
+        {/* --- PUBLIC ROUTES --- */}
+        <Route path="/" element={<LandingPage />} />
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/register" element={<RegisterPage />} />
+
+        {/* NEW: Public Shareable Report Link */}
+        <Route path="/report/:id" element={<ReportPage />} />
+
+        {/* --- PROTECTED ROUTES --- */}
+        <Route element={<Protected><Layout /></Protected>}>
+          <Route path="/dashboard" element={<DashboardPage />} />
+          <Route path="/resumes" element={<ResumesPage />} />
+          <Route path="/history" element={<HistoryPage />} />
+          <Route path="/compare" element={<ComparePage />} />
+          <Route path="/scan" element={<ScanPage />} />
+          <Route path="/scan/:id" element={<ScanResultPage />} />
+          <Route path="/settings" element={<SettingsPage />} />
+
+          {/* Admin specific protection */}
+          <Route
+            path="/admin"
+            element={
+              <Protected adminOnly>
+                <AdminPage />
+              </Protected>
+            }
+          />
+        </Route>
+
+        {/* --- 404 NOT FOUND --- */}
+        <Route path="*" element={<NotFoundPage />} />
+      </Routes>
+    </BrowserRouter>
+  </AuthProvider>
+);
+
+export default App;
