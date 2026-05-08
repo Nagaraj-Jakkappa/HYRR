@@ -47,6 +47,7 @@ export default function LoginPage() {
                 className="input bg-black/20 border-white/10 text-white focus:border-[#5B5FEF]/50 transition-colors"
                 type="email"
                 placeholder="you@example.com"
+                autoComplete="email" // Added for browser optimization
                 value={form.email}
                 onChange={e => setForm(f => ({ ...f, email: e.target.value }))}
                 required
@@ -59,11 +60,17 @@ export default function LoginPage() {
                   className="input pr-10 bg-black/20 border-white/10 text-white focus:border-[#5B5FEF]/50 transition-colors"
                   type={show ? 'text' : 'password'}
                   placeholder="••••••••"
+                  autoComplete="current-password" // Fixes the [DOM] warning
                   value={form.password}
                   onChange={e => setForm(f => ({ ...f, password: e.target.value }))}
                   required
                 />
-                <button type="button" onClick={() => setShow(s => !s)} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-300">
+                <button
+                  type="button"
+                  onClick={() => setShow(s => !s)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-300"
+                  tabIndex={-1} // Prevents tabbing to the toggle icon
+                >
                   {show ? <EyeOff size={15} /> : <Eye size={15} />}
                 </button>
               </div>
