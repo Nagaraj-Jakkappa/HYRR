@@ -20,20 +20,53 @@ const adminRoutes = require('./routes/adminRoutes');
 const app = express();
 const server = http.createServer(app);
 
-// --- ALLOWED ORIGINS CONFIGURATION ---
-const allowedOrigins = [
-  process.env.CLIENT_URL, // Dynamic URL from Railway Environment Variables
-  'https://hyrr-blue.vercel.app', // Your specific Vercel production URL
-  'http://localhost:5173' // Local development
-].filter(Boolean); // Removes undefined/null values
+// --- DYNAMIC CORS CONFIGURATION ---
+const isVercelPreview = (origin) => {
+  // Allows any vercel.app domain that contains your project name
+  return origin.endsWith('.vercel.app') && origin.includes('hyrr');
+};
 
-// Socket.io setup
-const io = new Server(server, {
-  cors: {
-    origin: allowedOrigins,
-    methods: ['GET', 'POST'],
-    credentials: true,
+const allowedOrigins = [
+  process.env.CLIENT_URL,         // Railway ENV variable
+  'https://hyrr-blue.vercel.app',  // Main Production URL
+  'http://localhost:5173'         // Local development
+].filter(Boolean);
+
+const corsOptions = {
+  origin: function (origin, callback) {
+    // 1. Allow requests with no origin (like mobile apps or server-to-server)
+    if (!origin) return callback(null, true);
+
+    // 2. Allow if in static list, vercel preview, or development mode
+    if (
+      allowedOrigins.indexOf(origin) !== -1 || 
+      isVercelPreview(origin) || 
+      process.env.NODE_ENV === 'development'
+    ) {
+      callback(null, true);
+    } else {
+      console.error(`Blocked by CORS: ${origin}`);
+      callback(new Error('Not allowed by CORS'));
+    }
   },
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
+};
+
+// --- MIDDLEWARE ---
+app.use(helmet({ contentSecurityPolicy: false }));
+app.use(cors(corsOptions));
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ extended: true }));
+
+if (process.env.NODE_ENV !== 'test') {
+  app.use(morgan('dev'));
+}
+
+// Socket.io setup with the same CORS options
+const io = new Server(server, {
+  cors: corsOptions
 });
 
 app.set('io', io);
@@ -59,31 +92,6 @@ io.on('connection', (socket) => {
     console.log(`🔌 Socket disconnected: ${socket.userId}`);
   });
 });
-
-// Middleware
-app.use(helmet({
-  contentSecurityPolicy: false, 
-}));
-
-app.use(cors({
-  origin: function (origin, callback) {
-    // Allow requests with no origin (like mobile apps or curl)
-    if (!origin) return callback(null, true);
-    if (allowedOrigins.indexOf(origin) !== -1 || process.env.NODE_ENV === 'development') {
-      return callback(null, true);
-    } else {
-      return callback(new Error('CORS policy block'), false);
-    }
-  },
-  credentials: true,
-}));
-
-app.use(express.json({ limit: '10mb' }));
-app.use(express.urlencoded({ extended: true }));
-
-if (process.env.NODE_ENV !== 'test') {
-  app.use(morgan('dev'));
-}
 
 // Global API Limiter
 app.use('/api', apiLimiter);
