@@ -22,25 +22,33 @@ const server = http.createServer(app);
 
 // --- DYNAMIC CORS CONFIGURATION ---
 const isVercelPreview = (origin) => {
+  if (!origin) return false;
   // Allows any vercel.app domain that contains your project name
   return origin.endsWith('.vercel.app') && origin.includes('hyrr');
 };
 
 const allowedOrigins = [
-  process.env.CLIENT_URL,         // Railway ENV variable
   'https://hyrr-blue.vercel.app',  // Main Production URL
-  'http://localhost:5173'         // Local development
-].filter(Boolean);
+  'http://localhost:5173'          // Local development
+];
+
+// Clean trailing slash from environment variable if it exists
+if (process.env.CLIENT_URL) {
+  allowedOrigins.push(process.env.CLIENT_URL.replace(/\/$/, ""));
+}
 
 const corsOptions = {
   origin: function (origin, callback) {
-    // 1. Allow requests with no origin (like mobile apps or server-to-server)
+    // 1. Allow requests with no origin (like mobile apps or server-to-server health checks)
     if (!origin) return callback(null, true);
+
+    // Clean trailing slash from the browser's incoming origin string
+    const cleanOrigin = origin.replace(/\/$/, "");
 
     // 2. Allow if in static list, vercel preview, or development mode
     if (
-      allowedOrigins.indexOf(origin) !== -1 || 
-      isVercelPreview(origin) || 
+      allowedOrigins.includes(cleanOrigin) || 
+      isVercelPreview(cleanOrigin) || 
       process.env.NODE_ENV === 'development'
     ) {
       callback(null, true);
@@ -51,7 +59,8 @@ const corsOptions = {
   },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept'],
+  optionsSuccessStatus: 200 // Ensures seamless preflight completion status code handling
 };
 
 // --- MIDDLEWARE ---
