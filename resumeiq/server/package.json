@@ -35,6 +35,11 @@
     "uuid": "^14.0.0",
     "validator": "^13.11.0"
   },
+  "overrides": {
+    "multer-storage-cloudinary": {
+      "cloudinary": "$cloudinary"
+    }
+  },
   "devDependencies": {
     "nodemon": "^3.0.2"
   }
