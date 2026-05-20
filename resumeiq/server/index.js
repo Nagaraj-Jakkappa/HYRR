@@ -18,6 +18,11 @@ const scanRoutes = require('./routes/scanRoutes');
 const adminRoutes = require('./routes/adminRoutes');
 
 const app = express();
+
+// --- TRUST PROXY SETTING ---
+// Required for express-rate-limit to work behind Railway's load balancer
+app.set('trust proxy', 1);
+
 const server = http.createServer(app);
 
 // --- CORS CONFIGURATION ---
@@ -97,7 +102,7 @@ app.get('/api/health', (req, res) => {
 app.use(errorHandler);
 
 // --- SERVER INITIALIZATION ---
-const PORT = process.env.PORT || 8080; // Railway often expects 8080
+const PORT = process.env.PORT || 8080;
 const start = async () => {
   try {
     await connectDB();
