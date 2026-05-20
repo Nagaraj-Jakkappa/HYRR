@@ -193,24 +193,38 @@ exports.createScan = async (req, res, next) => {
     });
 
     const io = req.app.get('io');
-    const emitter = io ? (event, data) => io.to(user._id.toString()).emit(event, data) : null;
+    const userIdStr = user._id.toString();
+
+    // Improved Emitter with logging
+    const emitter = (event, data) => {
+      console.log(`[Socket Emit] Event: ${event}`, data);
+      if (io) io.to(userIdStr).emit(event, data);
+    };
 
     res.status(202).json({ success: true, message: 'Scan started', data: { scanId: scan._id } });
 
+    // Background process with full logging
     (async () => {
       try {
+        console.log(`[Scan Background] Starting scan: ${scan._id}`);
+
         scan.status = 'processing';
         await scan.save();
 
-        if (emitter) emitter('scan:progress', { scanId: scan._id, step: 'Extracting keywords...', pct: 20 });
+        emitter('scan:progress', { scanId: scan._id, step: 'Extracting keywords...', pct: 20 });
         const keywords = await extractKeywordsFromJD(jobDescription);
+        console.log(`[Scan Background] Keywords extracted: ${keywords.length}`);
+
         job.extractedKeywords = keywords;
         await job.save();
 
-        if (emitter) emitter('scan:progress', { scanId: scan._id, step: 'Running AI analysis...', pct: 40 });
+        emitter('scan:progress', { scanId: scan._id, step: 'Running AI analysis...', pct: 40 });
+        console.log(`[Scan Background] Calling analyzeResume...`);
+
         const analysis = await analyzeResume(resume.rawText, jobDescription, keywords, emitter);
 
-        if (!analysis) throw new Error("AI Analysis failed.");
+        if (!analysis) throw new Error("AI Analysis returned no data.");
+        console.log(`[Scan Background] AI Analysis success, score: ${analysis.atsScore}`);
 
         Object.assign(scan, {
           atsScore: analysis.atsScore || 0,
@@ -227,12 +241,13 @@ exports.createScan = async (req, res, next) => {
         await scan.save();
         await User.findByIdAndUpdate(user._id, { $inc: { scansUsed: 1 } });
 
-        if (emitter) emitter('scan:done', { scanId: scan._id, atsScore: scan.atsScore });
+        emitter('scan:done', { scanId: scan._id, atsScore: scan.atsScore });
+        console.log(`[Scan Background] Scan completed successfully: ${scan._id}`);
       } catch (err) {
-        console.error("Scan Background Error:", err);
+        console.error("[Scan Background CRITICAL ERROR]", err);
         scan.status = 'failed';
         await scan.save();
-        if (emitter) emitter('scan:failed', { scanId: scan._id, message: err.message });
+        emitter('scan:failed', { scanId: scan._id, message: err.message });
       }
     })();
   } catch (err) { next(err); }
