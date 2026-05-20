@@ -4,11 +4,11 @@
 
 @layer base {
   body {
-    /* Changed to #0A0A0F to match your specific landing page background */
+    /* Main layout background configuration matching your landing page colors */
     @apply bg-[#0A0A0F] text-[#EEEEF0] font-sans antialiased;
   }
 
-  /* Modern minimal scrollbar */
+  /* Modern global minimal scrollbar */
   ::-webkit-scrollbar {
     width: 6px;
   }
@@ -21,7 +21,7 @@
     @apply bg-[#1a1a1a] border border-white/5 rounded-full hover:bg-[#242424];
   }
 
-  /* Selection highlight using your brand blue */
+  /* Selection highlight using your brand blue configuration */
   ::selection {
     @apply bg-[#5B5FEF]/30 text-white;
   }
@@ -29,22 +29,22 @@
 
 @layer components {
 
-  /* Updated card to use the surface color from your design */
+  /* Updated card layout surface styling definitions */
   .card {
     @apply bg-[#13131A] border border-white/[0.05] rounded-2xl transition-all duration-300 hover:border-[#5B5FEF]/30;
   }
 
-  /* Primary button with the 'Hyrr' tech-blue glow */
+  /* Primary button featuring the signature 'Hyrr' interactive tech glow */
   .btn-primary {
     @apply bg-[#5B5FEF] hover:bg-[#4A4EDF] text-white font-bold px-6 py-3 rounded-xl transition-all duration-200 flex items-center justify-center gap-2 shadow-lg shadow-[#5B5FEF]/20 active:scale-95;
   }
 
-  /* Ghost button for secondary actions */
+  /* Ghost button for standard nested secondary dashboard actions */
   .btn-ghost {
     @apply bg-white/5 hover:bg-white/10 border border-white/5 text-gray-300 hover:text-white font-medium px-6 py-3 rounded-xl transition-all duration-200 flex items-center justify-center gap-2;
   }
 
-  /* Dark mode input fields */
+  /* High-fidelity dark mode form fields input configuration */
   .input {
     @apply bg-[#13131A] border border-white/10 rounded-xl px-4 py-3 text-sm text-[#EEEEF0] placeholder-gray-600 focus:outline-none focus:border-[#5B5FEF] focus:ring-1 focus:ring-[#5B5FEF]/30 transition-all w-full;
   }
@@ -53,7 +53,7 @@
     @apply block text-[10px] font-mono font-bold text-gray-500 mb-2 uppercase tracking-[0.2em];
   }
 
-  /* Status badges with custom font */
+  /* Structural telemetry context status metrics badges */
   .badge {
     @apply inline-flex items-center gap-1 text-xs font-mono font-bold px-3 py-1 rounded-full border;
   }
@@ -61,7 +61,7 @@
 
 @layer utilities {
 
-  /* Futuristic glow effects */
+  /* Futuristic atmospheric blur glow arrays */
   .glow-blue {
     box-shadow: 0 0 40px -10px rgba(91, 95, 239, 0.3);
   }
@@ -70,10 +70,53 @@
     text-shadow: 0 0 15px rgba(91, 95, 239, 0.4);
   }
 
-  /* For that background ambient lighting */
+  /* Shared backdrop ambient glowing illumination matrix mesh styling */
   .bg-mesh {
     background-image:
       radial-gradient(at 0% 0%, rgba(91, 95, 239, 0.15) 0px, transparent 50%),
       radial-gradient(at 100% 100%, rgba(61, 235, 166, 0.1) 0px, transparent 50%);
+  }
+
+  /* Custom narrow scrollbar layout configuration for left inputs field panes flow optimization */
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 4px;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 99px;
+  }
+}
+
+/* --- HARD CORE PRINT MEDIA INTERPRETATION LAYER --- */
+@media print {
+  body {
+    background: white !important;
+    color: black !important;
+  }
+
+  /* Suppresses standard browser margins, headers, and footer overlay data stamps */
+  @page {
+    size: a4 portrait;
+    margin: 0;
+  }
+
+  .pdf-page {
+    margin: 0 !important;
+    border: none !important;
+    box-shadow: none !important;
+    width: 210mm !important;
+    min-height: 297mm !important;
+    padding: 20mm !important;
+    page-break-after: always;
+  }
+
+  .break-inside-avoid {
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
   }
 }
