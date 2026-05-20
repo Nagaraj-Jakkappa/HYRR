@@ -2,7 +2,6 @@ const Groq = require("groq-sdk");
 const crypto = require("crypto");
 const redis = require("../config/redis");
 
-// Initialize a single Groq client for all functions
 const aiClient = new Groq({
   apiKey: process.env.GROQ_API_KEY,
 });
@@ -18,9 +17,10 @@ const extractKeywordsFromJD = async (jobDescription) => {
         if (cached) return JSON.parse(cached);
       }
     } catch (redisErr) {
-      console.warn(redisErr.message);
+      console.warn("Redis Cache Warning:", redisErr.message);
     }
 
+    console.log("Calling Groq for Keyword Extraction...");
     const response = await aiClient.chat.completions.create({
       model: "llama-3.1-8b-instant",
       messages: [
@@ -33,71 +33,57 @@ const extractKeywordsFromJD = async (jobDescription) => {
       temperature: 0.3,
     });
 
-    const keywords = response.choices[0].message.content.split(',').map(k => k.trim());
+    const content = response.choices[0].message.content;
+    const keywords = content.split(',').map(k => k.trim());
 
     try {
       if (redis && typeof redis.set === 'function') {
-        await redis.set(cacheKey, JSON.stringify(keywords), {
-          EX: 86400
-        });
+        await redis.set(cacheKey, JSON.stringify(keywords), { EX: 86400 });
       }
     } catch (cacheErr) {
-      console.error(cacheErr.message);
+      console.error("Redis Set Error:", cacheErr.message);
     }
 
     return keywords;
   } catch (error) {
+    console.error("Keyword Extraction API Error:", error.message);
     return [];
   }
 };
 
 const analyzeResume = async (resumeText, jobDescription, keywords, socket) => {
-  try {
-    const sendUpdate = (event, data) => {
-      if (typeof socket === 'function') {
-        socket(event, data);
-      }
-    };
+  const sendUpdate = (event, data) => {
+    if (typeof socket === 'function') {
+      socket(event, data);
+    }
+  };
 
+  try {
     sendUpdate('scan:progress', { step: 'Analyzing Structure', pct: 40 });
 
+    console.log("Calling Groq for Resume Analysis...");
     const response = await aiClient.chat.completions.create({
       model: "llama-3.1-8b-instant",
       messages: [
         {
           role: "system",
-          content: `You are an expert ATS (Applicant Tracking System) optimizer. 
-          Analyze the resume against the job description and keywords.
-          You MUST return a VALID JSON object.
-          
-          CRITICAL: "suggestions" must be an array of OBJECTS.
-          Each object needs:
-          1. "text": The actionable advice.
-          2. "type": One of ["info", "warning", "success", "tip"].
-
-          Use this structure:
-          {
-            "atsScore": 85,
-            "keywordMatchPct": 70,
-            "formattingScore": 90,
-            "matchedKeywords": ["React", "Node.js"],
-            "missingKeywords": ["TypeScript", "AWS"],
-            "suggestions": [{ "text": "Example", "type": "warning" }],
-            "tokensUsed": 1000
-          }`
+          content: `You are an expert ATS optimizer. Return a VALID JSON object. { "atsScore": 85, "keywordMatchPct": 70, "formattingScore": 90, "matchedKeywords": [], "missingKeywords": [], "suggestions": [{"text": "...", "type": "warning"}], "tokensUsed": 0 }`
         },
         {
           role: "user",
-          content: `Job Description: ${jobDescription}\n\nKeywords: ${keywords.join(', ')}\n\nResume Content: ${resumeText}`
+          content: `Job: ${jobDescription}\nKeywords: ${keywords.join(', ')}\nResume: ${resumeText}`
         }
       ],
       temperature: 0.2,
       response_format: { type: "json_object" }
     });
 
-    sendUpdate('scan:progress', { step: 'Finalizing Score', pct: 90 });
+    console.log("Groq Analysis Response Received.");
 
-    const result = JSON.parse(response.choices[0].message.content);
+    const content = response.choices[0].message.content;
+    const result = JSON.parse(content);
+
+    sendUpdate('scan:progress', { step: 'Finalizing Score', pct: 90 });
 
     if (result.suggestions && Array.isArray(result.suggestions)) {
       result.suggestions = result.suggestions.map(s => ({
@@ -110,35 +96,25 @@ const analyzeResume = async (resumeText, jobDescription, keywords, socket) => {
 
     return result;
   } catch (error) {
+    console.error("CRITICAL AI Analysis Error:", error);
     throw new Error(`AI Analysis Failed: ${error.message}`);
   }
 };
 
-// --- NEW: Magic Rewrite Function ---
 const rewriteTextWithAI = async (text, jobTitle) => {
   try {
-    const prompt = `You are an expert resume writer. Rewrite the following bullet point to make it sound highly professional, action-oriented, and impactful. Tailor the tone for a ${jobTitle || 'professional'} role. 
-    Do not add introductory text, just return the improved bullet point.
-    
-    Original text: "${text}"`;
-
+    const prompt = `Rewrite this bullet point to be impactful for a ${jobTitle} role. Original: "${text}"`;
     const chatCompletion = await aiClient.chat.completions.create({
       messages: [{ role: 'user', content: prompt }],
-      // Using the more powerful model for rewriting if defined, falling back to versatile
       model: process.env.GROQ_MODEL || 'llama-3.3-70b-versatile',
       temperature: 0.7,
       max_tokens: 150,
     });
-
     return chatCompletion.choices[0].message.content.trim();
   } catch (error) {
-    console.error('AI Rewrite Error:', error);
+    console.error('AI Rewrite Error:', error.message);
     throw new Error('Failed to rewrite text');
   }
 };
 
-module.exports = {
-  analyzeResume,
-  extractKeywordsFromJD,
-  rewriteTextWithAI
-};
+module.exports = { analyzeResume, extractKeywordsFromJD, rewriteTextWithAI };
