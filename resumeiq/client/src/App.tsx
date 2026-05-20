@@ -8,7 +8,7 @@ import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import DashboardPage from './pages/DashboardPage';
 import ResumesPage from './pages/ResumesPage';
-import ResumeBuilderPage from './pages/ResumeBuilderPage'; // NEW: Import Resume Builder Page
+import ResumeBuilderPage from './pages/ResumeBuilderPage';
 import ScanPage from './pages/ScanPage';
 import ScanResultPage from './pages/ScanResultPage';
 import AdminPage from './pages/AdminPage';
@@ -65,11 +65,14 @@ const App = () => (
         <Route element={<Protected><Layout /></Protected>}>
           <Route path="/dashboard" element={<DashboardPage />} />
           <Route path="/resumes" element={<ResumesPage />} />
-          <Route path="/builder" element={<ResumeBuilderPage />} /> {/* NEW: Protected Builder Route */}
+          <Route path="/builder" element={<ResumeBuilderPage />} />
           <Route path="/history" element={<HistoryPage />} />
           <Route path="/compare" element={<ComparePage />} />
+
+          {/* Feature 2: Optimization Scan Flow Routes */}
           <Route path="/scan" element={<ScanPage />} />
-          <Route path="/scan/:id" element={<ScanResultPage />} />
+          <Route path="/scan/results/:id" element={<ScanResultPage />} />
+
           <Route path="/settings" element={<SettingsPage />} />
 
           {/* Admin specific protection */}

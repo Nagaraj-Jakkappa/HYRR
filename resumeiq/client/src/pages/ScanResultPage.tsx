@@ -18,7 +18,7 @@ import {
 import toast from 'react-hot-toast';
 import api from '../services/api';
 
-// --- IMPORT THE NEW MAGIC REWRITE BUTTON ---
+// --- IMPORT THE MAGIC REWRITE BUTTON ---
 import MagicRewriteButton from '../components/ui/resume/MagicRewriteButton';
 
 interface ScanResult {
@@ -42,9 +42,7 @@ interface ScanResult {
 
 // --- WIN RATE BADGE COMPONENT ---
 const WinRateBadge = ({ score }: { score: number }) => {
-  // Platform-wide average fallback (can be replaced with actual admin stats if available)
   const avgATS = 68;
-
   let label = "";
   let colorClass = "";
 
@@ -58,7 +56,7 @@ const WinRateBadge = ({ score }: { score: number }) => {
     label = "Better than average";
     colorClass = "bg-amber-500/10 text-amber-500 border-amber-500/20";
   } else {
-    return null; // Don't show badge if below average
+    return null;
   }
 
   return (
@@ -75,8 +73,6 @@ export default function ScanResultPage() {
   const [loading, setLoading] = useState(true);
   const [isGenerating, setIsGenerating] = useState<'pdf' | 'docx' | null>(null);
   const [checkedItems, setCheckedItems] = useState<Record<string, boolean>>({});
-
-  // --- STATE FOR MAGIC REWRITE SANDBOX ---
   const [rewriteText, setRewriteText] = useState('');
 
   useEffect(() => {
@@ -84,9 +80,11 @@ export default function ScanResultPage() {
     const fetchResults = async () => {
       try {
         const { data } = await api.get(`/scans/${id}`);
-        setScan(data.data.scan || data.data);
+        // Normalizes data access layer checks
+        const rootData = data.data?.scan || data.data || data;
+        setScan(rootData);
       } catch (error) {
-        toast.error('Failed to load scan results');
+        toast.error('Failed to sync report calculations metrics.');
       } finally {
         setLoading(false);
       }
@@ -147,7 +145,7 @@ export default function ScanResultPage() {
   const handleShare = () => {
     const publicUrl = `${window.location.origin}/report/${id}`;
     navigator.clipboard.writeText(publicUrl);
-    toast.success('Public report link copied to clipboard!');
+    toast.success('Public presentation report string copied to clipboard!');
   };
 
   const handleDownload = async (format: 'pdf' | 'docx') => {
@@ -168,14 +166,14 @@ export default function ScanResultPage() {
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `Hyrr_Optimized_${scan?.jobId.companyName || 'Resume'}.${format}`;
+      a.download = `Hyrr_Optimized_${scan?.jobId?.companyName || 'Resume'}.${format}`;
       document.body.appendChild(a);
       a.click();
       window.URL.revokeObjectURL(url);
       document.body.removeChild(a);
-      toast.success(`${format.toUpperCase()} generated with AI optimization!`);
+      toast.success(`${format.toUpperCase()} structural template generated successfully!`);
     } catch (error) {
-      toast.error('Could not generate resume. Please try again.');
+      toast.error('Document compilation engine encountered a runtime issue.');
     } finally {
       setIsGenerating(null);
     }
@@ -189,7 +187,7 @@ export default function ScanResultPage() {
 
   if (!scan) return (
     <div className="min-h-screen bg-[#0A0A0F] flex items-center justify-center text-gray-500">
-      Scan result not found.
+      Scan result data profile is missing.
     </div>
   );
 
@@ -201,7 +199,7 @@ export default function ScanResultPage() {
           Back to Dashboard
         </Link>
 
-        {/* Score Card */}
+        {/* Score Card Header Module */}
         <div className="bg-[#13131A] border border-white/5 rounded-[40px] p-10 mb-8 relative overflow-hidden">
           <div className="relative z-10 flex flex-col md:flex-row items-center gap-8">
             <div className="flex flex-col items-center">
@@ -212,8 +210,8 @@ export default function ScanResultPage() {
             </div>
 
             <div className="text-center md:text-left flex-1">
-              <h1 className="text-3xl font-black mb-1">{scan.jobId.jobTitle}</h1>
-              <p className="text-gray-500 font-mono uppercase tracking-[0.2em] text-xs">{scan.jobId.companyName}</p>
+              <h1 className="text-3xl font-black mb-1">{scan.jobId?.jobTitle || 'Target Vacancy'}</h1>
+              <p className="text-gray-500 font-mono uppercase tracking-[0.2em] text-xs">{scan.jobId?.companyName || 'Enterprise Profile'}</p>
             </div>
             <button
               onClick={handleShare}
@@ -226,7 +224,7 @@ export default function ScanResultPage() {
           <div className="absolute -right-20 -top-20 w-64 h-64 bg-[#5B5FEF]/10 blur-[100px] rounded-full"></div>
         </div>
 
-        {/* DOWNLOAD SECTION */}
+        {/* Optimized Content Download Card */}
         <div className="bg-[#13131A] border border-[#5B5FEF]/30 rounded-[32px] p-8 mb-8 relative">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-8">
             <div className="max-w-md">
@@ -269,7 +267,7 @@ export default function ScanResultPage() {
           </div>
         </div>
 
-        {/* Keyword Analysis */}
+        {/* Keywords Metrics Distributions Panel */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
           <div className="bg-[#13131A] p-8 rounded-[32px] border border-white/5">
             <h3 className="text-xs font-black uppercase tracking-widest text-[#3DEBA6] mb-6 flex items-center gap-2">
@@ -279,6 +277,9 @@ export default function ScanResultPage() {
               {scan.matchedKeywords?.map(k => (
                 <span key={k} className="px-3 py-1 bg-[#3DEBA6]/5 border border-[#3DEBA6]/10 text-[#3DEBA6] text-[10px] font-bold rounded-lg uppercase">{k}</span>
               ))}
+              {(!scan.matchedKeywords || scan.matchedKeywords.length === 0) && (
+                <p className="text-xs text-gray-600 italic">No explicit semantic criteria matches flagged.</p>
+              )}
             </div>
           </div>
 
@@ -290,11 +291,14 @@ export default function ScanResultPage() {
               {scan.missingKeywords?.map(k => (
                 <span key={k} className="px-3 py-1 bg-red-400/5 border border-red-400/10 text-red-400 text-[10px] font-bold rounded-lg uppercase">{k}</span>
               ))}
+              {(!scan.missingKeywords || scan.missingKeywords.length === 0) && (
+                <span className="text-xs text-[#3DEBA6] font-bold font-mono">✓ 100% Core Matrix Intersection Coverage</span>
+              )}
             </div>
           </div>
         </div>
 
-        {/* Suggestions Card */}
+        {/* Strategic System Suggestions Array Block */}
         <div className="bg-[#13131A] p-8 rounded-[32px] border border-white/5 mb-8">
           <h3 className="text-lg font-black mb-6 flex items-center gap-2">
             <Target size={20} className="text-[#5B5FEF]" />
@@ -304,16 +308,16 @@ export default function ScanResultPage() {
             {scan.suggestions?.map((s, i) => (
               <div key={i} className="flex gap-4 p-5 bg-white/[0.01] border border-white/[0.03] rounded-2xl text-gray-400 text-sm">
                 <span className="text-[#5B5FEF] font-mono font-black">0{i + 1}</span>
-                <p>{typeof s === 'string' ? s : (s.text || s.message)}</p>
+                <p>{typeof s === 'string' ? s : (s.text || s.message || "Refine template parameters alignment.")}</p>
               </div>
             ))}
             {(!scan.suggestions || scan.suggestions.length === 0) && (
-              <p className="text-gray-500 italic text-sm">No specific suggestions for this scan.</p>
+              <p className="text-gray-500 italic text-sm">No structural optimization flags raised.</p>
             )}
           </div>
         </div>
 
-        {/* CHECKLIST CARD */}
+        {/* Dynamic Interactive Checklist Tracker */}
         <div className="bg-[#13131A] p-8 rounded-[32px] border border-white/5 mb-8">
           <div className="flex items-center justify-between mb-6">
             <h3 className="text-lg font-black flex items-center gap-2">
@@ -358,17 +362,16 @@ export default function ScanResultPage() {
           </div>
         </div>
 
-        {/* --- NEW: MAGIC REWRITE PLAYGROUND --- */}
+        {/* Magic AI Generation Sandbox Playground */}
         <div className="bg-[#13131A] border border-[#a25bef]/30 p-8 rounded-[32px] relative overflow-hidden">
           <div className="absolute -right-20 -top-20 w-64 h-64 bg-[#a25bef]/10 blur-[100px] rounded-full pointer-events-none"></div>
-
           <div className="relative z-10">
             <h3 className="text-lg font-black mb-2 flex items-center gap-2 text-white">
               <Sparkles size={20} className="text-[#a25bef]" />
               AI Bullet Point Rewriter
             </h3>
             <p className="text-sm text-gray-400 mb-6">
-              Paste a weak bullet point from your resume below. Our AI will instantly rewrite it to include strong action verbs tailored specifically for the <strong className="text-white">{scan.jobId.jobTitle}</strong> role.
+              Paste a weak bullet point from your resume below. Our AI will instantly rewrite it to include strong action verbs tailored specifically for the <strong className="text-white">{scan.jobId?.jobTitle || 'Targeted'}</strong> role.
             </p>
 
             <div className="flex flex-col sm:flex-row sm:justify-between sm:items-end gap-3 mb-3">
@@ -377,7 +380,7 @@ export default function ScanResultPage() {
               </label>
               <MagicRewriteButton
                 currentText={rewriteText}
-                jobTitle={scan.jobId.jobTitle}
+                jobTitle={scan.jobId?.jobTitle}
                 onRewrite={(newText) => setRewriteText(newText)}
               />
             </div>

@@ -1,5 +1,6 @@
 import axios from 'axios';
 
+// --- AXIOS INITIALIZATION ---
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL || 'http://localhost:5000/api',
 });
@@ -56,6 +57,16 @@ api.interceptors.response.use(
   }
 );
 
+// --- TYPE DEFINITIONS ---
+export interface ScanPayload {
+  resumeId: string;
+  jobTitle: string;
+  companyName: string;
+  jobDescription: string;
+}
+
+// --- API DOMAINS ---
+
 export const authAPI = {
   register: (data: any) => api.post('/auth/register', data),
   login: (data: any) => api.post('/auth/login', data),
@@ -76,14 +87,15 @@ export const resumeAPI = {
   delete: (id: string) => api.delete(`/resumes/${id}`),
 };
 
-// --- NEW: Magic Rewrite API Call ---
+// --- Magic Rewrite AI Call ---
 export const magicRewriteAPI = async (text: string, jobTitle?: string) => {
   const response = await api.post('/resumes/rewrite', { text, jobTitle });
   return response.data;
 };
 
+// --- ATS Scan Engine Actions ---
 export const scanAPI = {
-  create: (data: any) => api.post('/scans', data),
+  create: (data: ScanPayload) => api.post('/scans', data),
   getAll: (page = 1) => api.get(`/scans?page=${page}`),
   getOne: (id: string) => api.get(`/scans/${id}`),
   getById: (id: string) => api.get(`/scans/${id}`),
