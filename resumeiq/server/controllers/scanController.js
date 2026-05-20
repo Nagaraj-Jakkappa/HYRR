@@ -17,10 +17,6 @@ const getCandidateName = (text, filename) => {
   return firstLine.length > 2 && firstLine.length < 50 ? firstLine : filename.split('.')[0];
 };
 
-/**
- * FEATURE 1: Public Read-Only Report
- * Strips sensitive PII and returns only the analysis metrics for public viewing
- */
 exports.getPublicReport = async (req, res, next) => {
   try {
     const scan = await Scan.findById(req.params.id)
@@ -35,7 +31,6 @@ exports.getPublicReport = async (req, res, next) => {
       return res.status(400).json({ success: false, message: 'Report is still processing' });
     }
 
-    // Curate a safe payload (excluding user IDs, hashes, and raw resume text)
     const publicData = {
       _id: scan._id,
       atsScore: scan.atsScore,
@@ -79,15 +74,7 @@ exports.downloadResume = async (req, res, next) => {
         {
           role: "system",
           content: `You are a professional resume writer. Rewrite the resume to better match the job description by naturally incorporating specific missing keywords. 
-          
-          STRICT RULES:
-          - NEVER add, fabricate, or modify the Certifications section.
-          - NEVER add "in progress" or placeholder certifications (e.g., Bubble.io, PHP).
-          - Only add missing keywords to the Technical Skills section naturally.
-          - Do not invent experience the candidate does not have.
-          - Keep the Certifications section exactly as it appears in the original resume.
-          - Only improve bullet point phrasing in the Experience and Projects sections.
-          - Return ONLY the improved resume text, no explanation.`
+          Return ONLY the improved resume text, no explanation.`
         },
         {
           role: "user",
@@ -195,7 +182,6 @@ exports.createScan = async (req, res, next) => {
     const io = req.app.get('io');
     const userIdStr = user._id.toString();
 
-    // Improved Emitter with logging
     const emitter = (event, data) => {
       console.log(`[Socket Emit] Event: ${event}`, data);
       if (io) io.to(userIdStr).emit(event, data);
@@ -203,7 +189,6 @@ exports.createScan = async (req, res, next) => {
 
     res.status(202).json({ success: true, message: 'Scan started', data: { scanId: scan._id } });
 
-    // Background process with full logging
     (async () => {
       try {
         console.log(`[Scan Background] Starting scan: ${scan._id}`);
@@ -221,7 +206,8 @@ exports.createScan = async (req, res, next) => {
         emitter('scan:progress', { scanId: scan._id, step: 'Running AI analysis...', pct: 40 });
         console.log(`[Scan Background] Calling analyzeResume...`);
 
-        const analysis = await analyzeResume(resume.rawText, jobDescription, keywords, emitter);
+        // --- UPDATED: Added scan._id into positional parameters ---
+        const analysis = await analyzeResume(resume.rawText, jobDescription, keywords, emitter, scan._id);
 
         if (!analysis) throw new Error("AI Analysis returned no data.");
         console.log(`[Scan Background] AI Analysis success, score: ${analysis.atsScore}`);

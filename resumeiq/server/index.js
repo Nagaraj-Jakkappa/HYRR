@@ -87,6 +87,20 @@ io.use((socket, next) => {
   }
 });
 
+// --- NEW: SOCKET ROOM CONNECTION HANDLER ---
+// Directs authenticated sockets into a distinct room matching their user ID
+io.on('connection', (socket) => {
+  if (socket.userId) {
+    const userRoom = socket.userId.toString();
+    socket.join(userRoom);
+    console.log(`[Socket] Client ${socket.id} joined isolated user room: ${userRoom}`);
+  }
+
+  socket.on('disconnect', () => {
+    console.log(`[Socket] Client disconnected: ${socket.id}`);
+  });
+});
+
 // --- ROUTES ---
 app.use('/api', apiLimiter);
 app.use('/api/auth', authRoutes);

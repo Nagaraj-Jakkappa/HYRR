@@ -51,10 +51,12 @@ const extractKeywordsFromJD = async (jobDescription) => {
   }
 };
 
-const analyzeResume = async (resumeText, jobDescription, keywords, socket) => {
+// --- UPDATED SIGNATURE: Added scanId ---
+const analyzeResume = async (resumeText, jobDescription, keywords, socket, scanId) => {
   const sendUpdate = (event, data) => {
     if (typeof socket === 'function') {
-      socket(event, data);
+      // Merges scanId automatically with progress updates so the client catches it
+      socket(event, { scanId, ...data });
     }
   };
 
