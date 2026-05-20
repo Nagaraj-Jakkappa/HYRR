@@ -2,9 +2,16 @@ const Resume = require('../models/Resume');
 const { cloudinary } = require('../config/cloudinary');
 const { extractTextFromBuffer } = require('../utils/textExtractor');
 const axios = require('axios');
+const pdfParse = require('pdf-parse');
+const { Groq } = require('groq-sdk');
 
 // NEW: Import the AI rewrite service
 const { rewriteTextWithAI } = require('../utils/aiService');
+
+// Initialize the Groq SDK client
+const groq = new Groq({
+  apiKey: process.env.GROQ_API_KEY
+});
 
 exports.uploadResume = async (req, res, next) => {
   try {
@@ -102,7 +109,7 @@ exports.deleteResume = async (req, res, next) => {
   }
 };
 
-// --- NEW: Magic Rewrite Controller Method ---
+// --- Magic Rewrite Controller Method ---
 exports.magicRewrite = async (req, res) => {
   try {
     const { text, jobTitle } = req.body;
@@ -120,5 +127,83 @@ exports.magicRewrite = async (req, res) => {
     });
   } catch (error) {
     res.status(500).json({ message: 'Error generating magic rewrite', error: error.message });
+  }
+};
+
+// --- NEW: LinkedIn Document Ingestion Processing Engine ---
+exports.importLinkedInPDF = async (req, res, next) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ success: false, message: 'No file transaction payload delivered.' });
+    }
+
+    // Extract raw text layout maps directly out of the memory buffer payload
+    const parsedPdf = await pdfParse(req.file.buffer);
+    const rawText = parsedPdf.text;
+
+    if (!rawText || rawText.trim().length < 100) {
+      return res.status(400).json({ success: false, message: 'Extracted PDF text data properties are too sparse.' });
+    }
+
+    // Structural LLM Prompting specifying exact JSON format matching your frontend ResumeData schema
+    const prompt = `
+      You are an expert resume parsing engine. Analyze the following raw text extracted from a LinkedIn "Save to PDF" profile document.
+      Extract the personal metrics, professional summaries, work timelines, and academic instances.
+      
+      CRITICAL: You must return ONLY a clean JSON object conforming EXACTLY to the structure specified below. Do not add markdown blocks like \`\`\`json, do not write header descriptions or introductory texts.
+      
+      Target Structure Blueprint:
+      {
+        "personalInfo": {
+          "fullName": "Extract string or fallback to empty string",
+          "email": "Extract valid email or empty string",
+          "phone": "Extract number or empty string",
+          "location": "Extract city/state or empty string",
+          "linkedin": "Extract profile url handle or empty string"
+        },
+        "summary": "Synthesize a professional overview text block based on their headline and summary section",
+        "experience": [
+          {
+            "company": "Company Name",
+            "position": "Job Title",
+            "startDate": "YYYY-MM or string format",
+            "endDate": "YYYY-MM or string format",
+            "current": true/false based on timeline details,
+            "description": "Construct comprehensive structural summary lines of achievements or metadata"
+          }
+        ],
+        "education": [
+          {
+            "institution": "School or University Name",
+            "degree": "BCA, B.E., etc.",
+            "fieldOfStudy": "Computer Applications, etc.",
+            "startDate": "Year string",
+            "endDate": "Year string"
+          }
+        ],
+        "skills": ["Array", "of", "skill", "strings"]
+      }
+
+      Raw LinkedIn Profile Content Stream:
+      ${rawText}
+    `;
+
+    const chatCompletion = await groq.chat.completions.create({
+      messages: [{ role: 'user', content: prompt }],
+      model: 'llama3-8b-8192',
+      temperature: 0.1, // Forces structural certainty alignment
+      response_format: { type: "json_object" }
+    });
+
+    const parsedJson = JSON.parse(chatCompletion.choices[0].message.content);
+
+    return res.status(200).json({
+      success: true,
+      message: 'LinkedIn extraction parsed successfully.',
+      data: parsedJson
+    });
+  } catch (error) {
+    console.error('LinkedIn Parsing Error:', error);
+    return res.status(500).json({ success: false, message: 'Extraction engine encountered a parsing layout failure.', error: error.message });
   }
 };

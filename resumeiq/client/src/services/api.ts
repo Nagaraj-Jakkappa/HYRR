@@ -85,6 +85,12 @@ export const resumeAPI = {
     }),
   getAll: () => api.get('/resumes'),
   delete: (id: string) => api.delete(`/resumes/${id}`),
+
+  // --- NEW: LinkedIn Document Ingestion Processing ---
+  importLinkedIn: (formData: FormData) =>
+    api.post('/resumes/import-linkedin', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' }
+    }),
 };
 
 // --- Magic Rewrite AI Call ---

@@ -13,6 +13,7 @@ import {
     MetricEngineerTemplate
 } from '../components/ui/resume/Templates';
 import MagicRewriteButton from '../components/ui/resume/MagicRewriteButton';
+import { resumeAPI } from '../services/api';
 import { ResumeData } from '../types/resume';
 import {
     ChevronLeft,
@@ -24,7 +25,10 @@ import {
     Briefcase,
     GraduationCap,
     Wrench,
-    Eye
+    Eye,
+    Linkedin,
+    Loader2,
+    UploadCloud
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 
@@ -65,7 +69,10 @@ export default function ResumeBuilderPage() {
 
     const [activeTemplate, setActiveTemplate] = useState<TemplateKey>('minimalist');
     const [exporting, setExporting] = useState(false);
+    const [importingLinkedin, setImportingLinkedin] = useState(false);
+
     const printAreaRef = useRef<HTMLDivElement>(null);
+    const fileInputRef = useRef<HTMLInputElement>(null);
 
     // --- FORM HANDLERS ---
     const handlePersonalInfoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -110,6 +117,31 @@ export default function ResumeBuilderPage() {
         });
     };
 
+    // --- LINKEDIN PROFILE INGESTION HANDLER ---
+    const handleLinkedInUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        const formData = new FormData();
+        formData.append('file', file);
+
+        setImportingLinkedin(true);
+        const loadingToast = toast.loading('Extracting data maps from LinkedIn file structure...');
+
+        try {
+            const { data } = await resumeAPI.importLinkedIn(formData);
+            if (data?.success && data?.data) {
+                setResumeData(data.data);
+                toast.success('Workspace populated successfully from LinkedIn!', { id: loadingToast });
+            }
+        } catch (err: any) {
+            toast.error(err?.response?.data?.message || 'LinkedIn data ingestion aborted.', { id: loadingToast });
+        } finally {
+            setImportingLinkedin(false);
+            if (fileInputRef.current) fileInputRef.current.value = '';
+        }
+    };
+
     // --- PDF COMPILER ENGINE ---
     const handleExportPDF = async () => {
         const element = printAreaRef.current;
@@ -137,7 +169,6 @@ export default function ResumeBuilderPage() {
         }
     };
 
-    // Maps keys to their respective render outputs
     const renderSelectedTemplate = () => {
         switch (activeTemplate) {
             case 'minimalist': return <MinimalistTemplate data={resumeData} />;
@@ -205,6 +236,37 @@ export default function ResumeBuilderPage() {
 
                 {/* LEFT COLUMN: THE COMPREHENSIVE FORMS ENGINE */}
                 <div className="lg:col-span-5 bg-[#13131A] border border-white/5 p-5 rounded-2xl space-y-6 max-h-[calc(100vh-180px)] overflow-y-auto custom-scrollbar">
+
+                    {/* --- LINKEDIN QUICK-IMPORT ACCELERATOR BLOCK --- */}
+                    <div className="bg-blue-600/5 border border-blue-500/20 p-4 rounded-xl space-y-3">
+                        <div className="flex items-center gap-2">
+                            <div className="p-1.5 bg-blue-600 text-white rounded-lg">
+                                <Linkedin size={16} fill="currentColor" />
+                            </div>
+                            <div>
+                                <h4 className="text-xs font-bold text-white tracking-wide">Import from LinkedIn Profile</h4>
+                                <p className="text-[10px] text-gray-500 mt-0.5">Upload your "Save to PDF" file to fill fields instantly.</p>
+                            </div>
+                        </div>
+
+                        <input
+                            type="file"
+                            accept=".pdf"
+                            ref={fileInputRef}
+                            onChange={handleLinkedInUpload}
+                            className="hidden"
+                        />
+
+                        <button
+                            type="button"
+                            disabled={importingLinkedin}
+                            onClick={() => fileInputRef.current?.click()}
+                            className="w-full flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 disabled:bg-slate-800 text-white text-xs font-bold py-2.5 px-4 rounded-xl transition-all shadow-md shadow-blue-600/5"
+                        >
+                            {importingLinkedin ? <Loader2 size={13} className="animate-spin" /> : <UploadCloud size={13} />}
+                            {importingLinkedin ? 'Extracting Profiles Data...' : 'Upload Profile PDF Document'}
+                        </button>
+                    </div>
 
                     {/* PERSONAL INFRASTRUCTURE CONFIGURATIONS */}
                     <section className="space-y-4">
