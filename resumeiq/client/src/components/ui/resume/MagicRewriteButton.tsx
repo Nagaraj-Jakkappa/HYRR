@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { magicRewriteAPI } from '../../services/api';
+import { magicRewriteAPI } from '../../../services/api';
 
 interface MagicRewriteButtonProps {
     currentText: string;
