@@ -2,6 +2,7 @@ const Groq = require("groq-sdk");
 const crypto = require("crypto");
 const redis = require("../config/redis");
 
+// Initialize a single Groq client for all functions
 const aiClient = new Groq({
   apiKey: process.env.GROQ_API_KEY,
 });
@@ -113,4 +114,31 @@ const analyzeResume = async (resumeText, jobDescription, keywords, socket) => {
   }
 };
 
-module.exports = { analyzeResume, extractKeywordsFromJD };
+// --- NEW: Magic Rewrite Function ---
+const rewriteTextWithAI = async (text, jobTitle) => {
+  try {
+    const prompt = `You are an expert resume writer. Rewrite the following bullet point to make it sound highly professional, action-oriented, and impactful. Tailor the tone for a ${jobTitle || 'professional'} role. 
+    Do not add introductory text, just return the improved bullet point.
+    
+    Original text: "${text}"`;
+
+    const chatCompletion = await aiClient.chat.completions.create({
+      messages: [{ role: 'user', content: prompt }],
+      // Using the more powerful model for rewriting if defined, falling back to versatile
+      model: process.env.GROQ_MODEL || 'llama-3.3-70b-versatile',
+      temperature: 0.7,
+      max_tokens: 150,
+    });
+
+    return chatCompletion.choices[0].message.content.trim();
+  } catch (error) {
+    console.error('AI Rewrite Error:', error);
+    throw new Error('Failed to rewrite text');
+  }
+};
+
+module.exports = {
+  analyzeResume,
+  extractKeywordsFromJD,
+  rewriteTextWithAI
+};

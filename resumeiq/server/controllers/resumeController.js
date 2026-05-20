@@ -3,6 +3,9 @@ const { cloudinary } = require('../config/cloudinary');
 const { extractTextFromBuffer } = require('../utils/textExtractor');
 const axios = require('axios');
 
+// NEW: Import the AI rewrite service
+const { rewriteTextWithAI } = require('../utils/aiService');
+
 exports.uploadResume = async (req, res, next) => {
   try {
     if (!req.file) {
@@ -96,5 +99,26 @@ exports.deleteResume = async (req, res, next) => {
     res.json({ success: true, message: 'Resume deleted' });
   } catch (err) {
     next(err);
+  }
+};
+
+// --- NEW: Magic Rewrite Controller Method ---
+exports.magicRewrite = async (req, res) => {
+  try {
+    const { text, jobTitle } = req.body;
+
+    if (!text) {
+      return res.status(400).json({ message: 'Text is required for rewriting' });
+    }
+
+    const improvedText = await rewriteTextWithAI(text, jobTitle);
+
+    res.status(200).json({
+      success: true,
+      original: text,
+      improved: improvedText
+    });
+  } catch (error) {
+    res.status(500).json({ message: 'Error generating magic rewrite', error: error.message });
   }
 };

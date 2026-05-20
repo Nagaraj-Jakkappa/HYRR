@@ -21,20 +21,20 @@ api.interceptors.response.use(
   (res) => res,
   async (err) => {
     const originalRequest = err.config;
-    
+
     if (!err.response) return Promise.reject(err);
 
     // If unauthorized and we haven't tried to refresh yet
     if (err.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
-      
+
       try {
         const refreshToken = localStorage.getItem('refreshToken');
         if (!refreshToken) throw new Error('No refresh token available');
 
         // Call refresh endpoint
         const response = await axios.post(`${api.defaults.baseURL}/auth/refresh`, { refreshToken });
-        
+
         // Handle different possible backend response structures
         const newAccessToken = response.data?.data?.accessToken || response.data?.accessToken;
 
@@ -74,6 +74,12 @@ export const resumeAPI = {
     }),
   getAll: () => api.get('/resumes'),
   delete: (id: string) => api.delete(`/resumes/${id}`),
+};
+
+// --- NEW: Magic Rewrite API Call ---
+export const magicRewriteAPI = async (text: string, jobTitle?: string) => {
+  const response = await api.post('/resumes/rewrite', { text, jobTitle });
+  return response.data;
 };
 
 export const scanAPI = {

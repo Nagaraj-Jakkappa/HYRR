@@ -18,6 +18,9 @@ import {
 import toast from 'react-hot-toast';
 import api from '../services/api';
 
+// --- IMPORT THE NEW MAGIC REWRITE BUTTON ---
+import MagicRewriteButton from '../components/ui/resume/MagicRewriteButton';
+
 interface ScanResult {
   _id: string;
   atsScore: number;
@@ -37,7 +40,7 @@ interface ScanResult {
   };
 }
 
-// --- NEW FEATURE COMPONENT ---
+// --- WIN RATE BADGE COMPONENT ---
 const WinRateBadge = ({ score }: { score: number }) => {
   // Platform-wide average fallback (can be replaced with actual admin stats if available)
   const avgATS = 68;
@@ -72,6 +75,9 @@ export default function ScanResultPage() {
   const [loading, setLoading] = useState(true);
   const [isGenerating, setIsGenerating] = useState<'pdf' | 'docx' | null>(null);
   const [checkedItems, setCheckedItems] = useState<Record<string, boolean>>({});
+
+  // --- STATE FOR MAGIC REWRITE SANDBOX ---
+  const [rewriteText, setRewriteText] = useState('');
 
   useEffect(() => {
     if (!id) return;
@@ -202,7 +208,6 @@ export default function ScanResultPage() {
               <div className="w-28 h-28 rounded-full border-[6px] border-[#5B5FEF] flex items-center justify-center text-3xl font-black shadow-[0_0_30px_rgba(91,95,239,0.2)]">
                 {Math.round(scan.atsScore)}%
               </div>
-              {/* BADGE ADDED HERE */}
               <WinRateBadge score={scan.atsScore} />
             </div>
 
@@ -309,7 +314,7 @@ export default function ScanResultPage() {
         </div>
 
         {/* CHECKLIST CARD */}
-        <div className="bg-[#13131A] p-8 rounded-[32px] border border-white/5">
+        <div className="bg-[#13131A] p-8 rounded-[32px] border border-white/5 mb-8">
           <div className="flex items-center justify-between mb-6">
             <h3 className="text-lg font-black flex items-center gap-2">
               <ClipboardList size={20} className="text-[#3DEBA6]" />
@@ -350,6 +355,39 @@ export default function ScanResultPage() {
                 </div>
               </div>
             ))}
+          </div>
+        </div>
+
+        {/* --- NEW: MAGIC REWRITE PLAYGROUND --- */}
+        <div className="bg-[#13131A] border border-[#a25bef]/30 p-8 rounded-[32px] relative overflow-hidden">
+          <div className="absolute -right-20 -top-20 w-64 h-64 bg-[#a25bef]/10 blur-[100px] rounded-full pointer-events-none"></div>
+
+          <div className="relative z-10">
+            <h3 className="text-lg font-black mb-2 flex items-center gap-2 text-white">
+              <Sparkles size={20} className="text-[#a25bef]" />
+              AI Bullet Point Rewriter
+            </h3>
+            <p className="text-sm text-gray-400 mb-6">
+              Paste a weak bullet point from your resume below. Our AI will instantly rewrite it to include strong action verbs tailored specifically for the <strong className="text-white">{scan.jobId.jobTitle}</strong> role.
+            </p>
+
+            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-end gap-3 mb-3">
+              <label className="text-xs font-bold text-gray-500 uppercase tracking-widest">
+                Draft Bullet Point
+              </label>
+              <MagicRewriteButton
+                currentText={rewriteText}
+                jobTitle={scan.jobId.jobTitle}
+                onRewrite={(newText) => setRewriteText(newText)}
+              />
+            </div>
+
+            <textarea
+              value={rewriteText}
+              onChange={(e) => setRewriteText(e.target.value)}
+              placeholder='e.g., "I made the website faster and fixed bugs."'
+              className="w-full bg-white/[0.02] border border-white/10 rounded-2xl p-5 text-sm text-gray-200 focus:outline-none focus:border-[#a25bef]/50 transition-colors placeholder:text-gray-600 resize-y min-h-[120px]"
+            />
           </div>
         </div>
 

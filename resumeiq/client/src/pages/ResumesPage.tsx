@@ -7,15 +7,22 @@ import {
   ExternalLink,
   Loader,
   File,
-  Lightbulb // Added for Feature 3
+  Lightbulb,
+  Sparkles // Added for the playground
 } from 'lucide-react'
 import toast from 'react-hot-toast'
+// Import our new AI Button
+import MagicRewriteButton from '../components/ui/resume/MagicRewriteButton'
 
 export default function ResumesPage() {
   const [resumes, setResumes] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [uploading, setUploading] = useState(false)
   const [dragOver, setDragOver] = useState(false)
+
+  // State for the Magic Rewrite Playground
+  const [testText, setTestText] = useState('')
+
   const inputRef = useRef<HTMLInputElement>(null)
 
   const load = async () => {
@@ -129,6 +136,33 @@ export default function ResumesPage() {
           )}
         </>
       )}
+
+      {/* --- MAGIC REWRITE PLAYGROUND --- */}
+      <div className="mt-12 p-6 border border-purple-500/30 bg-purple-500/5 rounded-xl">
+        <div className="flex items-center gap-2 mb-4">
+          <Sparkles className="text-purple-400" size={20} />
+          <h2 className="text-lg font-semibold text-purple-100">AI Magic Rewrite Sandbox</h2>
+        </div>
+        <p className="text-sm text-gray-400 mb-4">Test your new AI rewrite feature here. Type a weak bullet point and watch Groq improve it!</p>
+
+        <div className="flex justify-between items-center mb-2">
+          <label className="text-sm font-medium text-gray-300">Work Experience Bullet Point</label>
+          <MagicRewriteButton
+            currentText={testText}
+            jobTitle="Software Engineer"
+            onRewrite={(newText) => setTestText(newText)}
+          />
+        </div>
+
+        <textarea
+          value={testText}
+          onChange={(e) => setTestText(e.target.value)}
+          placeholder="e.g., I made the website faster and fixed bugs."
+          className="w-full bg-[#1A1A24] border border-gray-700 rounded-lg p-3 text-sm text-gray-200 focus:outline-none focus:border-purple-500 transition-colors"
+          rows={4}
+        />
+      </div>
+
     </div>
   )
 }
