@@ -5,8 +5,8 @@ const axios = require('axios');
 const pdfParse = require('pdf-parse');
 const { Groq } = require('groq-sdk');
 
-// NEW: Import the AI rewrite service
-const { rewriteTextWithAI } = require('../utils/aiService');
+// AI utility services imports
+const { rewriteTextWithAI, generateCoverLetterWithAI } = require('../utils/aiService');
 
 // Initialize the Groq SDK client
 const groq = new Groq({
@@ -130,7 +130,7 @@ exports.magicRewrite = async (req, res) => {
   }
 };
 
-// --- NEW: LinkedIn Document Ingestion Processing Engine ---
+// --- LinkedIn Document Ingestion Processing Engine ---
 exports.importLinkedInPDF = async (req, res, next) => {
   try {
     if (!req.file) {
@@ -205,5 +205,27 @@ exports.importLinkedInPDF = async (req, res, next) => {
   } catch (error) {
     console.error('LinkedIn Parsing Error:', error);
     return res.status(500).json({ success: false, message: 'Extraction engine encountered a parsing layout failure.', error: error.message });
+  }
+};
+
+// --- NEW: AI Cover Letter Ingestion Generator Suite ---
+exports.generateCoverLetter = async (req, res, next) => {
+  try {
+    const { resumeData, companyName, jobTitle } = req.body;
+
+    if (!resumeData || !companyName || !jobTitle) {
+      return res.status(400).json({ success: false, message: 'Missing generation context arguments.' });
+    }
+
+    const coverLetterText = await generateCoverLetterWithAI(resumeData, companyName, jobTitle);
+
+    return res.status(200).json({
+      success: true,
+      message: 'Cover letter compiled successfully.',
+      data: { content: coverLetterText }
+    });
+  } catch (error) {
+    console.error('Cover Letter Generation Error:', error);
+    return res.status(500).json({ success: false, message: 'AI generation engine encountered a critical compilation error.', error: error.message });
   }
 };

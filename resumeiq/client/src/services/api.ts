@@ -86,11 +86,15 @@ export const resumeAPI = {
   getAll: () => api.get('/resumes'),
   delete: (id: string) => api.delete(`/resumes/${id}`),
 
-  // --- NEW: LinkedIn Document Ingestion Processing ---
+  // --- LinkedIn Document Ingestion Processing ---
   importLinkedIn: (formData: FormData) =>
     api.post('/resumes/import-linkedin', formData, {
       headers: { 'Content-Type': 'multipart/form-data' }
     }),
+
+  // --- NEW: Cover Letter Generation Pipeline ---
+  generateCoverLetter: (data: { resumeData: any; companyName: string; jobTitle: string }) =>
+    api.post('/resumes/cover-letter', data)
 };
 
 // --- Magic Rewrite AI Call ---

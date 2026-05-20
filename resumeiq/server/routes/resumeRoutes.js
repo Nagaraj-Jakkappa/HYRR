@@ -9,7 +9,8 @@ const {
     getResume,
     deleteResume,
     magicRewrite,
-    importLinkedInPDF
+    importLinkedInPDF,
+    generateCoverLetter // --- NEW: Connected Feature 5 Entrypoint ---
 } = require('../controllers/resumeController');
 
 const { protect } = require('../middleware/auth');
@@ -31,6 +32,9 @@ router.post('/import-linkedin', memoryUpload.single('file'), importLinkedInPDF);
 
 // --- AI Magic Rewrite Sandbox Pipeline ---
 router.post('/rewrite', magicRewrite);
+
+// --- NEW: AI Cover Letter Ingestion Generator Route ---
+router.post('/cover-letter', generateCoverLetter);
 
 // --- Dynamic Database ID Resource Controllers ---
 router.get('/:id', getResume);

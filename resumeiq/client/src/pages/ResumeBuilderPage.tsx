@@ -10,7 +10,8 @@ import {
     SleekSerifTemplate,
     InfographicTemplate,
     EuropeanTemplate,
-    MetricEngineerTemplate
+    MetricEngineerTemplate,
+    MatchingCoverLetterTemplate
 } from '../components/ui/resume/Templates';
 import MagicRewriteButton from '../components/ui/resume/MagicRewriteButton';
 import { resumeAPI } from '../services/api';
@@ -20,7 +21,6 @@ import {
     Plus,
     Trash2,
     FileDown,
-    Layout,
     User,
     Briefcase,
     GraduationCap,
@@ -28,14 +28,17 @@ import {
     Eye,
     Linkedin,
     Loader2,
-    UploadCloud
+    UploadCloud,
+    Sparkles,
+    FileText
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 type TemplateKey = 'minimalist' | 'modern' | 'executive' | 'tech' | 'creative' | 'academic' | 'serif' | 'infographic' | 'european' | 'metric';
+type WorkspaceMode = 'resume' | 'coverLetter';
 
 export default function ResumeBuilderPage() {
-    // --- STATE ---
+    // --- INITIAL STATES ---
     const [resumeData, setResumeData] = useState<ResumeData>({
         personalInfo: {
             fullName: 'Nagaraj Jakkappa',
@@ -68,13 +71,20 @@ export default function ResumeBuilderPage() {
     });
 
     const [activeTemplate, setActiveTemplate] = useState<TemplateKey>('minimalist');
+    const [activeMode, setActiveMode] = useState<WorkspaceMode>('resume');
     const [exporting, setExporting] = useState(false);
     const [importingLinkedin, setImportingLinkedin] = useState(false);
+    const [generatingLetter, setGeneratingLetter] = useState(false);
+
+    // --- COVER LETTER SPECIFIC FORMS STATE ---
+    const [targetCompany, setTargetCompany] = useState('GoComet');
+    const [targetRole, setTargetRole] = useState('Frontend Engineer');
+    const [coverLetterContent, setCoverLetterContent] = useState('');
 
     const printAreaRef = useRef<HTMLDivElement>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
 
-    // --- FORM HANDLERS ---
+    // --- FORM INPUT CHANGE MUTATION HANDLERS ---
     const handlePersonalInfoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
         setResumeData(prev => ({
@@ -117,7 +127,32 @@ export default function ResumeBuilderPage() {
         });
     };
 
-    // --- LINKEDIN PROFILE INGESTION HANDLER ---
+    // --- AI COVER LETTER COMPILATION RUN ---
+    const handleGenerateCoverLetter = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!targetCompany || !targetRole) return toast.error('Please configure target enterprise context anchors.');
+
+        setGeneratingLetter(true);
+        const loadToast = toast.loading('Assembling custom tailored cover letter narrative loops via Groq...');
+
+        try {
+            const { data } = await resumeAPI.generateCoverLetter({
+                resumeData,
+                companyName: targetCompany,
+                jobTitle: targetRole
+            });
+            if (data?.success && data?.data?.content) {
+                setCoverLetterContent(data.data.content);
+                toast.success('Tailored narrative structured successfully!', { id: loadToast });
+            }
+        } catch (err: any) {
+            toast.error(err?.response?.data?.message || 'AI generation pipeline was interrupted.', { id: loadToast });
+        } finally {
+            setGeneratingLetter(false);
+        }
+    };
+
+    // --- LINKEDIN EXTRACTOR HANDLER ---
     const handleLinkedInUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (!file) return;
@@ -142,7 +177,7 @@ export default function ResumeBuilderPage() {
         }
     };
 
-    // --- PDF COMPILER ENGINE ---
+    // --- NATIVE PDF EXPORT ENGINE ---
     const handleExportPDF = async () => {
         const element = printAreaRef.current;
         if (!element) return toast.error('Render target canvas could not be compiled.');
@@ -150,9 +185,10 @@ export default function ResumeBuilderPage() {
         setExporting(true);
         const html2pdf = (await import('html2pdf.js')).default;
 
+        const fileLabel = activeMode === 'resume' ? 'Resume' : `CoverLetter_${targetCompany}`;
         const opt = {
             margin: 0,
-            filename: `${resumeData.personalInfo.fullName.replace(/\s+/g, '_')}_Resume.pdf`,
+            filename: `${resumeData.personalInfo.fullName.replace(/\s+/g, '_')}_${fileLabel}.pdf`,
             image: { type: 'jpeg' as const, quality: 0.98 },
             html2canvas: { scale: 2, useCORS: true, letterRendering: true },
             jsPDF: { unit: 'mm' as const, format: 'a4' as const, orientation: 'portrait' as const }
@@ -170,6 +206,17 @@ export default function ResumeBuilderPage() {
     };
 
     const renderSelectedTemplate = () => {
+        if (activeMode === 'coverLetter') {
+            return (
+                <MatchingCoverLetterTemplate
+                    data={resumeData}
+                    companyName={targetCompany}
+                    jobTitle={targetRole}
+                    text={coverLetterContent || "Your customized AI cover letter copy variant will compile inside this canvas element block once triggered."}
+                />
+            );
+        }
+
         switch (activeTemplate) {
             case 'minimalist': return <MinimalistTemplate data={resumeData} />;
             case 'modern': return <ModernTemplate data={resumeData} />;
@@ -188,249 +235,244 @@ export default function ResumeBuilderPage() {
     return (
         <div className="min-h-screen bg-[#0A0A0F] text-[#EEEEF0] p-6 font-sans">
 
-            {/* Top Controls Hub Header */}
+            {/* Top Controller Header Banner Panel */}
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-[#13131A] border border-white/5 p-6 rounded-2xl mb-6">
                 <div>
                     <Link to="/resumes" className="inline-flex items-center text-gray-500 hover:text-white mb-2 transition-colors text-xs font-bold group">
                         <ChevronLeft className="mr-1 group-hover:-translate-x-0.5 transition-transform" size={14} /> Back to Resumes
                     </Link>
-                    <h1 className="text-xl font-bold tracking-tight">Interactive Template Workspace</h1>
-                    <p className="text-xs text-gray-500 mt-0.5">Choose from 10 high-fidelity ATS engine blueprints.</p>
+                    <h1 className="text-xl font-bold tracking-tight">Interactive Design & Content Studio</h1>
+                    <p className="text-xs text-gray-500 mt-0.5">Generate highly tailored matching career artifacts instantly.</p>
                 </div>
 
-                {/* Template Controls Selection Panel */}
+                {/* Global Operational Selection Controllers Row */}
                 <div className="flex flex-wrap items-center gap-3 w-full md:w-auto">
-                    <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto items-start sm:items-center bg-[#0A0A0F] border border-white/10 p-2 rounded-xl">
-                        <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-gray-500 px-2">Blueprint:</span>
-                        <select
-                            value={activeTemplate}
-                            onChange={e => setActiveTemplate(e.target.value as TemplateKey)}
-                            className="bg-[#13131A] text-xs font-semibold px-4 py-1.5 rounded-lg border border-white/5 text-white outline-none cursor-pointer focus:border-blue-500"
+                    {/* Main Module Selection Toggle */}
+                    <div className="flex bg-[#0A0A0F] border border-white/10 p-1 rounded-xl">
+                        <button
+                            onClick={() => setActiveMode('resume')}
+                            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${activeMode === 'resume' ? 'bg-[#5B5FEF] text-white' : 'text-gray-400 hover:text-white'
+                                }`}
                         >
-                            <option value="minimalist">Minimalist Standard (ATS)</option>
-                            <option value="modern">Modern Slate Accent</option>
-                            <option value="executive">Executive Boardroom</option>
-                            <option value="tech">Tech Mono Dashboard</option>
-                            <option value="creative">Metro Split Creative</option>
-                            <option value="academic">Academic CV Grid</option>
-                            <option value="serif">Sleek Serif Editorial</option>
-                            <option value="infographic">Infographic Timeline</option>
-                            <option value="european">EuroPass Euro Standard</option>
-                            <option value="metric">Metric High-Density</option>
-                        </select>
+                            <FileText size={13} /> Resume
+                        </button>
+                        <button
+                            onClick={() => setActiveMode('coverLetter')}
+                            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${activeMode === 'coverLetter' ? 'bg-[#5B5FEF] text-white' : 'text-gray-400 hover:text-white'
+                                }`}
+                        >
+                            <Sparkles size={13} /> Cover Letter
+                        </button>
                     </div>
+
+                    {activeMode === 'resume' && (
+                        <div className="bg-[#0A0A0F] border border-white/10 p-1 rounded-xl">
+                            <select
+                                value={activeTemplate}
+                                onChange={e => setActiveTemplate(e.target.value as TemplateKey)}
+                                className="bg-[#13131A] text-xs font-semibold px-3 py-1 rounded-lg border-none text-white outline-none cursor-pointer"
+                            >
+                                <option value="minimalist">Minimalist (ATS)</option>
+                                <option value="modern">Modern Slate</option>
+                                <option value="executive">Executive</option>
+                                <option value="tech">Tech Mono</option>
+                                <option value="creative">Creative Split</option>
+                                <option value="academic">Academic CV</option>
+                                <option value="serif">Sleek Serif</option>
+                                <option value="infographic">Infographic</option>
+                                <option value="european">EuroPass</option>
+                                <option value="metric">Metric Matrix</option>
+                            </select>
+                        </div>
+                    )}
 
                     <button
                         onClick={handleExportPDF}
                         disabled={exporting}
-                        className="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 disabled:bg-slate-800 text-white text-xs font-bold px-5 py-2.5 rounded-xl transition shadow-lg shadow-emerald-600/5 ml-auto sm:ml-0"
+                        className="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 disabled:bg-slate-800 text-white text-xs font-bold px-5 py-2.5 rounded-xl transition shadow-lg"
                     >
-                        {exporting ? <Loader size={13} className="animate-spin" /> : <FileDown size={13} />}
-                        {exporting ? 'Compiling PDF...' : 'Export Native PDF'}
+                        {exporting ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <FileDown size={13} />}
+                        {exporting ? 'Compiling PDF...' : 'Export PDF Document'}
                     </button>
                 </div>
             </div>
 
-            {/* Main Form/Preview Split Columns */}
+            {/* Main Structural Dual Splitting Column Config */}
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
 
-                {/* LEFT COLUMN: THE COMPREHENSIVE FORMS ENGINE */}
+                {/* LEFT COLUMN COMPARTMENT FORM CANVAS */}
                 <div className="lg:col-span-5 bg-[#13131A] border border-white/5 p-5 rounded-2xl space-y-6 max-h-[calc(100vh-180px)] overflow-y-auto custom-scrollbar">
 
-                    {/* --- LINKEDIN QUICK-IMPORT ACCELERATOR BLOCK --- */}
-                    <div className="bg-blue-600/5 border border-blue-500/20 p-4 rounded-xl space-y-3">
-                        <div className="flex items-center gap-2">
-                            <div className="p-1.5 bg-blue-600 text-white rounded-lg">
-                                <Linkedin size={16} fill="currentColor" />
-                            </div>
-                            <div>
-                                <h4 className="text-xs font-bold text-white tracking-wide">Import from LinkedIn Profile</h4>
-                                <p className="text-[10px] text-gray-500 mt-0.5">Upload your "Save to PDF" file to fill fields instantly.</p>
-                            </div>
-                        </div>
-
-                        <input
-                            type="file"
-                            accept=".pdf"
-                            ref={fileInputRef}
-                            onChange={handleLinkedInUpload}
-                            className="hidden"
-                        />
-
-                        <button
-                            type="button"
-                            disabled={importingLinkedin}
-                            onClick={() => fileInputRef.current?.click()}
-                            className="w-full flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 disabled:bg-slate-800 text-white text-xs font-bold py-2.5 px-4 rounded-xl transition-all shadow-md shadow-blue-600/5"
-                        >
-                            {importingLinkedin ? <Loader2 size={13} className="animate-spin" /> : <UploadCloud size={13} />}
-                            {importingLinkedin ? 'Extracting Profiles Data...' : 'Upload Profile PDF Document'}
-                        </button>
-                    </div>
-
-                    {/* PERSONAL INFRASTRUCTURE CONFIGURATIONS */}
-                    <section className="space-y-4">
-                        <h3 className="text-sm font-bold flex items-center gap-2 text-blue-400 border-b border-white/5 pb-2">
-                            <User size={15} /> Personal Details
-                        </h3>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                            <div>
-                                <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">Full Name</label>
-                                <input
-                                    type="text" name="fullName" value={resumeData.personalInfo.fullName} onChange={handlePersonalInfoChange}
-                                    className="w-full bg-[#0A0A0F] border border-white/10 rounded-lg p-2.5 text-xs text-white focus:border-blue-500 focus:outline-none transition-all"
-                                />
-                            </div>
-                            <div>
-                                <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">Email Address</label>
-                                <input
-                                    type="email" name="email" value={resumeData.personalInfo.email} onChange={handlePersonalInfoChange}
-                                    className="w-full bg-[#0A0A0F] border border-white/10 rounded-lg p-2.5 text-xs text-white focus:border-blue-500 focus:outline-none transition-all"
-                                />
-                            </div>
-                            <div>
-                                <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">Phone Number</label>
-                                <input
-                                    type="text" name="phone" value={resumeData.personalInfo.phone} onChange={handlePersonalInfoChange}
-                                    className="w-full bg-[#0A0A0F] border border-white/10 rounded-lg p-2.5 text-xs text-white focus:border-blue-500 focus:outline-none transition-all"
-                                />
-                            </div>
-                            <div>
-                                <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">LinkedIn Profile</label>
-                                <input
-                                    type="text" name="linkedin" value={resumeData.personalInfo.linkedin} onChange={handlePersonalInfoChange}
-                                    className="w-full bg-[#0A0A0F] border border-white/10 rounded-lg p-2.5 text-xs text-white focus:border-blue-500 focus:outline-none transition-all"
-                                />
-                            </div>
-                        </div>
-                    </section>
-
-                    {/* PROFESSIONAL ABSTRACT */}
-                    <section className="space-y-3">
-                        <h3 className="text-sm font-bold flex items-center gap-2 text-purple-400 border-b border-white/5 pb-2">
-                            <Briefcase size={15} /> Professional Summary
-                        </h3>
-                        <textarea
-                            className="w-full bg-[#0A0A0F] border border-white/10 rounded-xl p-3 text-xs text-white outline-none focus:border-blue-500 resize-none font-sans leading-relaxed"
-                            rows={3}
-                            value={resumeData.summary}
-                            onChange={e => setResumeData({ ...resumeData, summary: e.target.value })}
-                        />
-                    </section>
-
-                    {/* WORK EXPERIENCE FIELDS */}
-                    <section className="space-y-4">
-                        <div className="flex justify-between items-center border-b border-white/5 pb-2">
-                            <h3 className="text-sm font-bold flex items-center gap-2 text-emerald-400">
-                                <Briefcase size={15} /> Work Experience
+                    {activeMode === 'coverLetter' ? (
+                        /* --- THE ACTIVE AI COVER LETTER WRITER PANEL FORM --- */
+                        <form onSubmit={handleGenerateCoverLetter} className="space-y-4">
+                            <h3 className="text-sm font-bold flex items-center gap-2 text-[#5B5FEF] border-b border-white/5 pb-2">
+                                <Sparkles size={15} /> AI Cover Letter Generator Studio
                             </h3>
-                            <button onClick={addExperience} className="text-[10px] bg-white/5 hover:bg-blue-600/20 hover:text-blue-400 border border-white/10 px-2.5 py-1 rounded-lg flex items-center gap-1 transition-all font-bold uppercase tracking-wider">
-                                <Plus size={11} /> Add Role
-                            </button>
-                        </div>
 
-                        <div className="space-y-4">
-                            {resumeData.experience.map((exp, idx) => (
-                                <div key={idx} className="relative p-4 border border-white/5 bg-[#0A0A0F]/30 rounded-xl space-y-3">
-                                    {resumeData.experience.length > 1 && (
-                                        <button onClick={() => removeExperience(idx)} className="absolute top-3 right-3 text-gray-500 hover:text-red-400 transition-colors">
-                                            <Trash2 size={14} />
-                                        </button>
-                                    )}
-
-                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pr-4">
-                                        <div>
-                                            <label className="block text-[9px] font-bold text-gray-500 uppercase mb-1">Job Title</label>
-                                            <input
-                                                type="text" value={exp.position} onChange={e => handleExperienceChange(idx, 'position', e.target.value)}
-                                                className="w-full bg-[#0A0A0F] border border-white/10 rounded-lg p-2 text-xs focus:border-blue-500 text-white"
-                                            />
-                                        </div>
-                                        <div>
-                                            <label className="block text-[9px] font-bold text-gray-500 uppercase mb-1">Company</label>
-                                            <input
-                                                type="text" value={exp.company} onChange={e => handleExperienceChange(idx, 'company', e.target.value)}
-                                                className="w-full bg-[#0A0A0F] border border-white/10 rounded-lg p-2 text-xs focus:border-blue-500 text-white"
-                                            />
-                                        </div>
-                                        <div>
-                                            <label className="block text-[9px] font-bold text-gray-500 uppercase mb-1">Start Date</label>
-                                            <input
-                                                type="text" value={exp.startDate} onChange={e => handleExperienceChange(idx, 'startDate', e.target.value)}
-                                                className="w-full bg-[#0A0A0F] border border-white/10 rounded-lg p-2 text-xs focus:border-blue-500 text-white"
-                                            />
-                                        </div>
-                                        <div>
-                                            <label className="block text-[9px] font-bold text-gray-500 uppercase mb-1">End Date</label>
-                                            <input
-                                                type="text" value={exp.endDate} onChange={e => handleExperienceChange(idx, 'endDate', e.target.value)}
-                                                className="w-full bg-[#0A0A0F] border border-white/10 rounded-lg p-2 text-xs focus:border-blue-500 text-white"
-                                            />
-                                        </div>
-                                    </div>
-
-                                    <div className="space-y-1.5">
-                                        <div className="flex justify-between items-end">
-                                            <label className="block text-[9px] font-bold text-gray-500 uppercase">Role Achievements & Descriptions</label>
-                                            <MagicRewriteButton
-                                                currentText={exp.description}
-                                                jobTitle={exp.position}
-                                                onRewrite={newText => handleExperienceChange(idx, 'description', newText)}
-                                            />
-                                        </div>
-                                        <textarea
-                                            value={exp.description}
-                                            onChange={e => handleExperienceChange(idx, 'description', e.target.value)}
-                                            className="w-full bg-[#0A0A0F] border border-white/10 rounded-lg p-2 text-xs focus:border-blue-500 min-h-[100px] font-sans resize-y text-white leading-relaxed"
-                                        />
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                    </section>
-
-                    {/* ACADEMIC CREDENTIALS */}
-                    <section className="space-y-4">
-                        <h3 className="text-sm font-bold flex items-center gap-2 text-amber-400 border-b border-white/5 pb-2">
-                            <GraduationCap size={15} /> Academic Credentials
-                        </h3>
-                        {resumeData.education.map((edu, idx) => (
-                            <div key={idx} className="grid grid-cols-1 sm:grid-cols-2 gap-3 bg-[#0A0A0F]/20 border border-white/5 p-4 rounded-xl">
+                            <div className="space-y-3">
                                 <div>
-                                    <label className="block text-[9px] font-bold text-gray-500 uppercase mb-1">Institution Name</label>
+                                    <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">Target Enterprise Company Name</label>
                                     <input
-                                        type="text" value={edu.institution} onChange={e => handleEducationChange(idx, 'institution', e.target.value)}
-                                        className="w-full bg-[#0A0A0F] border border-white/10 rounded-lg p-2 text-xs focus:border-blue-500 text-white"
+                                        type="text" value={targetCompany} onChange={e => setTargetCompany(e.target.value)}
+                                        className="w-full bg-[#0A0A0F] border border-white/10 rounded-lg p-2.5 text-xs text-white focus:border-blue-500 focus:outline-none"
+                                        placeholder="e.g., GoComet" required
                                     />
                                 </div>
                                 <div>
-                                    <label className="block text-[9px] font-bold text-gray-500 uppercase mb-1">Degree Type</label>
+                                    <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">Target Designation Job Title</label>
                                     <input
-                                        type="text" value={edu.degree} onChange={e => handleEducationChange(idx, 'degree', e.target.value)}
-                                        className="w-full bg-[#0A0A0F] border border-white/10 rounded-lg p-2 text-xs focus:border-blue-500 text-white"
+                                        type="text" value={targetRole} onChange={e => setTargetRole(e.target.value)}
+                                        className="w-full bg-[#0A0A0F] border border-white/10 rounded-lg p-2.5 text-xs text-white focus:border-blue-500 focus:outline-none"
+                                        placeholder="e.g., Frontend Engineer" required
                                     />
                                 </div>
                             </div>
-                        ))}
-                    </section>
 
-                    {/* SKILLS COMPETENCIES */}
-                    <section className="space-y-2">
-                        <h3 className="text-sm font-bold flex items-center gap-2 text-cyan-400 border-b border-white/5 pb-2">
-                            <Wrench size={15} /> Core Skills Competencies Matrix
-                        </h3>
-                        <input
-                            className="w-full bg-[#0A0A0F] border border-white/10 rounded-xl p-3 text-xs outline-none text-white focus:border-blue-500 transition-all font-mono"
-                            value={resumeData.skills.join(', ')}
-                            onChange={e => setResumeData({ ...resumeData, skills: e.target.value.split(',').map(s => s.trim()) })}
-                        />
-                    </section>
+                            <button
+                                type="submit" disabled={generatingLetter}
+                                className="w-full mt-2 flex items-center justify-center gap-2 bg-[#5B5FEF] hover:bg-[#4A4EDF] disabled:bg-slate-800 text-white text-xs font-bold py-3 px-4 rounded-xl transition-all shadow-md"
+                            >
+                                {generatingLetter ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Sparkles size={13} />}
+                                {generatingLetter ? 'Assembling AI Content Elements...' : 'Compile Tailored Cover Letter Copy'}
+                            </button>
+
+                            {coverLetterContent && (
+                                <div className="mt-4 space-y-1.5">
+                                    <label className="block text-[9px] font-bold text-gray-500 uppercase">Interactive Copy Review Text Sandbox</label>
+                                    <textarea
+                                        value={coverLetterContent} onChange={e => setCoverLetterContent(e.target.value)}
+                                        className="w-full bg-[#0A0A0F] border border-white/10 rounded-lg p-3 text-xs text-gray-300 min-h-[250px] font-sans resize-y leading-relaxed outline-none focus:border-blue-500"
+                                    />
+                                </div>
+                            )}
+                        </form>
+                    ) : (
+                        /* --- STANDARD RESUME ENTRY CONTROLLERS FIELDS --- */
+                        <>
+                            {/* LINKEDIN QUICK IMPORT MODULE */}
+                            <div className="bg-blue-600/5 border border-blue-500/20 p-4 rounded-xl space-y-3">
+                                <div className="flex items-center gap-2">
+                                    <div className="p-1.5 bg-blue-600 text-white rounded-lg">
+                                        <Linkedin size={16} fill="currentColor" />
+                                    </div>
+                                    <div>
+                                        <h4 className="text-xs font-bold text-white tracking-wide">Import from LinkedIn Profile</h4>
+                                        <p className="text-[10px] text-gray-500 mt-0.5">Upload your "Save to PDF" file to fill fields instantly.</p>
+                                    </div>
+                                </div>
+                                <input type="file" accept=".pdf" ref={fileInputRef} onChange={handleLinkedInUpload} className="hidden" />
+                                <button
+                                    type="button" disabled={importingLinkedin} onClick={() => fileInputRef.current?.click()}
+                                    className="w-full flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 disabled:bg-slate-800 text-white text-xs font-bold py-2.5 px-4 rounded-xl transition-all shadow-md shadow-blue-600/5"
+                                >
+                                    {importingLinkedin ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <UploadCloud size={13} />}
+                                    {importingLinkedin ? 'Extracting Profiles Data...' : 'Upload Profile PDF Document'}
+                                </button>
+                            </div>
+
+                            {/* PERSONAL DETAILS SECTION */}
+                            <section className="space-y-4">
+                                <h3 className="text-sm font-bold flex items-center gap-2 text-blue-400 border-b border-white/5 pb-2">
+                                    <User size={15} /> Personal Details
+                                </h3>
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                    <div>
+                                        <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">Full Name</label>
+                                        <input type="text" name="fullName" value={resumeData.personalInfo.fullName} onChange={handlePersonalInfoChange} className="w-full bg-[#0A0A0F] border border-white/10 rounded-lg p-2.5 text-xs text-white focus:border-blue-500 focus:outline-none transition-all" />
+                                    </div>
+                                    <div>
+                                        <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">Email Address</label>
+                                        <input type="email" name="email" value={resumeData.personalInfo.email} onChange={handlePersonalInfoChange} className="w-full bg-[#0A0A0F] border border-white/10 rounded-lg p-2.5 text-xs text-white focus:border-blue-500 focus:outline-none transition-all" />
+                                    </div>
+                                    <div>
+                                        <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">Phone Number</label>
+                                        <input type="text" name="phone" value={resumeData.personalInfo.phone} onChange={handlePersonalInfoChange} className="w-full bg-[#0A0A0F] border border-white/10 rounded-lg p-2.5 text-xs text-white focus:border-blue-500 focus:outline-none transition-all" />
+                                    </div>
+                                    <div>
+                                        <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">LinkedIn Profile</label>
+                                        <input type="text" name="linkedin" value={resumeData.personalInfo.linkedin} onChange={handlePersonalInfoChange} className="w-full bg-[#0A0A0F] border border-white/10 rounded-lg p-2.5 text-xs text-white focus:border-blue-500 focus:outline-none transition-all" />
+                                    </div>
+                                </div>
+                            </section>
+
+                            {/* PROFESSIONAL ABSTRACT SUMMARY */}
+                            <section className="space-y-3">
+                                <h3 className="text-sm font-bold flex items-center gap-2 text-purple-400 border-b border-white/5 pb-2">
+                                    <Briefcase size={15} /> Professional Summary
+                                </h3>
+                                <textarea className="w-full bg-[#0A0A0F] border border-white/10 rounded-xl p-3 text-xs text-white outline-none focus:border-blue-500 resize-none font-sans leading-relaxed" rows={3} value={resumeData.summary} onChange={e => setResumeData({ ...resumeData, summary: e.target.value })} />
+                            </section>
+
+                            {/* WORK HISTORY CHANNELS GRID */}
+                            <section className="space-y-4">
+                                <div className="flex justify-between items-center border-b border-white/5 pb-2">
+                                    <h3 className="text-sm font-bold flex items-center gap-2 text-emerald-400">
+                                        <Briefcase size={15} /> Work Experience
+                                    </h3>
+                                    <button onClick={addExperience} className="text-[10px] bg-white/5 hover:bg-blue-600/20 px-2.5 py-1 rounded-lg flex items-center gap-1 font-bold uppercase border border-white/10 transition-all">
+                                        <Plus size={11} /> Add Role
+                                    </button>
+                                </div>
+                                <div className="space-y-4">
+                                    {resumeData.experience.map((exp, idx) => (
+                                        <div key={idx} className="relative p-4 border border-white/5 bg-[#0A0A0F]/30 rounded-xl space-y-3">
+                                            {resumeData.experience.length > 1 && (
+                                                <button onClick={() => removeExperience(idx)} className="absolute top-3 right-3 text-gray-500 hover:text-red-400"><Trash2 size={14} /></button>
+                                            )}
+                                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pr-4">
+                                                <input type="text" value={exp.position} onChange={e => handleExperienceChange(idx, 'position', e.target.value)} className="bg-[#0A0A0F] border border-white/10 rounded-lg p-2 text-xs text-white" placeholder="Role Title" />
+                                                <input type="text" value={exp.company} onChange={e => handleExperienceChange(idx, 'company', e.target.value)} className="bg-[#0A0A0F] border border-white/10 rounded-lg p-2 text-xs text-white" placeholder="Enterprise" />
+                                                <input type="text" value={exp.startDate} onChange={e => handleExperienceChange(idx, 'startDate', e.target.value)} className="bg-[#0A0A0F] border border-white/10 rounded-lg p-2 text-xs text-white" placeholder="Start Date" />
+                                                <input type="text" value={exp.endDate} onChange={e => handleExperienceChange(idx, 'endDate', e.target.value)} className="bg-[#0A0A0F] border border-white/10 rounded-lg p-2 text-xs text-white" placeholder="End Date" />
+                                            </div>
+                                            <div className="space-y-1.5">
+                                                <div className="flex justify-between items-end">
+                                                    <label className="block text-[9px] font-bold text-gray-500 uppercase">Role Description lines</label>
+                                                    <MagicRewriteButton currentText={exp.description} jobTitle={exp.position} onRewrite={newText => handleExperienceChange(idx, 'description', newText)} />
+                                                </div>
+                                                <textarea value={exp.description} onChange={e => handleExperienceChange(idx, 'description', e.target.value)} className="w-full bg-[#0A0A0F] border border-white/10 rounded-lg p-2 text-xs text-white min-h-[100px]" />
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </section>
+
+                            {/* ACADEMIC CREDENTIALS */}
+                            <section className="space-y-4">
+                                <h3 className="text-sm font-bold flex items-center gap-2 text-amber-400 border-b border-white/5 pb-2">
+                                    <GraduationCap size={15} /> Academic Credentials
+                                </h3>
+                                {resumeData.education.map((edu, idx) => (
+                                    <div key={idx} className="grid grid-cols-1 sm:grid-cols-2 gap-3 bg-[#0A0A0F]/20 border border-white/5 p-4 rounded-xl">
+                                        <div>
+                                            <label className="block text-[9px] font-bold text-gray-500 uppercase mb-1">Institution Name</label>
+                                            <input type="text" value={edu.institution} onChange={e => handleEducationChange(idx, 'institution', e.target.value)} className="w-full bg-[#0A0A0F] border border-white/10 rounded-lg p-2 text-xs text-white" />
+                                        </div>
+                                        <div>
+                                            <label className="block text-[9px] font-bold text-gray-500 uppercase mb-1">Degree Type</label>
+                                            <input type="text" value={edu.degree} onChange={e => handleEducationChange(idx, 'degree', e.target.value)} className="w-full bg-[#0A0A0F] border border-white/10 rounded-lg p-2 text-xs text-white" />
+                                        </div>
+                                    </div>
+                                ))}
+                            </section>
+
+                            {/* CORE COMPETENCIES MATRIX SECTION */}
+                            <section className="space-y-2">
+                                <h3 className="text-sm font-bold flex items-center gap-2 text-cyan-400 border-b border-white/5 pb-2">
+                                    <Wrench size={15} /> Technical Assets Matrix
+                                </h3>
+                                <input className="w-full bg-[#0A0A0F] border border-white/10 rounded-xl p-3 text-xs text-white focus:border-blue-500 font-mono" value={resumeData.skills.join(', ')} onChange={e => setResumeData({ ...resumeData, skills: e.target.value.split(',').map(s => s.trim()) })} />
+                            </section>
+                        </>
+                    )}
+
                 </div>
 
-                {/* RIGHT COLUMN: HIGH-FIDELITY AUTOMATED TEMPLATE SIMULATOR SHEET */}
+                {/* RIGHT COLUMN VIEWPORT PANE PANEL PREVIEW */}
                 <div className="lg:col-span-7 bg-[#14141A] p-4 rounded-2xl border border-white/5 flex flex-col items-center justify-start overflow-x-auto min-h-[calc(100vh-180px)]">
                     <div className="w-full flex items-center gap-1.5 text-[10px] font-bold font-mono tracking-widest text-gray-500 uppercase mb-3 pl-1 border-b border-white/5 pb-2">
-                        <Eye size={12} /> Live Blueprint Preview Frame
+                        <Eye size={12} /> Live Blueprint Canvas Simulation Screen
                     </div>
                     <div
                         ref={printAreaRef}

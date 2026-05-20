@@ -413,3 +413,48 @@ export const MetricEngineerTemplate: React.FC<TemplateProps> = ({ data }) => (
         </div>
     </div>
 );
+
+// ==========================================
+// --- NEW: MATCHING COVER LETTER Blueprints COMPONENT ---
+// ==========================================
+interface CoverLetterProps {
+    data: ResumeData;
+    companyName: string;
+    jobTitle: string;
+    text: string;
+}
+
+export const MatchingCoverLetterTemplate: React.FC<CoverLetterProps> = ({ data, companyName, jobTitle, text }) => {
+    // Formats paragraphs separated by linebreaks safely into clean UI blocks
+    const paragraphs = text.split('\n\n').filter(p => p.trim().length > 0);
+
+    return (
+        <div className="p-10 bg-white text-slate-800 font-sans text-[11pt] leading-relaxed max-w-[210mm] min-h-[297mm] mx-auto box-border pdf-page">
+            {/* Header Info Module */}
+            <div className="border-b-2 border-slate-900 pb-4 mb-8">
+                <h1 className="text-3xl font-black tracking-tight text-slate-900 uppercase">{data.personalInfo.fullName}</h1>
+                <p className="text-xs font-mono text-slate-500 mt-1">{data.personalInfo.email}  |  {data.personalInfo.phone}  |  {data.personalInfo.location}</p>
+            </div>
+
+            {/* Recipient Metadata Block */}
+            <div className="text-xs font-sans text-slate-500 space-y-0.5 mb-8">
+                <div className="font-bold text-slate-900">Hiring Selection Committee</div>
+                <div>{companyName} Enterprise Hub</div>
+                <div className="italic mt-2">Re: Application for the position of {jobTitle}</div>
+            </div>
+
+            {/* Structured Content Loop */}
+            <div className="space-y-5 text-slate-700 text-justify font-sans text-[10.5pt]">
+                {paragraphs.map((para, index) => (
+                    <p key={index}>{para}</p>
+                ))}
+            </div>
+
+            {/* Formal Sign-off Component Layout */}
+            <div className="mt-12 space-y-1">
+                <div className="text-xs font-mono text-gray-400">Respectfully compiled,</div>
+                <div className="font-bold text-slate-900 text-sm mt-4">{data.personalInfo.fullName}</div>
+            </div>
+        </div>
+    );
+};
