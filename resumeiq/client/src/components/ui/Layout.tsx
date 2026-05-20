@@ -1,11 +1,12 @@
 import { Outlet, NavLink, useNavigate, Link } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
-import { LayoutDashboard, FileText, Search, Clock, Shield, LogOut, ChevronRight, Settings } from 'lucide-react'
+import { LayoutDashboard, FileText, Sparkles, Search, Clock, Shield, LogOut, ChevronRight, Settings } from 'lucide-react'
 import toast from 'react-hot-toast'
 
 const nav = [
   { to: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
   { to: '/resumes', icon: FileText, label: 'My Resumes' },
+  { to: '/builder', icon: Sparkles, label: 'Resume Builder' }, // --- NEW: Connected Feature 3 Entrypoint Link ---
   { to: '/history', icon: Clock, label: 'History' },
   { to: '/scan', icon: Search, label: 'New Scan' },
 ]
@@ -89,7 +90,7 @@ export default function Layout() {
               <p className="text-[10px] text-hyrr-muted font-mono capitalize">{user?.plan} Member</p>
             </div>
 
-            {/* NEW: Settings Icon Link */}
+            {/* Settings Icon Link */}
             <Link
               to="/settings"
               className="text-gray-600 hover:text-[#5B5FEF] transition-colors p-1.5 hover:bg-[#5B5FEF]/10 rounded-lg"
