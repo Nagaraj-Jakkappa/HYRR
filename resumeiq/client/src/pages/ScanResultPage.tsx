@@ -67,34 +67,6 @@ const WinRateBadge = ({ score }: { score: number }) => {
   );
 };
 
-const ScoreRing = ({ score }: { score: number }) => {
-    const color = score >= 80 ? '#3DEBA6' : score >= 60 ? '#F0C060' : '#FF4D4D';
-    const offset = 283 - (score / 100) * 283;
-
-    return (
-        <div className="relative flex flex-col items-center">
-            <div className="relative flex items-center justify-center w-32 h-32">
-                <svg width="128" height="128" className="transform -rotate-90 drop-shadow-xl">
-                    <circle cx="64" cy="64" r="45" fill="none" stroke="rgba(255,255,255,0.05)" strokeWidth="8" />
-                    <circle
-                        cx="64" cy="64" r="45" fill="none" stroke={color} strokeWidth="8"
-                        strokeDasharray="283" strokeDashoffset={offset} strokeLinecap="round"
-                        className="transition-all duration-1000 ease-out"
-                    />
-                </svg>
-                <div className="absolute text-center flex flex-col items-center justify-center pt-1">
-                    <div className="flex items-baseline">
-                        <span className="text-3xl font-black text-white">{Math.round(score)}</span>
-                        <span className="text-sm font-bold text-white/50">%</span>
-                    </div>
-                </div>
-            </div>
-            {/* BADGE INTEGRATION */}
-            <WinRateBadge score={score} />
-        </div>
-    );
-};
-
 export default function ScanResultPage() {
   const { id } = useParams<{ id: string }>();
   const [scan, setScan] = useState<ScanResult | null>(null);
@@ -231,7 +203,14 @@ export default function ScanResultPage() {
         <div className="bg-[#13131A] border border-white/5 rounded-[40px] p-10 mb-8 relative overflow-hidden">
           <div className="relative z-10 flex flex-col md:flex-row items-center gap-8">
             <div className="flex flex-col items-center">
-              <ScoreRing score={scan.atsScore} />
+              <div className={`w-32 h-32 rounded-full border-[8px] flex items-center justify-center text-4xl font-black transition-all duration-1000 ${
+                scan.atsScore >= 80 ? 'border-[#3DEBA6] text-[#3DEBA6] shadow-[0_0_40px_rgba(61,235,166,0.25)]' :
+                scan.atsScore >= 60 ? 'border-[#F0C060] text-[#F0C060] shadow-[0_0_40px_rgba(240,192,96,0.25)]' :
+                'border-[#ef4444] text-[#ef4444] shadow-[0_0_40px_rgba(239,68,68,0.25)]'
+              }`}>
+                {Math.round(scan.atsScore)}<span className="text-xl ml-0.5">%</span>
+              </div>
+              <WinRateBadge score={scan.atsScore} />
             </div>
 
             <div className="text-center md:text-left flex-1">
@@ -246,7 +225,11 @@ export default function ScanResultPage() {
               <span className="text-sm font-bold">Share Report</span>
             </button>
           </div>
-          <div className="absolute -right-20 -top-20 w-64 h-64 bg-[#5B5FEF]/10 blur-[100px] rounded-full"></div>
+          <div className={`absolute -right-20 -top-20 w-64 h-64 blur-[100px] rounded-full ${
+            scan.atsScore >= 80 ? 'bg-[#3DEBA6]/10' :
+            scan.atsScore >= 60 ? 'bg-[#F0C060]/10' :
+            'bg-[#ef4444]/10'
+          }`}></div>
         </div>
 
         {/* Optimized Content Download Card */}
