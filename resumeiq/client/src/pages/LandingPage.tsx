@@ -25,6 +25,17 @@ import {
 
 export default function LandingPage() {
     const navigate = useNavigate();
+    const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
+    const [selectedPlan, setSelectedPlan] = useState<{ title: string, price: string } | null>(null);
+
+    const handlePlanSelect = (title: string, price: string) => {
+        if (title.toLowerCase() === 'free') {
+            navigate('/register');
+        } else {
+            setSelectedPlan({ title, price });
+            setIsPaymentModalOpen(true);
+        }
+    };
 
     return (
         <div className="min-h-screen bg-[#0A0A0F] text-[#EEEEF0] overflow-x-hidden selection:bg-[#5B5FEF]/30">
@@ -465,6 +476,7 @@ export default function LandingPage() {
                             'PDF export',
                             'Shareable scan reports',
                         ]}
+                        onSelect={handlePlanSelect}
                     />
                     <PricingCard
                         featured
@@ -481,6 +493,7 @@ export default function LandingPage() {
                             'Scan comparison',
                             'Priority AI inference',
                         ]}
+                        onSelect={handlePlanSelect}
                     />
                     <PricingCard
                         title="Career+"
@@ -493,6 +506,7 @@ export default function LandingPage() {
                             'Optimized resume downloads',
                             'Priority support',
                         ]}
+                        onSelect={handlePlanSelect}
                     />
                 </div>
             </section>
@@ -562,6 +576,51 @@ export default function LandingPage() {
                     </div>
                 </div>
             </section>
+
+            {/* ═══════════════════════════════ PAYMENT MODAL ═══════════════════════════════ */}
+            {isPaymentModalOpen && selectedPlan && (
+                <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
+                    <div className="bg-[#13131A]/90 backdrop-blur-2xl border border-white/10 rounded-3xl p-8 max-w-md w-full text-center shadow-[0_20px_60px_rgba(0,0,0,0.8)] transform transition-all relative">
+                        <button
+                            onClick={() => setIsPaymentModalOpen(false)}
+                            className="absolute top-4 right-4 text-gray-500 hover:text-white transition"
+                        >
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-6 h-6">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        </button>
+
+                        <div className="w-16 h-16 bg-[#3DEBA6]/20 border border-[#3DEBA6]/30 rounded-full flex items-center justify-center mx-auto mb-6">
+                            <ShieldCheck className="text-[#3DEBA6]" size={28} />
+                        </div>
+
+                        <h2 className="text-2xl font-black mb-2 text-white">Upgrade to {selectedPlan.title}</h2>
+                        <p className="text-gray-400 text-sm mb-6">Complete your payment of <strong className="text-white">{selectedPlan.price}</strong> via UPI</p>
+
+                        <div className="bg-white p-4 rounded-2xl inline-block mb-4 shadow-xl">
+                            <img 
+                                src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=upi://pay?pa=nagupoojary33-3@oksbi&pn=HYRR%20${selectedPlan.title}`} 
+                                alt="UPI QR Code" 
+                                className="w-48 h-48"
+                            />
+                        </div>
+
+                        <div className="bg-black/40 border border-white/5 rounded-xl p-4 mb-6">
+                            <p className="text-xs text-gray-500 mb-1">UPI ID</p>
+                            <p className="font-mono text-[#3DEBA6] font-bold tracking-tight">nagupoojary33-3@oksbi</p>
+                        </div>
+                        
+                        <p className="text-xs text-gray-500 mb-6">Scan to pay with any UPI app (GPay, PhonePe, Paytm)</p>
+
+                        <button
+                            onClick={() => navigate(`/register?plan=${selectedPlan.title.toLowerCase()}`)}
+                            className="w-full bg-gradient-to-r from-[#5B5FEF] to-[#8E5BEF] hover:from-[#6c70fc] hover:to-[#9f6dfc] text-white font-bold py-4 rounded-[16px] transition-all shadow-[0_0_20px_rgba(91,95,239,0.3)] hover:shadow-[0_0_30px_rgba(91,95,239,0.5)] active:scale-[0.98]"
+                        >
+                            I have made the payment
+                        </button>
+                    </div>
+                </div>
+            )}
 
             {/* ═══════════════════════════════ FOOTER ═══════════════════════════════ */}
             <Footer />
@@ -659,12 +718,14 @@ function PricingCard({
     desc,
     items,
     featured = false,
+    onSelect,
 }: {
     title: string;
     price: string;
     desc: string;
     items: string[];
     featured?: boolean;
+    onSelect?: (title: string, price: string) => void;
 }) {
     return (
         <div
@@ -697,15 +758,15 @@ function PricingCard({
                 ))}
             </ul>
 
-            <Link
-                to="/register"
-                className={`block text-center py-4 rounded-2xl font-bold transition-all ${featured
+            <button
+                onClick={() => onSelect && onSelect(title, price)}
+                className={`w-full block text-center py-4 rounded-2xl font-bold transition-all ${featured
                     ? 'bg-gradient-to-r from-[#5B5FEF] to-[#8E5BEF] hover:from-[#6c70fc] hover:to-[#9f6dfc] shadow-[0_0_20px_rgba(91,95,239,0.3)] hover:shadow-[0_0_30px_rgba(91,95,239,0.5)] active:scale-[0.98]'
                     : 'bg-white/[0.04] hover:bg-white/[0.08]'
                     }`}
             >
                 Get Started
-            </Link>
+            </button>
         </div>
     );
 }
