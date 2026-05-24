@@ -2,6 +2,7 @@ import { useState, FormEvent } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { Eye, EyeOff } from 'lucide-react'
+import Footer from '../components/ui/Footer'
 import toast from 'react-hot-toast'
 
 export default function LoginPage() {
@@ -30,7 +31,8 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#0A0A0F] flex items-center justify-center px-4 selection:bg-[#5B5FEF]/30">
+    <div className="min-h-screen bg-[#0A0A0F] flex flex-col selection:bg-[#5B5FEF]/30">
+      <div className="flex-1 flex items-center justify-center px-4">
       <div className="w-full max-w-sm">
 
         {/* Logo Icon and Welcoming Typography Header */}
@@ -117,6 +119,8 @@ export default function LoginPage() {
           Demo link contexts: <span className="text-gray-500 font-bold">admin@hyrr.com</span> / <span className="text-gray-500 font-bold">admin123</span>
         </p>
       </div>
+      </div>
+      <Footer />
     </div>
   )
 }

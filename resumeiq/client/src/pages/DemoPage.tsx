@@ -5,6 +5,7 @@ import {
     Linkedin, BrainCircuit, ArrowLeft, BarChart3, Check
 } from 'lucide-react';
 import toast from 'react-hot-toast';
+import Footer from '../components/ui/Footer';
 
 export default function DemoPage() {
     const navigate = useNavigate();
@@ -120,6 +121,7 @@ export default function DemoPage() {
                 </div>
 
             </div>
+            <Footer />
         </div>
     );
 }

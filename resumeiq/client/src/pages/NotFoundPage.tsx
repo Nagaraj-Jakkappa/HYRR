@@ -1,12 +1,14 @@
 import { Link } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
+import Footer from '../components/ui/Footer';
 
 export default function NotFoundPage() {
   // Determine session authorization state locally
   const isAuthenticated = !!localStorage.getItem('accessToken');
 
   return (
-    <div className="min-h-screen bg-[#0A0A0F] text-[#EEEEF0] flex flex-col items-center justify-center p-6 font-sans">
+    <div className="min-h-screen bg-[#0A0A0F] text-[#EEEEF0] flex flex-col font-sans">
+      <div className="flex-1 flex flex-col items-center justify-center p-6">
 
       {/* Brand Logo */}
       <div className="flex items-center gap-3 mb-12">
@@ -29,6 +31,8 @@ export default function NotFoundPage() {
           <ArrowLeft size={18} /> {isAuthenticated ? "Go to Dashboard" : "Return to Home Base"}
         </Link>
       </div>
+      </div>
+      <Footer />
     </div>
   );
 }

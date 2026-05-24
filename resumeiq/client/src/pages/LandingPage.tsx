@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import Footer from '../components/ui/Footer';
 import {
     ArrowRight,
     Sparkles,
@@ -563,47 +564,7 @@ export default function LandingPage() {
             </section>
 
             {/* ═══════════════════════════════ FOOTER ═══════════════════════════════ */}
-            <footer className="border-t border-white/[0.04] py-20">
-                <div className="max-w-7xl mx-auto px-6">
-
-                    <div className="grid md:grid-cols-4 gap-12 mb-16">
-                        <div>
-                            <div className="flex items-center gap-3 mb-6">
-                                <LogoIcon />
-                                <span className="text-2xl font-black">hyrr</span>
-                            </div>
-                            <p className="text-sm text-gray-500 leading-relaxed">
-                                AI-powered resume intelligence platform. Build, scan, optimize,
-                                and export — all from one workspace.
-                            </p>
-                        </div>
-
-                        <FooterColumn
-                            title="Product"
-                            items={['ATS Scanner', 'Resume Builder', 'Magic Rewrite', 'Cover Letters', 'Templates']}
-                        />
-
-                        <FooterColumn
-                            title="Resources"
-                            items={['Privacy Policy', 'Terms of Service', 'Support', 'API Status']}
-                        />
-
-                        <FooterColumn
-                            title="Company"
-                            items={['About', 'Contact', 'Roadmap', 'Changelog']}
-                        />
-                    </div>
-
-                    <div className="border-t border-white/[0.04] pt-8 flex flex-col md:flex-row items-center justify-between gap-4">
-                        <p className="text-xs uppercase tracking-[0.2em] text-gray-600 font-black">
-                            © 2026 HYRR TECHNOLOGIES
-                        </p>
-                        <p className="text-sm text-gray-500">
-                            Built by Nagaraj Jambagi &middot; Powered by Groq &times; Llama 3.3
-                        </p>
-                    </div>
-                </div>
-            </footer>
+            <Footer />
         </div>
     );
 }

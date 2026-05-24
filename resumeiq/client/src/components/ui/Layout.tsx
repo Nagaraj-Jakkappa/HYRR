@@ -2,6 +2,7 @@ import { Outlet, NavLink, useNavigate, Link } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
 import { LayoutDashboard, FileText, Sparkles, Search, Clock, Shield, LogOut, ChevronRight, Settings } from 'lucide-react'
 import toast from 'react-hot-toast'
+import Footer from './Footer'
 
 const nav = [
   { to: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
@@ -127,9 +128,10 @@ export default function Layout() {
       {/* Main Content Area */}
       <main className="flex-1 overflow-y-auto relative">
         <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-[#5B5FEF]/5 blur-[120px] -z-10 pointer-events-none" />
-        <div className="p-8 max-w-7xl mx-auto">
+        <div className="p-8 max-w-7xl mx-auto min-h-[calc(100vh-120px)]">
           <Outlet />
         </div>
+        <Footer />
       </main>
     </div>
   )

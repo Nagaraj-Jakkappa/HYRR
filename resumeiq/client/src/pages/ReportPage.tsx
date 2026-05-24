@@ -3,6 +3,7 @@ import { useParams, Link } from 'react-router-dom';
 import { scanAPI } from '../services/api';
 import { CheckCircle, XCircle, ShieldCheck, Share2, ArrowRight, Info, Zap } from 'lucide-react';
 import toast from 'react-hot-toast';
+import Footer from '../components/ui/Footer';
 
 interface PublicScanData {
     _id: string;
@@ -186,6 +187,7 @@ export default function ReportPage() {
                     </ul>
                 </div>
             </div>
+            <Footer />
         </div>
     );
 }

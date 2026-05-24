@@ -2,6 +2,7 @@ import { useState, FormEvent } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import toast from 'react-hot-toast'
+import Footer from '../components/ui/Footer'
 
 export default function RegisterPage() {
   const { register } = useAuth()
@@ -23,7 +24,8 @@ export default function RegisterPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#0A0A0F] flex items-center justify-center px-4">
+    <div className="min-h-screen bg-[#0A0A0F] flex flex-col">
+      <div className="flex-1 flex items-center justify-center px-4">
       <div className="w-full max-w-sm">
         
         {/* Updated Hyrr Logo Section */}
@@ -71,6 +73,8 @@ export default function RegisterPage() {
           </p>
         </div>
       </div>
+      </div>
+      <Footer />
     </div>
   )
 }
