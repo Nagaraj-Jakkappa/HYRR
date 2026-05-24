@@ -1,4 +1,6 @@
 const User = require('../models/User');
+const Scan = require('../models/Scan');
+const Resume = require('../models/Resume');
 const {
   generateAccessToken,
   generateRefreshToken,
@@ -193,6 +195,52 @@ exports.logout = async (req, res, next) => {
       { $set: { refreshToken: null } }
     );
     res.json({ success: true, message: 'Logged out successfully' });
+  } catch (err) {
+    next(err);
+  }
+};
+
+/**
+ * Update User Profile
+ */
+exports.updateProfile = async (req, res, next) => {
+  try {
+    const { name } = req.body;
+    const user = await User.findById(req.user.id);
+    
+    if (!user) {
+      return res.status(404).json({ success: false, message: 'User not found' });
+    }
+
+    if (name) {
+      user.name = name;
+    }
+
+    await user.save();
+    res.json({ success: true, message: 'Profile updated successfully', data: { user } });
+  } catch (err) {
+    next(err);
+  }
+};
+
+/**
+ * Delete User Account (Self-Service)
+ */
+exports.deleteAccount = async (req, res, next) => {
+  try {
+    const user = await User.findById(req.user.id);
+    if (!user) {
+      return res.status(404).json({ success: false, message: 'User not found' });
+    }
+
+    // Delete associated data
+    await Scan.deleteMany({ userId: user._id });
+    await Resume.deleteMany({ userId: user._id });
+    
+    // Delete the user
+    await User.findByIdAndDelete(user._id);
+
+    res.json({ success: true, message: 'Account deleted permanently' });
   } catch (err) {
     next(err);
   }

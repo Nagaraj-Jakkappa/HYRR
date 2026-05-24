@@ -71,6 +71,8 @@ export const authAPI = {
   register: (data: any) => api.post('/auth/register', data),
   login: (data: any) => api.post('/auth/login', data),
   changePassword: (data: any) => api.post('/auth/change-password', data),
+  updateProfile: (data: any) => api.put('/auth/profile', data),
+  deleteAccount: () => api.delete('/auth/account'),
   logout: () => {
     const refreshToken = localStorage.getItem('refreshToken');
     return api.post('/auth/logout', { refreshToken });

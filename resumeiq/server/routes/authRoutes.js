@@ -6,7 +6,9 @@ const {
     refreshToken,
     logout,
     getMe,
-    changePassword
+    changePassword,
+    updateProfile,
+    deleteAccount
 } = require('../controllers/authController');
 const { protect } = require('../middleware/auth');
 const { authLimiter, apiLimiter } = require('../middleware/rateLimiter');
@@ -35,5 +37,11 @@ router.get('/me', protect, getMe);
 
 // New Feature 1: Change Password endpoint
 router.post('/change-password', protect, changePassword);
+
+// New Feature 2: Update Profile
+router.put('/profile', protect, updateProfile);
+
+// New Feature 3: Delete Account
+router.delete('/account', protect, deleteAccount);
 
 module.exports = router;
