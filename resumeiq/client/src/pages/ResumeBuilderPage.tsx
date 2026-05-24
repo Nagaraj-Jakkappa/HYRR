@@ -30,7 +30,10 @@ import {
     Loader2,
     UploadCloud,
     Sparkles,
-    FileText
+    FileText,
+    LayoutTemplate,
+    X,
+    Check
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 
@@ -71,6 +74,7 @@ export default function ResumeBuilderPage() {
     });
 
     const [activeTemplate, setActiveTemplate] = useState<TemplateKey>('minimalist');
+    const [isTemplateModalOpen, setIsTemplateModalOpen] = useState(false);
     const [activeMode, setActiveMode] = useState<WorkspaceMode>('resume');
     const [exporting, setExporting] = useState(false);
     const [importingLinkedin, setImportingLinkedin] = useState(false);
@@ -266,24 +270,13 @@ export default function ResumeBuilderPage() {
                     </div>
 
                     {activeMode === 'resume' && (
-                        <div className="bg-[#0A0A0F] border border-white/10 p-1 rounded-xl">
-                            <select
-                                value={activeTemplate}
-                                onChange={e => setActiveTemplate(e.target.value as TemplateKey)}
-                                className="bg-[#13131A] text-xs font-semibold px-3 py-1 rounded-lg border-none text-white outline-none cursor-pointer"
-                            >
-                                <option value="minimalist">Minimalist (ATS)</option>
-                                <option value="modern">Modern Slate</option>
-                                <option value="executive">Executive</option>
-                                <option value="tech">Tech Mono</option>
-                                <option value="creative">Creative Split</option>
-                                <option value="academic">Academic CV</option>
-                                <option value="serif">Sleek Serif</option>
-                                <option value="infographic">Infographic</option>
-                                <option value="european">EuroPass</option>
-                                <option value="metric">Metric Matrix</option>
-                            </select>
-                        </div>
+                        <button
+                            onClick={() => setIsTemplateModalOpen(true)}
+                            className="flex items-center gap-2 bg-[#13131A] hover:bg-white/5 text-xs font-semibold px-4 py-2.5 rounded-xl border border-white/10 text-white cursor-pointer transition-all"
+                        >
+                            <LayoutTemplate size={14} className="text-[#5B5FEF]" />
+                            <span className="capitalize">{activeTemplate} Template</span>
+                        </button>
                     )}
 
                     <button
@@ -483,6 +476,79 @@ export default function ResumeBuilderPage() {
                 </div>
 
             </div>
+
+            {/* TEMPLATE LIBRARY MODAL */}
+            {isTemplateModalOpen && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 overflow-y-auto">
+                    <div className="bg-[#0A0A0F] border border-white/10 rounded-3xl w-full max-w-[1400px] my-8 relative shadow-[0_20px_60px_rgba(0,0,0,0.8)] flex flex-col max-h-[90vh]">
+                        
+                        <div className="flex items-center justify-between p-6 border-b border-white/5 shrink-0">
+                            <div>
+                                <h2 className="text-2xl font-black text-white">Template Library</h2>
+                                <p className="text-sm text-gray-400 mt-1">Select an ATS-friendly layout for your resume.</p>
+                            </div>
+                            <button 
+                                onClick={() => setIsTemplateModalOpen(false)}
+                                className="p-2 bg-white/5 hover:bg-white/10 rounded-full text-white transition-colors"
+                            >
+                                <X size={20} />
+                            </button>
+                        </div>
+
+                        <div className="p-8 overflow-y-auto custom-scrollbar flex-1">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
+                                {[
+                                    { id: 'modern', name: 'Modern Template', tag: 'ATS GOLD', desc: 'Clean, structured layout that fits detailed experience on a single page.', image: '/image_614ba7.jpg' },
+                                    { id: 'academic', name: 'Ivy League', tag: 'HARVARD', desc: 'Modernized Harvard format with a compact summary section and balanced white space.', image: '/image_614c06.jpg' },
+                                    { id: 'serif', name: 'Elegant Layout', tag: 'COLUMN', desc: 'Side-column design that highlights skills and strengths while dedicating prime real estate.', image: '/image_614f52.jpg' },
+                                    { id: 'executive', name: 'Polished Slate', tag: 'PREMIUM', desc: 'Professional design that invites recruiters to spend more time on your application.', image: '/image_614fce.jpg' },
+                                    { id: 'minimalist', name: 'Single Column', tag: 'OCR RIGID', desc: 'Classic single-column with highlighted section headings. Maximum ATS compatibility.', image: '/image_61534c.jpg' },
+                                    { id: 'tech', name: 'Tech Mono', tag: 'DEVELOPER', desc: 'Monospaced fonts and a terminal-like aesthetic for software engineers.', image: null },
+                                    { id: 'creative', name: 'Creative Split', tag: 'DESIGN', desc: 'A bold, two-column layout with contrasting colors for creative professionals.', image: null },
+                                    { id: 'infographic', name: 'Infographic', tag: 'VISUAL', desc: 'Visual representation of your skills and timeline. Great for non-traditional applications.', image: null },
+                                    { id: 'european', name: 'EuroPass', tag: 'EU STANDARD', desc: 'Strict adherence to European CV standards. Perfect for overseas applications.', image: null },
+                                    { id: 'metric', name: 'Metric Matrix', tag: 'DATA DRIVEN', desc: 'Focuses heavily on numbers, KPIs, and deliverables. Ideal for product and sales.', image: null },
+                                ].map(t => (
+                                    <div 
+                                        key={t.id}
+                                        onClick={() => { setActiveTemplate(t.id as TemplateKey); setIsTemplateModalOpen(false); }}
+                                        className={`bg-[#13131A] border rounded-3xl p-4 transition-all flex flex-col justify-between group cursor-pointer shadow-xl ${activeTemplate === t.id ? 'border-[#5B5FEF] ring-2 ring-[#5B5FEF]/30 bg-[#5B5FEF]/5' : 'border-white/[0.05] hover:border-[#5B5FEF]/30'}`}
+                                    >
+                                        <div>
+                                            <div className="rounded-xl overflow-hidden border border-white/5 bg-[#1A1A24] aspect-[1/1.414] mb-4 relative flex items-center justify-center">
+                                                {t.image ? (
+                                                    <img
+                                                        src={t.image}
+                                                        alt={`${t.name} Template`}
+                                                        className="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-300"
+                                                    />
+                                                ) : (
+                                                    <div className="text-white/10 font-black text-2xl tracking-widest uppercase transform -rotate-45">HYRR</div>
+                                                )}
+                                                
+                                                {activeTemplate === t.id && (
+                                                    <div className="absolute inset-0 bg-[#5B5FEF]/20 flex items-center justify-center backdrop-blur-[2px]">
+                                                        <div className="bg-[#5B5FEF] text-white px-3 py-1.5 rounded-lg text-xs font-bold shadow-lg flex items-center gap-1.5">
+                                                            <Check size={14} /> Active
+                                                        </div>
+                                                    </div>
+                                                )}
+                                            </div>
+                                            <div className="flex items-center justify-between px-1 mb-3">
+                                                <h3 className="font-extrabold text-xs text-white truncate mr-2">{t.name}</h3>
+                                                <span className="text-[8px] font-black text-[#3DEBA6] uppercase tracking-wider font-mono shrink-0">{t.tag}</span>
+                                            </div>
+                                            <p className="text-[11px] text-gray-400 font-mono px-1 leading-relaxed border-t border-white/5 pt-2.5 line-clamp-3">
+                                                {t.desc}
+                                            </p>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }
