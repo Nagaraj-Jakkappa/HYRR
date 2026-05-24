@@ -199,13 +199,19 @@ exports.viewResumeFile = async (req, res, next) => {
       // If fetching fails, maybe it requires signed URLs or auth
       console.warn(`[ViewFile] Axios GET failed for secure_url:`, streamErr.message);
       
-      // Fallback: Generate a signed URL and try again
-      const signedUrl = cloudinary.url(foundAsset.public_id, {
+      // Fallback: Generate a signed CDN URL and try again
+      // We MUST disable analytics because the `?_a=` query param added by Cloudinary's SDK 
+      // breaks signature validation at the CDN edge for restricted raw files!
+      let signedUrl = cloudinary.url(foundAsset.public_id, {
         resource_type: foundAsset.resource_type,
         type: foundAsset.type,
         sign_url: true,
-        secure: true
+        secure: true,
+        analytics: false // Prevent ?_a= telemetry param
       });
+      
+      // Double check and strip any query strings just to be absolutely certain
+      signedUrl = signedUrl.split('?')[0];
       
       console.log(`[ViewFile] Fetching signed_url:`, signedUrl);
       const signedResponse = await axios.get(signedUrl, { responseType: 'stream' });
