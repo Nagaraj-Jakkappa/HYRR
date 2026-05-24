@@ -332,33 +332,33 @@ export default function LandingPage() {
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-5 items-stretch">
                     <TemplateCard
                         image="/image_614ba7.jpg"
-                        name="Modern Template"
+                        name="Classic"
                         tag="ATS GOLD"
-                        desc="Clean, structured layout that fits detailed experience on a single page. Strong ATS parse rate and high recruiter readability."
+                        desc="Classically structured resume template, for a robust career history."
                     />
                     <TemplateCard
                         image="/image_614c06.jpg"
-                        name="Ivy League"
+                        name="Traditional"
                         tag="HARVARD"
-                        desc="Modernized Harvard format with a compact summary section and balanced white space for a sophisticated, standout impression."
+                        desc="Classic full-page resume template with sizable resume sections."
                     />
                     <TemplateCard
                         image="/image_614f52.jpg"
-                        name="Elegant Layout"
+                        name="Prime ATS"
                         tag="COLUMN"
-                        desc="Side-column design that highlights skills and strengths while dedicating prime real estate to experience and education."
+                        desc="Professional, streamlined resume template optimized for maximum ATS compatibility and readability."
                     />
                     <TemplateCard
                         image="/image_614fce.jpg"
-                        name="Polished Slate"
+                        name="Pure ATS"
                         tag="PREMIUM"
-                        desc="Professional design that invites recruiters to spend more time on your application. Balanced weight and subtle visual hierarchy."
+                        desc="A distraction-free, highly readable layout engineered specifically for ATS parsing engines."
                     />
                     <TemplateCard
                         image="/image_61534c.jpg"
-                        name="Single Column"
+                        name="Header ATS"
                         tag="OCR RIGID"
-                        desc="Classic single-column with highlighted section headings. Maximum ATS compatibility with zero parsing regressions."
+                        desc="Dedicated achievements section to highlight successes. Use an ATS-optimized template to increase visibility."
                     />
                 </div>
 
