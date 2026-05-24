@@ -216,7 +216,20 @@ exports.viewResumeFile = async (req, res, next) => {
     }
   } catch (err) {
     console.error('[ViewFile] Fatal error:', err.message);
-    res.status(500).json({ success: false, message: 'Unable to retrieve file.' });
+    
+    // Extract detailed Axios error info if it was a network failure
+    const errorDetails = err.response ? {
+      status: err.response?.status,
+      statusText: err.response?.statusText,
+      url: err.config?.url,
+      cloudMessage: err.message
+    } : err.message;
+
+    res.status(500).json({ 
+      success: false, 
+      message: 'Unable to retrieve file.',
+      debugError: errorDetails
+    });
   }
 };
 
