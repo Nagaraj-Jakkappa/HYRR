@@ -71,22 +71,22 @@ const ComparePage: React.FC = () => {
             <div className="grid grid-cols-1 md:grid-cols-[1fr_auto_1fr] gap-8 items-start relative">
                 <div className="hidden md:flex flex-col items-center justify-center h-full absolute left-1/2 -translate-x-1/2 py-20 pointer-events-none">
                     <div className="w-[1px] h-full bg-white/5" />
-                    <div className="my-4 bg-[#13131A] border border-white/10 px-3 py-1 rounded-full text-[10px] font-black text-gray-500">VS</div>
+                    <div className="my-4 bg-[#13131A]/90 backdrop-blur-md border border-white/10 shadow-[0_0_20px_rgba(255,255,255,0.05)] px-4 py-1.5 rounded-full text-[11px] font-black text-[#5B5FEF] tracking-widest uppercase">VS</div>
                     <div className="w-[1px] h-full bg-white/5" />
                 </div>
 
                 {scans.map((scan, idx) => (
                     <div
                         key={scan?._id || idx}
-                        className={`relative bg-[#13131A] p-8 rounded-[32px] border transition-all duration-500 ${idx === winnerIndex
-                                ? 'border-[#3DEBA6] shadow-[0_0_40px_rgba(61,235,166,0.1)] scale-[1.02] z-10'
-                                : 'border-white/5 opacity-80'
+                        className={`relative bg-[#13131A]/80 backdrop-blur-xl p-8 rounded-[32px] border transition-all duration-700 ${idx === winnerIndex
+                                ? 'border-[#3DEBA6]/40 shadow-[0_0_50px_rgba(61,235,166,0.15)] scale-[1.02] z-10'
+                                : 'border-white/5 opacity-70 hover:opacity-100 shadow-xl'
                             }`}
                     >
                         {/* BETTER FIT BADGE */}
                         {idx === winnerIndex && (
-                            <div className="absolute -top-3 -right-3 bg-[#3DEBA6] text-black px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-tighter flex items-center gap-1 shadow-lg shadow-[#3DEBA6]/20 animate-in fade-in zoom-in duration-300">
-                                <Zap size={10} fill="currentColor" />
+                            <div className="absolute -top-4 -right-4 bg-[#3DEBA6] text-black px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest flex items-center gap-1.5 shadow-[0_0_20px_rgba(61,235,166,0.4)] animate-in fade-in zoom-in duration-500">
+                                <Zap size={12} fill="currentColor" />
                                 Better Fit
                             </div>
                         )}
@@ -96,10 +96,11 @@ const ComparePage: React.FC = () => {
                             <h2 className="text-2xl font-bold">{scan.jobId?.jobTitle || 'Role'}</h2>
                         </header>
 
-                        <div className="flex justify-center mb-10">
-                            <div className={`w-32 h-32 rounded-full border-4 flex items-center justify-center relative transition-colors duration-500 ${idx === winnerIndex ? 'border-[#3DEBA6]/20 shadow-[0_0_20px_rgba(61,235,166,0.1)]' : 'border-white/5'
+                        <div className="flex justify-center mb-10 relative">
+                            {idx === winnerIndex && <div className="absolute inset-0 bg-[#3DEBA6]/10 blur-2xl rounded-full scale-150"></div>}
+                            <div className={`w-36 h-36 rounded-full border-8 flex items-center justify-center relative transition-colors duration-700 bg-[#0A0A0F]/50 ${idx === winnerIndex ? 'border-[#3DEBA6] shadow-[0_0_30px_rgba(61,235,166,0.3),inset_0_0_15px_rgba(61,235,166,0.2)]' : 'border-white/5 shadow-inner'
                                 }`}>
-                                <div className="text-center">
+                                <div className="text-center relative z-10">
                                     <span className={`text-3xl font-black block ${idx === winnerIndex ? 'text-[#3DEBA6]' : 'text-white'}`}>
                                         {scan.atsScore || 0}%
                                     </span>
@@ -133,11 +134,11 @@ const ComparePage: React.FC = () => {
                 ))}
             </div>
 
-            <div className="mt-12 bg-[#3DEBA6]/5 border border-[#3DEBA6]/20 p-6 rounded-[24px] flex items-center justify-center gap-4 text-[#3DEBA6]">
-                <Trophy size={24} />
-                <p className="font-bold text-sm">
+            <div className="mt-12 bg-[#3DEBA6]/10 border border-[#3DEBA6]/30 p-8 rounded-[32px] flex items-center justify-center gap-4 text-[#3DEBA6] shadow-[0_0_30px_rgba(61,235,166,0.1)] backdrop-blur-md">
+                <Trophy size={28} className="drop-shadow-md" />
+                <p className="font-bold text-base">
                     <span className="uppercase tracking-widest mr-2">{scans[winnerIndex]?.jobId?.companyName || 'Selected Path'}</span>
-                    is a better fit — {scoreDiff}% higher match probability
+                    is a better fit — <span className="font-black">{scoreDiff}% higher match probability</span>
                 </p>
             </div>
         </div>

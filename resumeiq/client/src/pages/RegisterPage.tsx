@@ -165,8 +165,9 @@ export default function RegisterPage() {
                     Full Name
                   </label>
                   <div className="relative group">
+                    <div className="absolute -inset-0.5 bg-gradient-to-r from-[#5B5FEF]/20 to-[#8E5BEF]/20 rounded-xl blur opacity-0 group-focus-within:opacity-100 transition duration-500 pointer-events-none"></div>
                     <input
-                      className="w-full bg-[#0A0A0F] border border-white/[0.08] rounded-xl px-4 py-3.5 text-sm text-white outline-none focus:border-[#5B5FEF]/50 focus:ring-1 focus:ring-[#5B5FEF]/20 transition-all placeholder:text-gray-600"
+                      className="w-full relative bg-[#0A0A0F]/90 border border-white/[0.08] rounded-xl px-4 py-3.5 text-sm text-white outline-none focus:border-[#5B5FEF]/50 focus:ring-1 focus:ring-[#5B5FEF]/20 transition-all placeholder:text-gray-600"
                       type="text"
                       placeholder="John Doe"
                       autoComplete="name"
@@ -174,7 +175,6 @@ export default function RegisterPage() {
                       onChange={e => setForm(f => ({ ...f, name: e.target.value }))}
                       required
                     />
-                    <div className="absolute inset-0 rounded-xl bg-[#5B5FEF]/5 opacity-0 group-focus-within:opacity-100 transition-opacity pointer-events-none" />
                   </div>
                 </div>
 
@@ -184,8 +184,9 @@ export default function RegisterPage() {
                     Email Address
                   </label>
                   <div className="relative group">
+                    <div className="absolute -inset-0.5 bg-gradient-to-r from-[#5B5FEF]/20 to-[#8E5BEF]/20 rounded-xl blur opacity-0 group-focus-within:opacity-100 transition duration-500 pointer-events-none"></div>
                     <input
-                      className="w-full bg-[#0A0A0F] border border-white/[0.08] rounded-xl px-4 py-3.5 text-sm text-white outline-none focus:border-[#5B5FEF]/50 focus:ring-1 focus:ring-[#5B5FEF]/20 transition-all placeholder:text-gray-600"
+                      className="w-full relative bg-[#0A0A0F]/90 border border-white/[0.08] rounded-xl px-4 py-3.5 text-sm text-white outline-none focus:border-[#5B5FEF]/50 focus:ring-1 focus:ring-[#5B5FEF]/20 transition-all placeholder:text-gray-600"
                       type="email"
                       placeholder="you@example.com"
                       autoComplete="email"
@@ -193,7 +194,6 @@ export default function RegisterPage() {
                       onChange={e => setForm(f => ({ ...f, email: e.target.value }))}
                       required
                     />
-                    <div className="absolute inset-0 rounded-xl bg-[#5B5FEF]/5 opacity-0 group-focus-within:opacity-100 transition-opacity pointer-events-none" />
                   </div>
                 </div>
 
@@ -203,8 +203,9 @@ export default function RegisterPage() {
                     Password
                   </label>
                   <div className="relative group">
+                    <div className="absolute -inset-0.5 bg-gradient-to-r from-[#5B5FEF]/20 to-[#8E5BEF]/20 rounded-xl blur opacity-0 group-focus-within:opacity-100 transition duration-500 pointer-events-none"></div>
                     <input
-                      className="w-full bg-[#0A0A0F] border border-white/[0.08] rounded-xl px-4 py-3.5 pr-12 text-sm text-white outline-none focus:border-[#5B5FEF]/50 focus:ring-1 focus:ring-[#5B5FEF]/20 transition-all placeholder:text-gray-600"
+                      className="w-full relative bg-[#0A0A0F]/90 border border-white/[0.08] rounded-xl px-4 py-3.5 pr-12 text-sm text-white outline-none focus:border-[#5B5FEF]/50 focus:ring-1 focus:ring-[#5B5FEF]/20 transition-all placeholder:text-gray-600"
                       type={show ? 'text' : 'password'}
                       placeholder="Min. 6 characters"
                       autoComplete="new-password"
@@ -215,12 +216,11 @@ export default function RegisterPage() {
                     <button
                       type="button"
                       onClick={() => setShow(s => !s)}
-                      className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-300 transition-colors"
+                      className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-300 transition-colors z-10"
                       tabIndex={-1}
                     >
                       {show ? <EyeOff size={16} /> : <Eye size={16} />}
                     </button>
-                    <div className="absolute inset-0 rounded-xl bg-[#5B5FEF]/5 opacity-0 group-focus-within:opacity-100 transition-opacity pointer-events-none" />
                   </div>
 
                   {/* Password strength indicator */}
@@ -251,7 +251,7 @@ export default function RegisterPage() {
                 <button
                   type="submit"
                   disabled={loading}
-                  className="w-full py-4 bg-[#5B5FEF] hover:bg-[#4A4EDF] disabled:bg-gray-800 disabled:cursor-not-allowed text-white rounded-xl font-bold text-sm transition-all shadow-[0_8px_32px_rgba(91,95,239,0.25)] hover:shadow-[0_8px_40px_rgba(91,95,239,0.35)] active:scale-[0.98] flex items-center justify-center gap-2 mt-2"
+                  className="w-full py-4 bg-gradient-to-r from-[#5B5FEF] to-[#8E5BEF] hover:from-[#6c70fc] hover:to-[#9f6dfc] disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-xl font-black uppercase tracking-wider text-sm transition-all shadow-[0_0_20px_rgba(91,95,239,0.3)] hover:shadow-[0_0_30px_rgba(91,95,239,0.5)] active:scale-[0.98] flex items-center justify-center gap-2 mt-2"
                 >
                   {loading ? (
                     <span className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
