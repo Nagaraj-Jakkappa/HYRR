@@ -18,6 +18,7 @@ exports.getAdminStats = async (req, res, next) => {
       topKeywords,
       scoreDistribution,
       userPerformance,
+      dailySignups,
       totalUsers,
       totalScans
     ] = await Promise.all([
