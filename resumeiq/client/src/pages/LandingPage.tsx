@@ -332,40 +332,40 @@ export default function LandingPage() {
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-5 items-stretch">
                     <TemplateCard
                         image="/image_614ba7.jpg"
-                        name="Modern Template"
+                        name="Modern"
                         tag="ATS GOLD"
-                        desc="Clean, structured layout that fits detailed experience on a single page. Strong ATS parse rate and high recruiter readability."
+                        desc="A clean and structured template that fits detailed experience on a single page while remaining easy to read—making it a strong, ATS-friendly choice for many roles."
                     />
                     <TemplateCard
                         image="/image_614c06.jpg"
                         name="Ivy League"
                         tag="HARVARD"
-                        desc="Modernized Harvard format with a compact summary section and balanced white space for a sophisticated, standout impression."
+                        desc="A modernized Harvard template featuring a stand-out design and a sophisticated feel. Compact enough to fit a stand-out section like a tailored summary and a strengths section, yet features enough white space."
                     />
                     <TemplateCard
                         image="/image_614f52.jpg"
-                        name="Elegant Layout"
+                        name="Elegant"
                         tag="COLUMN"
-                        desc="Side-column design that highlights skills and strengths while dedicating prime real estate to experience and education."
+                        desc="A beautiful template that highlights the strengths & uniqueness of the applicant in a dedicated column, while leaving most of the space for the employment history & education."
                     />
                     <TemplateCard
                         image="/image_614fce.jpg"
-                        name="Polished Slate"
+                        name="Polished"
                         tag="PREMIUM"
-                        desc="Professional design that invites recruiters to spend more time on your application. Balanced weight and subtle visual hierarchy."
+                        desc="A stand-out design that looks professional, but also invites the recruiter to spend more time on the resume."
                     />
                     <TemplateCard
                         image="/image_61534c.jpg"
                         name="Single Column"
                         tag="OCR RIGID"
-                        desc="Classic single-column with highlighted section headings. Maximum ATS compatibility with zero parsing regressions."
+                        desc="A classic design enhanced to stand out subtly. Highlighted headings improve readability, allowing recruiters to quickly grasp your application and see how you fit the role."
                     />
                 </div>
 
                 {/* Additional templates note */}
                 <div className="mt-8 text-center">
                     <p className="text-sm text-gray-500 mb-6">
-                        + 5 more templates in the builder: <span className="text-gray-300 font-semibold">Tech Mono</span>, <span className="text-gray-300 font-semibold">Creative Split</span>, <span className="text-gray-300 font-semibold">Academic CV</span>, <span className="text-gray-300 font-semibold">Infographic</span>, and <span className="text-gray-300 font-semibold">EuroPass</span>
+                        + 5 more templates in the builder: <span className="text-gray-300 font-semibold">Single Column Refined</span>, <span className="text-gray-300 font-semibold">Creative</span>, <span className="text-gray-300 font-semibold">Double Column</span>, <span className="text-gray-300 font-semibold">Elite</span>, and <span className="text-gray-300 font-semibold">Monochrome</span>
                     </p>
 
                     <Link

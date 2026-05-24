@@ -40,119 +40,6 @@ import toast from 'react-hot-toast';
 type TemplateKey = 'minimalist' | 'modern' | 'executive' | 'tech' | 'creative' | 'academic' | 'serif' | 'infographic' | 'european' | 'metric';
 type WorkspaceMode = 'resume' | 'coverLetter';
 
-const TemplatePlaceholder = ({ id }: { id: string }) => {
-    switch (id) {
-        case 'tech': // Classic
-            return (
-                <div className="w-full h-full bg-white p-3 flex flex-col gap-1.5 opacity-90 group-hover:scale-[1.03] transition-transform duration-300">
-                    <div className="w-3/4 h-2 bg-gray-800 mx-auto rounded-sm mb-1"></div>
-                    <div className="w-full h-0.5 bg-gray-300 mb-2"></div>
-                    <div className="flex gap-2 flex-1">
-                        <div className="w-1/3 flex flex-col gap-1.5 border-r border-gray-200 pr-1">
-                            <div className="w-full h-1 bg-gray-400 rounded-sm"></div>
-                            <div className="w-3/4 h-1 bg-gray-200 rounded-sm"></div>
-                            <div className="w-5/6 h-1 bg-gray-200 rounded-sm"></div>
-                            <div className="w-full h-1 bg-gray-400 rounded-sm mt-2"></div>
-                            <div className="w-2/3 h-1 bg-gray-200 rounded-sm"></div>
-                        </div>
-                        <div className="w-2/3 flex flex-col gap-1.5 pl-1">
-                            <div className="w-1/2 h-1.5 bg-gray-500 rounded-sm"></div>
-                            <div className="w-full h-1 bg-gray-200 rounded-sm"></div>
-                            <div className="w-11/12 h-1 bg-gray-200 rounded-sm"></div>
-                            <div className="w-full h-1 bg-gray-200 rounded-sm"></div>
-                            <div className="w-1/2 h-1.5 bg-gray-500 rounded-sm mt-2"></div>
-                            <div className="w-full h-1 bg-gray-200 rounded-sm"></div>
-                            <div className="w-10/12 h-1 bg-gray-200 rounded-sm"></div>
-                        </div>
-                    </div>
-                </div>
-            );
-        case 'creative': // Traditional
-            return (
-                <div className="w-full h-full bg-[#f8f9fa] p-3 flex flex-col gap-2 opacity-90 group-hover:scale-[1.03] transition-transform duration-300">
-                    <div className="w-1/2 h-2.5 bg-slate-700 rounded-sm"></div>
-                    <div className="w-1/3 h-1 bg-slate-400 rounded-sm mb-1"></div>
-                    <div className="w-full h-1.5 bg-slate-500 rounded-sm"></div>
-                    <div className="w-full h-1 bg-slate-300 rounded-sm"></div>
-                    <div className="w-11/12 h-1 bg-slate-300 rounded-sm"></div>
-                    <div className="w-full h-1.5 bg-slate-500 rounded-sm mt-2"></div>
-                    <div className="w-full h-1 bg-slate-300 rounded-sm"></div>
-                    <div className="w-5/6 h-1 bg-slate-300 rounded-sm"></div>
-                    <div className="w-full h-1 bg-slate-300 rounded-sm"></div>
-                </div>
-            );
-        case 'infographic': // Prime ATS
-            return (
-                <div className="w-full h-full bg-white p-3 flex flex-col gap-1.5 border-t-4 border-emerald-600 opacity-90 group-hover:scale-[1.03] transition-transform duration-300">
-                    <div className="flex justify-between items-end mb-2">
-                        <div className="w-1/2 h-2 bg-emerald-800 rounded-sm"></div>
-                        <div className="w-1/4 h-1 bg-emerald-600 rounded-sm"></div>
-                    </div>
-                    <div className="w-full flex gap-2">
-                        <div className="w-1/4 h-1.5 bg-gray-800 rounded-sm"></div>
-                        <div className="w-3/4 flex flex-col gap-1">
-                            <div className="w-full h-1 bg-gray-300 rounded-sm"></div>
-                            <div className="w-11/12 h-1 bg-gray-300 rounded-sm"></div>
-                            <div className="w-4/5 h-1 bg-gray-300 rounded-sm"></div>
-                        </div>
-                    </div>
-                    <div className="w-full flex gap-2 mt-1">
-                        <div className="w-1/4 h-1.5 bg-gray-800 rounded-sm"></div>
-                        <div className="w-3/4 flex flex-col gap-1">
-                            <div className="w-full h-1 bg-gray-300 rounded-sm"></div>
-                            <div className="w-5/6 h-1 bg-gray-300 rounded-sm"></div>
-                        </div>
-                    </div>
-                </div>
-            );
-        case 'european': // Pure ATS
-            return (
-                <div className="w-full h-full bg-white p-4 flex flex-col gap-2 opacity-95 group-hover:scale-[1.03] transition-transform duration-300 font-serif">
-                    <div className="w-full flex justify-center"><div className="w-1/2 h-1.5 bg-black rounded-sm"></div></div>
-                    <div className="w-full flex justify-center"><div className="w-2/3 h-0.5 bg-black rounded-sm mb-2"></div></div>
-                    <div className="w-1/3 h-1 bg-black rounded-sm uppercase tracking-widest mt-1"></div>
-                    <div className="w-full h-px bg-black mb-1"></div>
-                    <div className="w-full h-0.5 bg-gray-300 rounded-sm"></div>
-                    <div className="w-11/12 h-0.5 bg-gray-300 rounded-sm"></div>
-                    <div className="w-full h-0.5 bg-gray-300 rounded-sm mb-1"></div>
-                    <div className="w-1/3 h-1 bg-black rounded-sm uppercase tracking-widest mt-1"></div>
-                    <div className="w-full h-px bg-black mb-1"></div>
-                    <div className="w-full flex justify-between">
-                        <div className="w-1/2 h-0.5 bg-gray-600 rounded-sm"></div>
-                        <div className="w-1/4 h-0.5 bg-gray-400 rounded-sm"></div>
-                    </div>
-                    <div className="w-11/12 h-0.5 bg-gray-300 rounded-sm"></div>
-                    <div className="w-full h-0.5 bg-gray-300 rounded-sm"></div>
-                </div>
-            );
-        case 'metric': // Header ATS
-            return (
-                <div className="w-full h-full bg-white flex flex-col opacity-90 group-hover:scale-[1.03] transition-transform duration-300">
-                    <div className="w-full h-[30%] bg-[#1e3a8a] p-2 flex flex-col justify-center gap-1">
-                        <div className="w-2/3 h-2 bg-white rounded-sm"></div>
-                        <div className="w-1/3 h-1 bg-blue-200 rounded-sm"></div>
-                    </div>
-                    <div className="p-3 flex flex-col gap-1.5">
-                        <div className="w-1/3 h-1.5 bg-blue-900 rounded-sm mt-1"></div>
-                        <div className="w-full flex gap-1 items-start">
-                            <div className="w-1.5 h-1.5 rounded-full bg-blue-200 flex-shrink-0 mt-0.5"></div>
-                            <div className="w-full h-1 bg-gray-300 rounded-sm mt-0.5"></div>
-                        </div>
-                        <div className="w-full flex gap-1 items-start">
-                            <div className="w-1.5 h-1.5 rounded-full bg-blue-200 flex-shrink-0 mt-0.5"></div>
-                            <div className="w-5/6 h-1 bg-gray-300 rounded-sm mt-0.5"></div>
-                        </div>
-                        <div className="w-1/3 h-1.5 bg-blue-900 rounded-sm mt-2"></div>
-                        <div className="w-full h-1 bg-gray-300 rounded-sm"></div>
-                        <div className="w-11/12 h-1 bg-gray-300 rounded-sm"></div>
-                    </div>
-                </div>
-            );
-        default:
-            return <div className="text-white/10 font-black text-2xl tracking-widest uppercase transform -rotate-45">HYRR</div>;
-    }
-};
-
 export default function ResumeBuilderPage() {
     // --- INITIAL STATES ---
     const [resumeData, setResumeData] = useState<ResumeData>({
@@ -611,16 +498,16 @@ export default function ResumeBuilderPage() {
                         <div className="p-8 overflow-y-auto custom-scrollbar flex-1">
                             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
                                 {[
-                                    { id: 'modern', name: 'Modern Template', tag: 'ATS GOLD', desc: 'Clean, structured layout that fits detailed experience on a single page.', image: '/image_614ba7.jpg' },
-                                    { id: 'academic', name: 'Ivy League', tag: 'HARVARD', desc: 'Modernized Harvard format with a compact summary section and balanced white space.', image: '/image_614c06.jpg' },
-                                    { id: 'serif', name: 'Elegant Layout', tag: 'COLUMN', desc: 'Side-column design that highlights skills and strengths while dedicating prime real estate.', image: '/image_614f52.jpg' },
-                                    { id: 'executive', name: 'Polished Slate', tag: 'PREMIUM', desc: 'Professional design that invites recruiters to spend more time on your application.', image: '/image_614fce.jpg' },
-                                    { id: 'minimalist', name: 'Single Column', tag: 'OCR RIGID', desc: 'Classic single-column with highlighted section headings. Maximum ATS compatibility.', image: '/image_61534c.jpg' },
-                                    { id: 'tech', name: 'Classic', tag: 'CLASSIC', desc: 'Classically structured resume template, for a robust career history.', image: null },
-                                    { id: 'creative', name: 'Traditional', tag: 'TRADITIONAL', desc: 'Classic full-page resume template with sizable resume sections.', image: null },
-                                    { id: 'infographic', name: 'Prime ATS', tag: 'OPTIMIZED', desc: 'Professional, streamlined resume template optimized for maximum ATS compatibility and readability.', image: null },
-                                    { id: 'european', name: 'Pure ATS', tag: 'MINIMAL', desc: 'Minimalist layout focused entirely on semantic ATS parsing and content clarity. Zero visual distractions.', image: null },
-                                    { id: 'metric', name: 'Header ATS', tag: 'ACHIEVEMENT', desc: 'Dedicated achievements section to highlight successes. Use an ATS-optimized template to increase visibility.', image: null },
+                                    { id: 'modern', name: 'Modern', tag: 'ATS GOLD', desc: 'A clean and structured template that fits detailed experience on a single page while remaining easy to read—making it a strong, ATS-friendly choice for many roles.', image: '/image_614ba7.jpg' },
+                                    { id: 'academic', name: 'Ivy League', tag: 'HARVARD', desc: 'A modernized Harvard template featuring a stand-out design and a sophisticated feel. Compact enough to fit a stand-out section like a tailored summary and a strengths section, yet features enough white space.', image: '/image_614c06.jpg' },
+                                    { id: 'serif', name: 'Elegant', tag: 'COLUMN', desc: 'A beautiful template that highlights the strengths & uniqueness of the applicant in a dedicated column, while leaving most of the space for the employment history & education.', image: '/image_614f52.jpg' },
+                                    { id: 'executive', name: 'Polished', tag: 'PREMIUM', desc: 'A stand-out design that looks professional, but also invites the recruiter to spend more time on the resume.', image: '/image_614fce.jpg' },
+                                    { id: 'minimalist', name: 'Single Column', tag: 'OCR RIGID', desc: 'A classic design enhanced to stand out subtly. Highlighted headings improve readability, allowing recruiters to quickly grasp your application and see how you fit the role.', image: '/image_61534c.jpg' },
+                                    { id: 'tech', name: 'Single Column Refined', tag: 'TRADITIONAL', desc: 'A traditional, simple resume template perfect for someone who\'s just starting out their professional career.', image: null },
+                                    { id: 'creative', name: 'Creative', tag: 'DESIGN', desc: 'This design accentuates your header in a way that captures recruiters\' attention, encouraging them to explore further. Versatile and adaptable, it\'s suitable for a broad range of industries.', image: null },
+                                    { id: 'infographic', name: 'Double Column', tag: 'STRUCTURED', desc: 'The structure and layout of this template are easy to follow, ensuring your application will get more attention than the 20 other resumes waiting for the recruiter to check.', image: null },
+                                    { id: 'european', name: 'Elite', tag: 'OPTIMIZED', desc: 'A resume template that features a refined layout that impresses recruiters and an optimized structure for superior ATS performance.', image: null },
+                                    { id: 'metric', name: 'Monochrome', tag: 'CLASSIC', desc: 'Perfect choice for job seekers in conservative industries. This template is designed with a professional and classic layout.', image: null },
                                 ].map(t => (
                                     <div 
                                         key={t.id}
@@ -636,7 +523,7 @@ export default function ResumeBuilderPage() {
                                                         className="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-300"
                                                     />
                                                 ) : (
-                                                    <TemplatePlaceholder id={t.id} />
+                                                    <div className="text-white/10 font-black text-2xl tracking-widest uppercase transform -rotate-45">HYRR</div>
                                                 )}
                                                 
                                                 {activeTemplate === t.id && (
