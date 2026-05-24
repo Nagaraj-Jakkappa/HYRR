@@ -301,7 +301,7 @@ export default function DashboardPage() {
         <div className="bg-[#13131A] rounded-[40px] border border-white/5 overflow-hidden shadow-2xl">
           <div className="px-10 py-7 border-b border-white/5 flex justify-between items-center bg-white/[0.01]">
             <h3 className="font-bold text-lg tracking-tight">Recent Activity</h3>
-            <Link to="/scan" className="text-[10px] font-black text-[#5B5FEF] uppercase tracking-[0.2em]">View All</Link>
+            <Link to="/history" className="text-[10px] font-black text-[#5B5FEF] uppercase tracking-[0.2em]">View All</Link>
           </div>
 
           <div className="p-4 space-y-4">
