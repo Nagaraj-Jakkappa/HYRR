@@ -211,7 +211,7 @@ export default function AdminPage() {
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
               {/* SCAN ACTIVITY COMPOSED CHART */}
-              <div className="bg-[#13131A] p-8 rounded-[32px] border border-white/5">
+              <div className="bg-[#13131A]/80 backdrop-blur-xl p-8 rounded-[32px] border border-white/5 shadow-xl">
                 <p className="text-xs font-mono text-gray-500 uppercase tracking-widest mb-8 flex items-center justify-between">
                   <span className="flex items-center gap-2">
                     <TrendingUp size={14} className="text-[#5B5FEF]" /> Scan Activity (7 Days)
@@ -242,7 +242,7 @@ export default function AdminPage() {
               </div>
 
               {/* DAILY SIGNUPS CHART */}
-              <div className="bg-[#13131A] p-8 rounded-[32px] border border-white/5">
+              <div className="bg-[#13131A]/80 backdrop-blur-xl p-8 rounded-[32px] border border-white/5 shadow-xl">
                 <p className="text-xs font-mono text-gray-500 uppercase tracking-widest mb-8 flex items-center justify-between">
                   <span className="flex items-center gap-2">
                     <Users size={14} className="text-[#3DEBA6]" /> Daily Signups (7 Days)
@@ -270,7 +270,7 @@ export default function AdminPage() {
             </div>
 
             {/* Skill Gap Trends */}
-            <div className="bg-[#13131A] p-8 rounded-[32px] border border-white/5">
+            <div className="bg-[#13131A]/80 backdrop-blur-xl p-8 rounded-[32px] border border-white/5 shadow-xl">
               <p className="text-xs font-mono text-gray-500 uppercase tracking-widest mb-8">Skill Gap Trends</p>
               <div className="space-y-5">
                 {stats.topKeywords.map((kw) => (
@@ -294,7 +294,7 @@ export default function AdminPage() {
 
         {/* User Management Tab */}
         {tab === 'users' && (
-          <div className="bg-[#13131A] border border-white/5 rounded-[32px] overflow-hidden animate-in slide-in-from-bottom-4 duration-500">
+          <div className="bg-[#13131A]/80 backdrop-blur-xl border border-white/5 shadow-xl rounded-[32px] overflow-hidden animate-in slide-in-from-bottom-4 duration-500">
             <div className="p-6 border-b border-white/5 flex items-center gap-4 bg-white/[0.01]">
               <Search size={18} className="text-gray-500" />
               <input
@@ -380,7 +380,7 @@ export default function AdminPage() {
 
         {/* Global Scans Tab */}
         {tab === 'scans' && (
-          <div className="bg-[#13131A] border border-white/5 rounded-[32px] overflow-hidden animate-in slide-in-from-bottom-4 duration-500">
+          <div className="bg-[#13131A]/80 backdrop-blur-xl border border-white/5 shadow-xl rounded-[32px] overflow-hidden animate-in slide-in-from-bottom-4 duration-500">
             <div className="p-6 border-b border-white/5 bg-white/[0.01]">
               <h2 className="text-lg font-bold">Global Scans Record</h2>
               <p className="text-xs text-gray-500">View all resume scans performed across the platform.</p>
@@ -433,7 +433,7 @@ export default function AdminPage() {
 
         {/* Settings Tab */}
         {tab === 'settings' && settings && (
-          <div className="max-w-2xl bg-[#13131A] border border-white/5 rounded-[32px] p-8 animate-in slide-in-from-bottom-4 duration-500">
+          <div className="max-w-2xl bg-[#13131A]/80 backdrop-blur-xl shadow-xl border border-white/5 rounded-[32px] p-8 animate-in slide-in-from-bottom-4 duration-500">
             <h2 className="text-2xl font-black mb-6 flex items-center gap-2">
               <SettingsIcon className="text-[#5B5FEF]" size={24} />
               Platform Configuration
@@ -510,7 +510,7 @@ export default function AdminPage() {
 
 function StatCard({ title, value, color, icon }: { title: string, value: string | number, color: string, icon: React.ReactNode }) {
   return (
-    <div className="bg-[#13131A] p-8 rounded-[32px] border border-white/5 relative overflow-hidden group">
+    <div className="bg-[#13131A]/80 backdrop-blur-xl p-8 rounded-[32px] border border-white/5 relative overflow-hidden group shadow-xl">
       <div className="absolute right-6 top-8 text-white/5 group-hover:text-white/10 transition-colors">
         {icon}
       </div>

@@ -128,7 +128,7 @@ export default function ReportPage() {
             </div>
 
             <div className="max-w-4xl mx-auto p-6 mt-8">
-                <header className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6 mb-10 bg-[#13131A] p-8 rounded-[32px] border border-white/5 shadow-2xl">
+                <header className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6 mb-10 bg-[#13131A]/80 backdrop-blur-xl p-8 rounded-[32px] border border-white/5 shadow-2xl">
                     <div className="flex items-center gap-6">
                         <ScoreRing score={data.atsScore} />
                         <div>
@@ -147,7 +147,7 @@ export default function ReportPage() {
                 </header>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                    <div className="bg-[#13131A] p-8 rounded-[32px] border border-white/5">
+                    <div className="bg-[#13131A]/80 backdrop-blur-xl p-8 rounded-[32px] border border-white/5 shadow-xl">
                         <h3 className="text-sm font-bold mb-6 flex items-center gap-2 text-white">
                             <CheckCircle size={18} className="text-[#3DEBA6]" /> Matched Skills
                         </h3>
@@ -158,7 +158,7 @@ export default function ReportPage() {
                         </div>
                     </div>
 
-                    <div className="bg-[#13131A] p-8 rounded-[32px] border border-white/5">
+                    <div className="bg-[#13131A]/80 backdrop-blur-xl p-8 rounded-[32px] border border-white/5 shadow-xl">
                         <h3 className="text-sm font-bold mb-6 flex items-center gap-2 text-white">
                             <XCircle size={18} className="text-[#FF4D4D]" /> Missing Keywords
                         </h3>
@@ -170,7 +170,7 @@ export default function ReportPage() {
                     </div>
                 </div>
 
-                <div className="bg-[#13131A] p-8 rounded-[32px] border border-white/5">
+                <div className="bg-[#13131A]/80 backdrop-blur-xl p-8 rounded-[32px] border border-white/5 shadow-xl">
                     <h3 className="text-sm font-bold mb-6 text-white uppercase tracking-widest text-[10px] flex items-center gap-2">
                         <Info size={14} className="text-[#5B5FEF]" /> Optimization Strategy
                     </h3>

@@ -26,7 +26,7 @@ export default function NotFoundPage() {
 
         <Link
           to={isAuthenticated ? "/dashboard" : "/"}
-          className="inline-flex items-center gap-2 bg-[#13131A] border border-white/10 px-8 py-4 rounded-2xl font-bold hover:bg-white/5 transition-all"
+          className="inline-flex items-center gap-2 bg-gradient-to-r from-[#5B5FEF] to-[#8E5BEF] hover:from-[#6c70fc] hover:to-[#9f6dfc] text-white px-8 py-4 rounded-[24px] font-bold transition-all shadow-[0_0_20px_rgba(91,95,239,0.3)] hover:shadow-[0_0_30px_rgba(91,95,239,0.5)] active:scale-[0.98]"
         >
           <ArrowLeft size={18} /> {isAuthenticated ? "Go to Dashboard" : "Return to Home Base"}
         </Link>

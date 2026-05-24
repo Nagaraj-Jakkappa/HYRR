@@ -72,7 +72,7 @@ export default function LandingPage() {
 
                         <Link
                             to="/register"
-                            className="bg-[#5B5FEF] hover:bg-[#4A4EDF] px-5 py-3 rounded-2xl text-sm font-black transition-all shadow-lg shadow-[#5B5FEF]/20"
+                            className="bg-gradient-to-r from-[#5B5FEF] to-[#8E5BEF] hover:from-[#6c70fc] hover:to-[#9f6dfc] px-5 py-3 rounded-2xl text-sm font-black transition-all shadow-[0_0_20px_rgba(91,95,239,0.3)] hover:shadow-[0_0_30px_rgba(91,95,239,0.5)] active:scale-[0.98]"
                         >
                             Get Started Free
                         </Link>
@@ -700,7 +700,7 @@ function PricingCard({
             <Link
                 to="/register"
                 className={`block text-center py-4 rounded-2xl font-bold transition-all ${featured
-                    ? 'bg-[#5B5FEF] hover:bg-[#4A4EDF]'
+                    ? 'bg-gradient-to-r from-[#5B5FEF] to-[#8E5BEF] hover:from-[#6c70fc] hover:to-[#9f6dfc] shadow-[0_0_20px_rgba(91,95,239,0.3)] hover:shadow-[0_0_30px_rgba(91,95,239,0.5)] active:scale-[0.98]'
                     : 'bg-white/[0.04] hover:bg-white/[0.08]'
                     }`}
             >

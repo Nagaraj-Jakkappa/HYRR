@@ -52,7 +52,7 @@ export default function DemoPage() {
     return (
         <div className="min-h-screen bg-[#0A0A0F] text-[#EEEEF0] font-sans p-6 overflow-x-hidden">
             {/* Top Header Controls Banner */}
-            <div className="max-w-6xl mx-auto flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-[#13131A] border border-white/5 p-6 rounded-2xl mb-8">
+            <div className="max-w-6xl mx-auto flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-[#13131A]/80 backdrop-blur-xl border border-white/5 p-6 rounded-2xl mb-8 shadow-xl">
                 <div>
                     <button
                         onClick={() => navigate('/')}
@@ -73,7 +73,7 @@ export default function DemoPage() {
                     </div>
                     <button
                         onClick={() => navigate('/register')}
-                        className="bg-[#5B5FEF] hover:bg-[#4A4EDF] text-white text-xs font-black uppercase tracking-widest px-6 py-3 rounded-xl transition-all shadow-lg shadow-[#5B5FEF]/15"
+                        className="bg-gradient-to-r from-[#5B5FEF] to-[#8E5BEF] hover:from-[#6c70fc] hover:to-[#9f6dfc] text-white text-xs font-black uppercase tracking-widest px-6 py-3 rounded-xl transition-all shadow-[0_0_20px_rgba(91,95,239,0.3)] hover:shadow-[0_0_30px_rgba(91,95,239,0.5)] active:scale-[0.98]"
                     >
                         Deploy Your Own Instance
                     </button>
@@ -86,7 +86,7 @@ export default function DemoPage() {
                 {/* Left Column Controls */}
                 <div className="lg:col-span-4 space-y-6">
                     {/* Telemetry Panel */}
-                    <div className="bg-[#13131A] border border-white/5 rounded-2xl p-6">
+                    <div className="bg-[#13131A]/80 backdrop-blur-xl shadow-xl border border-white/5 rounded-2xl p-6">
                         <h3 className="text-sm font-bold text-gray-400 mb-4 flex items-center gap-2">
                             <BrainCircuit size={16} className="text-[#5B5FEF]" /> Engine Telemetry
                         </h3>
@@ -102,12 +102,12 @@ export default function DemoPage() {
                     </div>
 
                     {/* Operational Trigger Sandbox Button */}
-                    <div className="bg-[#13131A] border border-white/5 rounded-2xl p-5 space-y-3">
+                    <div className="bg-[#13131A]/80 backdrop-blur-xl shadow-xl border border-white/5 rounded-2xl p-5 space-y-3">
                         <div className="text-xs font-bold text-gray-400">Pipeline Actions</div>
                         <button
                             onClick={runDemoOptimization}
                             disabled={isOptimizing}
-                            className="w-full flex items-center justify-center gap-2 bg-[#5B5FEF] hover:bg-[#4A4EDF] disabled:bg-zinc-800 text-white text-xs font-bold py-3 px-4 rounded-xl transition-all shadow-md"
+                            className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-[#5B5FEF] to-[#8E5BEF] hover:from-[#6c70fc] hover:to-[#9f6dfc] disabled:from-zinc-800 disabled:to-zinc-800 disabled:shadow-none text-white text-xs font-bold py-3 px-4 rounded-xl transition-all shadow-[0_0_20px_rgba(91,95,239,0.3)] hover:shadow-[0_0_30px_rgba(91,95,239,0.5)] active:scale-[0.98]"
                         >
                             <Sparkles size={13} className={isOptimizing ? "animate-spin" : ""} />
                             {isOptimizing ? "Refactoring..." : "Execute Magic Bullet Rewrite"}
@@ -117,7 +117,7 @@ export default function DemoPage() {
 
                 {/* Right Column Interactive Artifact Fields */}
                 <div className="lg:col-span-8 space-y-6">
-                    <div className="bg-[#13131A] border border-white/5 rounded-2xl p-6 space-y-6">
+                    <div className="bg-[#13131A]/80 backdrop-blur-xl shadow-xl border border-white/5 rounded-2xl p-6 space-y-6">
                         <div className="flex items-center gap-2 border-b border-white/5 pb-3">
                             <FileText size={16} className="text-[#5B5FEF]" />
                             <h2 className="text-sm font-bold">Live Schema Ingestion Mirror</h2>
@@ -158,7 +158,7 @@ export default function DemoPage() {
             {/* TIME EXPIRED OVERLAY MODAL */}
             {timeExpired && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
-                    <div className="bg-[#13131A] border border-white/10 rounded-2xl p-8 max-w-md w-full text-center shadow-[0_20px_60px_rgba(0,0,0,0.8)] transform transition-all">
+                    <div className="bg-[#13131A]/90 backdrop-blur-2xl border border-white/10 rounded-3xl p-8 max-w-md w-full text-center shadow-[0_20px_60px_rgba(0,0,0,0.8)] transform transition-all">
                         <div className="w-16 h-16 bg-[#5B5FEF]/20 border border-[#5B5FEF]/30 rounded-full flex items-center justify-center mx-auto mb-6">
                             <Sparkles className="text-[#5B5FEF]" size={28} />
                         </div>
@@ -169,7 +169,7 @@ export default function DemoPage() {
                         <div className="flex flex-col gap-3">
                             <button
                                 onClick={() => navigate('/register')}
-                                className="w-full bg-[#5B5FEF] hover:bg-[#4A4EDF] text-white font-bold py-4 rounded-xl transition-all shadow-[0_8px_32px_rgba(91,95,239,0.25)]"
+                                className="w-full bg-gradient-to-r from-[#5B5FEF] to-[#8E5BEF] hover:from-[#6c70fc] hover:to-[#9f6dfc] text-white font-bold py-4 rounded-[16px] transition-all shadow-[0_0_20px_rgba(91,95,239,0.3)] hover:shadow-[0_0_30px_rgba(91,95,239,0.5)] active:scale-[0.98]"
                             >
                                 Create Free Account
                             </button>

@@ -214,21 +214,21 @@ export default function DashboardPage() {
 
         {/* QUICK ACTIONS */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-10">
-          <Link to="/scan" className="bg-[#5B5FEF] hover:bg-[#4A4DDB] text-white p-6 rounded-2xl font-bold transition-all flex items-center justify-between shadow-xl shadow-[#5B5FEF]/20 group">
+          <Link to="/scan" className="bg-gradient-to-r from-[#5B5FEF] to-[#8E5BEF] hover:from-[#6c70fc] hover:to-[#9f6dfc] text-white p-6 rounded-[24px] font-bold transition-all flex items-center justify-between shadow-[0_0_20px_rgba(91,95,239,0.3)] hover:shadow-[0_0_30px_rgba(91,95,239,0.5)] active:scale-[0.98] group">
             <div className="flex items-center gap-3">
               <PlusCircle size={20} />
               <span>New Analysis</span>
             </div>
             <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
           </Link>
-          <Link to="/builder" className="bg-[#13131A] hover:bg-white/10 border border-white/5 text-white p-6 rounded-2xl font-bold transition-all flex items-center justify-between group">
+          <Link to="/builder" className="bg-[#13131A]/80 backdrop-blur-xl hover:bg-[#13131A] border border-white/5 hover:border-white/10 text-white p-6 rounded-[24px] font-bold transition-all flex items-center justify-between group shadow-xl hover:shadow-[0_0_20px_rgba(61,235,166,0.1)] active:scale-[0.98]">
             <div className="flex items-center gap-3">
               <FileText size={20} className="text-[#3DEBA6]" />
               <span>Build Resume</span>
             </div>
             <ArrowRight size={18} className="text-gray-500 group-hover:translate-x-1 transition-transform" />
           </Link>
-          <Link to="/history" className="bg-[#13131A] hover:bg-white/10 border border-white/5 text-white p-6 rounded-2xl font-bold transition-all flex items-center justify-between group">
+          <Link to="/history" className="bg-[#13131A]/80 backdrop-blur-xl hover:bg-[#13131A] border border-white/5 hover:border-white/10 text-white p-6 rounded-[24px] font-bold transition-all flex items-center justify-between group shadow-xl hover:shadow-[0_0_20px_rgba(240,192,96,0.1)] active:scale-[0.98]">
             <div className="flex items-center gap-3">
               <History size={20} className="text-[#F0C060]" />
               <span>My History</span>
@@ -239,7 +239,7 @@ export default function DashboardPage() {
 
         {/* TOP ROW: ATS TREND CHART & RECOMMENDATION */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-10">
-          <div className="lg:col-span-2 bg-[#13131A] p-8 rounded-[32px] border border-white/5 relative overflow-hidden group">
+          <div className="lg:col-span-2 bg-[#13131A]/80 backdrop-blur-xl p-8 rounded-[32px] border border-white/5 relative overflow-hidden group shadow-2xl">
             <div className="flex items-center justify-between mb-8">
               <div>
                 <h3 className="text-white font-bold flex items-center gap-2">
@@ -321,7 +321,7 @@ export default function DashboardPage() {
             </div>
           </div>
 
-          <div className="bg-gradient-to-br from-[#13131A] to-[#0D0D14] p-8 rounded-[32px] border border-[#F0C060]/20 flex flex-col justify-between relative overflow-hidden group">
+          <div className="bg-gradient-to-br from-[#13131A]/90 to-[#0D0D14]/90 backdrop-blur-xl p-8 rounded-[32px] border border-[#F0C060]/20 flex flex-col justify-between relative overflow-hidden group shadow-[0_0_30px_rgba(240,192,96,0.1)]">
             <div className="absolute top-0 right-0 p-4 opacity-5 pointer-events-none">
               <Zap size={80} />
             </div>
@@ -354,7 +354,7 @@ export default function DashboardPage() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           
           {/* Recent Scans */}
-          <div className="bg-[#13131A] rounded-[40px] border border-white/5 overflow-hidden shadow-2xl">
+          <div className="bg-[#13131A]/80 backdrop-blur-xl rounded-[40px] border border-white/5 overflow-hidden shadow-2xl">
             <div className="px-8 py-6 border-b border-white/5 flex justify-between items-center bg-white/[0.01]">
               <h3 className="font-bold text-lg tracking-tight">Recent Scans</h3>
               <Link to="/history" className="text-[10px] font-black text-[#5B5FEF] uppercase tracking-[0.2em]">View All</Link>
@@ -396,7 +396,7 @@ export default function DashboardPage() {
           </div>
 
           {/* Recent Resumes */}
-          <div className="bg-[#13131A] rounded-[40px] border border-white/5 overflow-hidden shadow-2xl">
+          <div className="bg-[#13131A]/80 backdrop-blur-xl rounded-[40px] border border-white/5 overflow-hidden shadow-2xl">
             <div className="px-8 py-6 border-b border-white/5 flex justify-between items-center bg-white/[0.01]">
               <h3 className="font-bold text-lg tracking-tight">Recent Resumes</h3>
               <Link to="/resumes" className="text-[10px] font-black text-[#5B5FEF] uppercase tracking-[0.2em]">View All</Link>
@@ -449,7 +449,7 @@ export default function DashboardPage() {
 
 function StatCard({ label, value, icon: Icon, color, sub, isStatic }: any) {
   return (
-    <div className="bg-[#13131A] p-8 rounded-[32px] border border-white/5 group transition-all">
+    <div className="bg-[#13131A]/80 backdrop-blur-xl p-8 rounded-[32px] border border-white/5 shadow-xl group transition-all">
       <div className="flex justify-between items-start mb-6">
         <span className="text-[10px] font-mono font-black text-gray-500 uppercase tracking-[0.2em]">{label}</span>
         <div className="p-2 rounded-lg bg-white/5 group-hover:bg-white/10 transition-colors">
