@@ -14,6 +14,7 @@ const {
 } = require('../controllers/resumeController');
 
 const { protect } = require('../middleware/auth');
+const { requirePlan } = require('../middleware/planGate');
 const { upload } = require('../config/cloudinary');
 
 // Dedicated in-memory storage handler for processing LinkedIn PDFs without clogging temp disks
@@ -27,14 +28,14 @@ router.use(protect);
 router.post('/', upload.single('resume'), uploadResume);
 router.get('/', getMyResumes);
 
-// --- LinkedIn Automation Data Parser Ingestion ---
-router.post('/import-linkedin', memoryUpload.single('file'), importLinkedInPDF);
+// --- LinkedIn Automation Data Parser Ingestion (Pro+ only) ---
+router.post('/import-linkedin', requirePlan('pro', 'career+'), memoryUpload.single('file'), importLinkedInPDF);
 
 // --- AI Magic Rewrite Sandbox Pipeline ---
 router.post('/rewrite', magicRewrite);
 
-// --- NEW: AI Cover Letter Ingestion Generator Route ---
-router.post('/cover-letter', generateCoverLetter);
+// --- AI Cover Letter Generator (Pro+ only) ---
+router.post('/cover-letter', requirePlan('pro', 'career+'), generateCoverLetter);
 
 // --- Dynamic Database ID Resource Controllers ---
 router.get('/:id', getResume);

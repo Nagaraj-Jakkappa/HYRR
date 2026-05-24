@@ -160,7 +160,12 @@ exports.createScan = async (req, res, next) => {
 
     const user = req.user;
     if (user.plan === 'free' && user.scansUsed >= user.scansLimit) {
-      return res.status(403).json({ success: false, message: 'Free scan limit reached. Upgrade to Pro.' });
+      return res.status(403).json({
+        success: false,
+        message: `You've used all ${user.scansLimit} scans on the Free plan this month. Upgrade to Pro for unlimited scans.`,
+        code: 'PLAN_UPGRADE_REQUIRED',
+        currentPlan: user.plan,
+      });
     }
 
     const resume = await Resume.findOne({ _id: resumeId, userId: user._id });

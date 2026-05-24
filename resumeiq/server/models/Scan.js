@@ -71,7 +71,7 @@ const scanSchema = new mongoose.Schema({
   },
   aiModel: {
     type: String,
-    default: 'llama-3.1-8b-instant'
+    default: 'llama-3.3-70b-versatile'
   },
   tokensUsed: {
     type: Number,

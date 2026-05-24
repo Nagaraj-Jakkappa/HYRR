@@ -5,6 +5,7 @@ const { Server } = require('socket.io');
 const cors = require('cors');
 const helmet = require('helmet');
 const morgan = require('morgan');
+const mongoose = require('mongoose'); // Imported explicitly to handle the connection event hooks
 
 const connectDB = require('./config/db');
 const { connectRedis } = require('./config/redis');
@@ -87,7 +88,7 @@ io.use((socket, next) => {
   }
 });
 
-// --- NEW: SOCKET ROOM CONNECTION HANDLER ---
+// --- SOCKET ROOM CONNECTION HANDLER ---
 // Directs authenticated sockets into a distinct room matching their user ID
 io.on('connection', (socket) => {
   if (socket.userId) {
@@ -109,7 +110,13 @@ app.use('/api/scans', scanRoutes);
 app.use('/api/admin', adminRoutes);
 
 app.get('/api/health', (req, res) => {
-  res.json({ status: 'OK', environment: process.env.NODE_ENV });
+  res.json({
+    status: 'OK',
+    environment: process.env.NODE_ENV,
+    stack: 'Node.js + Express + MongoDB + Redis + Groq/Llama 3.3',
+    version: '1.0.0',
+    uptime: Math.floor(process.uptime()),
+  });
 });
 
 // Error handling
@@ -126,6 +133,7 @@ const start = async () => {
     server.listen(PORT, '0.0.0.0', () => {
       console.log(`✅ MongoDB & Redis Connected`);
       console.log(`🚀 Server running on port ${PORT}`);
+      console.log(`🤖 AI Engine: Groq × Llama 3.3`);
     });
   } catch (error) {
     console.error('❌ Failed to start server:', error);

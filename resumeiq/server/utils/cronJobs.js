@@ -32,6 +32,17 @@ const startCronJobs = () => {
     console.log('🧹 Cleaned up old failed scans');
   });
 
+  // Monthly scan quota reset — 1st of every month at midnight
+  cron.schedule('0 0 1 * *', async () => {
+    console.log('🔄 Resetting monthly scan quotas for all users...');
+    try {
+      const result = await User.updateMany({}, { $set: { scansUsed: 0 } });
+      console.log(`✅ Monthly scan reset complete: ${result.modifiedCount} users updated`);
+    } catch (err) {
+      console.error('❌ Monthly scan reset failed:', err.message);
+    }
+  });
+
   console.log('⏰ Cron jobs started');
 };
 

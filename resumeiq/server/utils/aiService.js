@@ -2,7 +2,7 @@ const Groq = require("groq-sdk");
 const crypto = require("crypto");
 const redis = require("../config/redis");
 
-// Global initialization of the Groq SDK client
+// Groq SDK client — uses Llama 3.3 (70B) for analysis/rewrites and Llama 3.1 (8B) for fast extraction
 const aiClient = new Groq({
   apiKey: process.env.GROQ_API_KEY,
 });
@@ -110,7 +110,7 @@ const analyzeResume = async (resumeText, jobDescription, keywords, socket, scanI
 };
 
 /**
- * Optimizes structural bullet phrases with clear action descriptors
+ * Rewrites a single resume bullet point using Groq Llama 3.3 for impact optimization
  */
 const rewriteTextWithAI = async (text, jobTitle) => {
   try {
@@ -129,7 +129,7 @@ const rewriteTextWithAI = async (text, jobTitle) => {
 };
 
 /**
- * Synthesizes a high-fidelity 3-paragraph cover letter using Groq Llama-3
+ * Generates a tailored 3-paragraph cover letter using Groq Llama 3.1 (8B Instant)
  */
 const generateCoverLetterWithAI = async (resumeData, companyName, jobTitle) => {
   try {
@@ -155,7 +155,7 @@ const generateCoverLetterWithAI = async (resumeData, companyName, jobTitle) => {
     // Re-uses the globally configured aiClient instance securely
     const completion = await aiClient.chat.completions.create({
       messages: [{ role: 'user', content: prompt }],
-      model: 'llama3-8b-8192',
+      model: 'llama-3.1-8b-instant', // <-- Updated to active model identifier
       temperature: 0.6
     });
 

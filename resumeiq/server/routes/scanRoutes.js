@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const scanController = require('../controllers/scanController');
 const { protect } = require('../middleware/auth');
+const { requirePlan } = require('../middleware/planGate');
 const { scanLimiter } = require('../middleware/rateLimiter');
 
 /**
@@ -52,6 +53,6 @@ router.get('/:id', scanController.getScan);
  * @desc    Generate and download an AI-optimized PDF or DOCX resume
  * @access  Private
  */
-router.post('/:id/download', scanController.downloadResume);
+router.post('/:id/download', requirePlan('pro', 'career+'), scanController.downloadResume);
 
 module.exports = router;

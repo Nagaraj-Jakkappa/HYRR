@@ -6,20 +6,22 @@ const userSchema = new mongoose.Schema({
   email: { type: String, required: true, unique: true, lowercase: true, trim: true },
   passwordHash: { type: String, required: true },
   role: { type: String, enum: ['user', 'admin'], default: 'user' },
-  plan: { type: String, enum: ['free', 'pro'], default: 'free' },
+  plan: { type: String, enum: ['free', 'pro', 'career+'], default: 'free' },
   scansUsed: { type: Number, default: 0 },
-  scansLimit: { type: Number, default: 5 },
+  scansLimit: { type: Number, default: 3 },
   refreshToken: { type: String, default: null },
   isActive: { type: Boolean, default: true },
   lastLogin: { type: Date },
 }, { timestamps: true });
 
+// Pre-save middleware hook logic matrix
 userSchema.pre('save', async function (next) {
   if (!this.isModified('passwordHash')) return next();
   this.passwordHash = await bcrypt.hash(this.passwordHash, 12);
   next();
 });
 
+// Structural custom schema evaluation methods
 userSchema.methods.comparePassword = async function (password) {
   return bcrypt.compare(password, this.passwordHash);
 };

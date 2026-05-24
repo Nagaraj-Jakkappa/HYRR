@@ -1,6 +1,7 @@
 const User = require('../models/User');
 const Scan = require('../models/Scan');
 const Resume = require('../models/Resume');
+const { getScansLimitForPlan } = require('../middleware/planGate');
 
 /**
  * 1. GET ADMIN STATS
@@ -151,9 +152,18 @@ exports.getAllUsers = async (req, res, next) => {
 exports.updateUserRole = async (req, res, next) => {
   try {
     const { role, plan } = req.body;
+
+    // Build update object — auto-set scansLimit when plan changes
+    const updateData = {};
+    if (role) updateData.role = role;
+    if (plan) {
+      updateData.plan = plan;
+      updateData.scansLimit = getScansLimitForPlan(plan);
+    }
+
     const user = await User.findByIdAndUpdate(
       req.params.id,
-      { role, plan },
+      updateData,
       { new: true, runValidators: true }
     ).select('-passwordHash');
 

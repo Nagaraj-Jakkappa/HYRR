@@ -20,6 +20,7 @@ import NotFoundPage from './pages/NotFoundPage';
 
 // Components
 import Layout from './components/ui/Layout';
+import DemoPage from './pages/DemoPage';
 
 const Protected = ({ children, adminOnly = false }: { children: any; adminOnly?: boolean }) => {
   const { user, loading } = useAuth();
@@ -68,6 +69,7 @@ const App = () => (
           <Route path="/builder" element={<ResumeBuilderPage />} />
           <Route path="/history" element={<HistoryPage />} />
           <Route path="/compare" element={<ComparePage />} />
+          <Route path="/demo" element={<DemoPage />} />
 
           {/* Feature 2: Optimization Scan Flow Routes */}
           <Route path="/scan" element={<ScanPage />} />
