@@ -199,8 +199,14 @@ exports.viewResumeFile = async (req, res, next) => {
           resource_type: 'raw',
           access_mode: 'public',
         });
-        console.log('[ViewFile] explicit() succeeded for:', pid, '→', result.secure_url);
-        return res.redirect(result.secure_url);
+        console.log('[ViewFile] explicit() succeeded for:', pid, '→ fetching public url');
+        
+        // Fetch the newly public URL and stream it to the client to avoid CORS/framing issues
+        const explicitResponse = await axios.get(result.secure_url, { responseType: 'stream' });
+        res.setHeader('Content-Type', contentType);
+        res.setHeader('Content-Disposition', `inline; filename="${resume.originalName}"`);
+        explicitResponse.data.pipe(res);
+        return;
       } catch (expErr) {
         console.warn('[ViewFile] explicit() failed for:', pid, '→', expErr.message);
       }
