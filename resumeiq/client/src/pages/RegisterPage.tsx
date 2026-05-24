@@ -263,13 +263,23 @@ export default function RegisterPage() {
                   )}
                 </button>
 
-                {/* Terms text */}
-                <p className="text-[10px] text-gray-600 text-center leading-relaxed font-mono">
-                  By creating an account, you agree to our{' '}
-                  <span className="text-gray-400 hover:text-white cursor-pointer transition-colors">Terms</span>
-                  {' '}and{' '}
-                  <span className="text-gray-400 hover:text-white cursor-pointer transition-colors">Privacy Policy</span>
-                </p>
+                {/* Terms text with checkbox */}
+                <div className="flex items-start gap-3 mt-4">
+                  <div className="pt-0.5">
+                    <input 
+                      type="checkbox" 
+                      id="terms" 
+                      required 
+                      className="w-3.5 h-3.5 rounded border-gray-600 bg-[#0A0A0F] text-[#5B5FEF] focus:ring-[#5B5FEF]/50 focus:ring-offset-0 cursor-pointer"
+                    />
+                  </div>
+                  <label htmlFor="terms" className="text-[11px] text-gray-500 leading-relaxed font-medium cursor-pointer">
+                    I agree to the{' '}
+                    <Link to="/terms" target="_blank" className="text-[#3DEBA6] hover:text-[#3DEBA6]/80 transition-colors">Terms of Service</Link>
+                    {' '}and{' '}
+                    <Link to="/privacy" target="_blank" className="text-[#3DEBA6] hover:text-[#3DEBA6]/80 transition-colors">Privacy Policy</Link>.
+                  </label>
+                </div>
               </form>
 
               {/* Divider */}

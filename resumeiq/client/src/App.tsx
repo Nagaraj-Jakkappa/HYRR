@@ -21,6 +21,8 @@ import NotFoundPage from './pages/NotFoundPage';
 // Components
 import Layout from './components/ui/Layout';
 import DemoPage from './pages/DemoPage';
+import TermsPage from './pages/TermsPage';
+import PrivacyPage from './pages/PrivacyPage';
 
 const Protected = ({ children, adminOnly = false }: { children: any; adminOnly?: boolean }) => {
   const { user, loading } = useAuth();
@@ -62,6 +64,8 @@ const App = () => (
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/report/:id" element={<ReportPage />} />
         <Route path="/demo" element={<DemoPage />} />
+        <Route path="/terms" element={<TermsPage />} />
+        <Route path="/privacy" element={<PrivacyPage />} />
 
         {/* --- PROTECTED ROUTES --- */}
         <Route element={<Protected><Layout /></Protected>}>
