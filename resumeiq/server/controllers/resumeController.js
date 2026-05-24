@@ -135,89 +135,85 @@ exports.viewResumeFile = async (req, res, next) => {
     const resume = await Resume.findOne({ _id: req.params.id, userId: req.user._id });
     if (!resume) return res.status(404).json({ success: false, message: 'Resume not found' });
 
-    const cloudName = process.env.CLOUDINARY_CLOUD_NAME;
-    const apiKey = process.env.CLOUDINARY_API_KEY;
-    const apiSecret = process.env.CLOUDINARY_API_SECRET;
-    const timestamp = Math.floor(Date.now() / 1000);
-    const format = resume.fileType; // 'pdf' or 'docx'
-
-    const contentType = format === 'pdf'
+    const contentType = resume.fileType === 'pdf'
       ? 'application/pdf'
       : 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
 
-    // For Cloudinary raw resources, the public_id includes the extension.
-    // The download API endpoint also appends the format, creating double-extension bugs.
-    // We try multiple public_id variants to handle this.
-    const rawId = resume.cloudinaryId;
+    const rawId = resume.cloudinaryId; // "resumeiq/resumes/...pdf"
     const strippedId = rawId.replace(/\.(pdf|docx|doc)$/i, '');
 
-    // Build a list of download URL attempts
-    const attempts = [
-      // Attempt 1: public_id WITHOUT extension + format (standard approach)
-      { publicId: strippedId, fmt: format },
-      // Attempt 2: public_id WITH extension + NO format (raw resource approach)
-      { publicId: rawId, fmt: '' },
-      // Attempt 3: public_id WITH extension + same format (some Cloudinary configs need this)
-      { publicId: rawId, fmt: format },
+    const candidates = [
+      { id: rawId, rType: 'raw' },
+      { id: strippedId, rType: 'raw' },
+      { id: rawId, rType: 'image' },
+      { id: strippedId, rType: 'image' }
     ];
 
-    for (const attempt of attempts) {
+    let foundAsset = null;
+
+    // 1. Find the exact asset using the Admin API
+    for (const candidate of candidates) {
       try {
-        // Build signed params (exclude empty values from signature)
-        const signParams = { public_id: attempt.publicId, timestamp };
-        if (attempt.fmt) signParams.format = attempt.fmt;
-
-        const signature = cloudinary.utils.api_sign_request(signParams, apiSecret);
-
-        let downloadUrl = `https://api.cloudinary.com/v1_1/${cloudName}/raw/download` +
-          `?public_id=${encodeURIComponent(attempt.publicId)}` +
-          `&timestamp=${timestamp}` +
-          `&signature=${signature}` +
-          `&api_key=${apiKey}`;
-        if (attempt.fmt) downloadUrl += `&format=${attempt.fmt}`;
-
-        console.log('[ViewFile] Trying:', attempt.publicId, 'format:', attempt.fmt || '(none)');
-        const fileResponse = await axios.get(downloadUrl, { responseType: 'stream' });
-
-        // Success — stream back to client
-        res.setHeader('Content-Type', contentType);
-        res.setHeader('Content-Disposition', `inline; filename="${resume.originalName}"`);
-        fileResponse.data.pipe(res);
-        return;
+        console.log(`[ViewFile] Probing asset ${candidate.id} (${candidate.rType})...`);
+        const asset = await cloudinary.api.resource(candidate.id, { resource_type: candidate.rType });
+        foundAsset = asset;
+        console.log(`[ViewFile] Found asset! resource_type: ${asset.resource_type}, access_mode: ${asset.access_mode || 'default'}`);
+        break; // Stop once we find it
       } catch (err) {
-        console.warn('[ViewFile] Failed:', attempt.publicId, '→', err.response?.status || err.message);
+        // Not found, continue
       }
     }
 
-    // Final fallback: make the file public on-the-fly using explicit(), then redirect
-    console.log('[ViewFile] All download attempts failed. Trying explicit() to make file public...');
-    const explicitVariants = [strippedId, rawId];
-    for (const pid of explicitVariants) {
+    if (!foundAsset) {
+      return res.status(404).json({
+        success: false,
+        message: 'Unable to locate file in cloud storage. Please re-upload.',
+        debug: { cloudinaryId: rawId, strippedId }
+      });
+    }
+
+    // 2. Ensure it is publicly accessible
+    if (foundAsset.access_mode !== 'public') {
       try {
-        const result = await cloudinary.uploader.explicit(pid, {
-          type: 'upload',
-          resource_type: 'raw',
-          access_mode: 'public',
+        console.log(`[ViewFile] Making asset public via explicit()...`);
+        const updatedAsset = await cloudinary.uploader.explicit(foundAsset.public_id, {
+          type: foundAsset.type,
+          resource_type: foundAsset.resource_type,
+          access_mode: 'public'
         });
-        console.log('[ViewFile] explicit() succeeded for:', pid, '→ fetching public url');
-        
-        // Fetch the newly public URL and stream it to the client to avoid CORS/framing issues
-        const explicitResponse = await axios.get(result.secure_url, { responseType: 'stream' });
-        res.setHeader('Content-Type', contentType);
-        res.setHeader('Content-Disposition', `inline; filename="${resume.originalName}"`);
-        explicitResponse.data.pipe(res);
-        return;
-      } catch (expErr) {
-        console.warn('[ViewFile] explicit() failed for:', pid, '→', expErr.message);
+        foundAsset.secure_url = updatedAsset.secure_url;
+      } catch (err) {
+        console.warn(`[ViewFile] explicit() failed:`, err.message);
       }
     }
 
-    // Nothing worked
-    res.status(500).json({
-      success: false,
-      message: 'Unable to retrieve file. Please re-upload your resume.',
-      debug: { cloudinaryId: rawId, strippedId }
-    });
+    // 3. Fetch the public URL and stream to client
+    try {
+      console.log(`[ViewFile] Fetching secure_url:`, foundAsset.secure_url);
+      const fileResponse = await axios.get(foundAsset.secure_url, { responseType: 'stream' });
+
+      res.setHeader('Content-Type', contentType);
+      res.setHeader('Content-Disposition', `inline; filename="${resume.originalName}"`);
+      fileResponse.data.pipe(res);
+    } catch (streamErr) {
+      // If fetching fails, maybe it requires signed URLs or auth
+      console.warn(`[ViewFile] Axios GET failed for secure_url:`, streamErr.message);
+      
+      // Fallback: Generate a signed URL and try again
+      const signedUrl = cloudinary.url(foundAsset.public_id, {
+        resource_type: foundAsset.resource_type,
+        type: foundAsset.type,
+        sign_url: true,
+        secure: true
+      });
+      
+      console.log(`[ViewFile] Fetching signed_url:`, signedUrl);
+      const signedResponse = await axios.get(signedUrl, { responseType: 'stream' });
+      
+      res.setHeader('Content-Type', contentType);
+      res.setHeader('Content-Disposition', `inline; filename="${resume.originalName}"`);
+      signedResponse.data.pipe(res);
+    }
   } catch (err) {
     console.error('[ViewFile] Fatal error:', err.message);
     res.status(500).json({ success: false, message: 'Unable to retrieve file.' });
