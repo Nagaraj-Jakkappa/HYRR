@@ -19,16 +19,22 @@ type FilterType = 'ALL' | 'HIGH' | 'MID' | 'LOW'
 const ScoreBadge = ({ score }: { score: number }) => {
   const safe = Number(score) || 0
   if (safe === 0) return (
-    <span className="px-3 py-1 rounded-full text-xs font-mono border bg-white/5 border-white/10 text-[#6B6B7E]">—</span>
+    <span className="px-3 py-1 rounded-full text-xs font-mono border bg-[#13131A] border-white/[0.06] text-[#6B6B7E] shadow-sm">—</span>
   )
   if (safe >= 80) return (
-    <span className="px-3 py-1 rounded-full text-xs font-mono font-bold border bg-[#3DEBA6]/10 border-[#3DEBA6]/25 text-[#3DEBA6]">{safe}%</span>
+    <span className="px-3 py-1 rounded-full text-xs font-mono font-bold border bg-[#3DEBA6]/10 border-[#3DEBA6]/30 text-[#3DEBA6] shadow-[0_0_10px_rgba(61,235,166,0.2)]">
+      {safe}%
+    </span>
   )
   if (safe >= 60) return (
-    <span className="px-3 py-1 rounded-full text-xs font-mono font-bold border bg-[#F0C060]/10 border-[#F0C060]/25 text-[#F0C060]">{safe}%</span>
+    <span className="px-3 py-1 rounded-full text-xs font-mono font-bold border bg-[#F0C060]/10 border-[#F0C060]/30 text-[#F0C060] shadow-[0_0_10px_rgba(240,192,96,0.15)]">
+      {safe}%
+    </span>
   )
   return (
-    <span className="px-3 py-1 rounded-full text-xs font-mono font-bold border bg-[#ef4444]/10 border-[#ef4444]/25 text-[#ef4444]">{safe}%</span>
+    <span className="px-3 py-1 rounded-full text-xs font-mono font-bold border bg-[#ef4444]/10 border-[#ef4444]/30 text-[#ef4444] shadow-[0_0_10px_rgba(239,68,68,0.15)]">
+      {safe}%
+    </span>
   )
 }
 
@@ -151,98 +157,108 @@ export default function HistoryPage() {
         </div>
       </div>
 
-      {/* Floating Compare Button */}
+      {/* Floating Compare Island */}
       {selectedIds.length === 2 && (
-        <div className="fixed bottom-10 left-1/2 -translate-x-1/2 z-50 bg-[#13131A] border border-[#5B5FEF] px-6 py-4 rounded-2xl shadow-2xl flex items-center gap-6 animate-in slide-in-from-bottom-10">
-          <div className="flex items-center gap-2">
+        <div className="fixed bottom-10 left-1/2 -translate-x-1/2 z-50 backdrop-blur-xl bg-[#13131A]/80 border border-[#5B5FEF]/50 px-6 py-4 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.5),0_0_20px_rgba(91,95,239,0.3)] flex items-center gap-6 animate-in slide-in-from-bottom-10 fade-in duration-300">
+          <div className="flex items-center gap-3">
             <div className="flex -space-x-2">
-              <div className="w-8 h-8 rounded-full bg-[#5B5FEF] flex items-center justify-center text-[10px] font-black border-2 border-[#13131A]">1</div>
-              <div className="w-8 h-8 rounded-full bg-[#5B5FEF] flex items-center justify-center text-[10px] font-black border-2 border-[#13131A]">2</div>
+              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#5B5FEF] to-[#8E5BEF] flex items-center justify-center text-[10px] font-black border-2 border-[#13131A] shadow-lg text-white">1</div>
+              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#5B5FEF] to-[#8E5BEF] flex items-center justify-center text-[10px] font-black border-2 border-[#13131A] shadow-lg text-white">2</div>
             </div>
-            <span className="text-xs font-mono font-bold text-[#EEEEF0]">Ready to Compare</span>
+            <span className="text-xs font-mono font-bold text-white tracking-wide">Ready to Compare</span>
           </div>
+          <div className="w-[1px] h-8 bg-white/10 hidden sm:block"></div>
           <button
             onClick={handleCompareAction}
-            className="bg-[#5B5FEF] hover:bg-[#4a4edb] text-white text-xs font-black px-5 py-2 rounded-xl uppercase tracking-wider transition-all"
+            className="bg-white hover:bg-gray-100 text-[#13131A] text-xs font-black px-5 py-2.5 rounded-xl uppercase tracking-wider transition-all shadow-[0_0_15px_rgba(255,255,255,0.2)] hover:shadow-[0_0_25px_rgba(255,255,255,0.4)]"
           >
-            Compare Selected Scans
+            Run Comparison
           </button>
         </div>
       )}
 
-      {/* Search + Filter row */}
-      <div className="flex flex-col sm:flex-row gap-3 mb-5">
+      {/* Command Bar (Search & Filter) */}
+      <div className="flex flex-col sm:flex-row gap-3 mb-6 bg-[#13131A] p-2 rounded-xl border border-white/[0.06] shadow-sm">
         <div className="relative flex-1">
-          <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#6B6B7E]" />
+          <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#6B6B7E]" />
           <input
             type="text"
-            placeholder="Search company or job title..."
-            className="w-full bg-[#13131A] border border-white/[0.06] rounded-lg py-2.5 pl-9 pr-4 text-sm text-[#EEEEF0] placeholder-[#6B6B7E] focus:outline-none focus:border-[#5B5FEF]/50 transition-all"
+            placeholder="Search by company or job title..."
+            className="w-full bg-[#0A0A0F]/50 border border-white/5 rounded-lg py-2.5 pl-10 pr-4 text-sm text-white placeholder-[#6B6B7E] focus:outline-none focus:border-[#5B5FEF]/50 focus:ring-1 focus:ring-[#5B5FEF]/30 transition-all font-medium"
             value={searchTerm}
             onChange={e => setSearchTerm(e.target.value)}
           />
         </div>
 
-        <div className="flex items-center gap-1 bg-[#13131A] border border-white/[0.06] rounded-lg p-1">
-          <Filter size={12} className="text-[#6B6B7E] mx-1.5" />
+        <div className="flex items-center gap-1 bg-[#0A0A0F]/50 border border-white/5 rounded-lg p-1">
+          <Filter size={14} className="text-[#6B6B7E] mx-2" />
           {(['ALL', 'HIGH', 'MID', 'LOW'] as FilterType[]).map(f => (
             <button
               key={f}
               onClick={() => setFilter(f)}
-              className={`px-3 py-1.5 rounded-md text-xs font-mono font-medium transition-all ${filter === f ? 'bg-[#5B5FEF] text-white' : 'text-[#6B6B7E] hover:text-[#EEEEF0]'
+              className={`px-3 py-2 rounded-md text-xs font-mono font-bold transition-all ${filter === f 
+                ? 'bg-[#5B5FEF] text-white shadow-md' 
+                : 'text-[#6B6B7E] hover:text-white hover:bg-white/5'
                 }`}
             >
-              {f} <span className="ml-1 opacity-60">({filterCounts[f]})</span>
+              {f} <span className={`ml-1 ${filter === f ? 'text-white/70' : 'opacity-50'}`}>{filterCounts[f]}</span>
             </button>
           ))}
         </div>
       </div>
 
-      {/* Table */}
-      <div className="bg-[#13131A] border border-white/[0.06] rounded-xl overflow-hidden">
-        <table className="w-full">
+      {/* Data Grid */}
+      <div className="bg-[#1A1A24] border border-white/[0.06] rounded-xl overflow-hidden shadow-xl relative">
+        {/* Subtle background glow */}
+        <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-[#5B5FEF]/5 to-transparent pointer-events-none"></div>
+        
+        <table className="w-full relative z-10">
           <thead>
-            <tr className="border-b border-white/[0.06]">
-              {isCompareMode && <th className="w-12 px-5 py-3.5"></th>}
-              <th className="px-5 py-3.5 text-left text-[10px] font-mono text-[#6B6B7E] uppercase tracking-wider">Company & Role</th>
-              <th className="px-5 py-3.5 text-left text-[10px] font-mono text-[#6B6B7E] uppercase tracking-wider hidden sm:table-cell">Resume</th>
-              <th className="px-5 py-3.5 text-center text-[10px] font-mono text-[#6B6B7E] uppercase tracking-wider">ATS Score</th>
-              <th className="px-5 py-3.5 text-center text-[10px] font-mono text-[#6B6B7E] uppercase tracking-wider hidden md:table-cell">Date</th>
-              <th className="px-5 py-3.5 text-right text-[10px] font-mono text-[#6B6B7E] uppercase tracking-wider">Result</th>
+            <tr className="border-b border-white/[0.06] bg-[#13131A]/80 backdrop-blur-sm">
+              {isCompareMode && <th className="w-12 px-5 py-4"></th>}
+              <th className="px-5 py-4 text-left text-[10px] font-bold font-mono text-[#6B6B7E] uppercase tracking-wider">Company & Role</th>
+              <th className="px-5 py-4 text-left text-[10px] font-bold font-mono text-[#6B6B7E] uppercase tracking-wider hidden sm:table-cell">Resume</th>
+              <th className="px-5 py-4 text-center text-[10px] font-bold font-mono text-[#6B6B7E] uppercase tracking-wider">ATS Score</th>
+              <th className="px-5 py-4 text-center text-[10px] font-bold font-mono text-[#6B6B7E] uppercase tracking-wider hidden md:table-cell">Date</th>
+              <th className="px-5 py-4 text-right text-[10px] font-bold font-mono text-[#6B6B7E] uppercase tracking-wider">Result</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-white/[0.04]">
-            {loading && [1, 2, 3].map(i => <SkeletonRow key={i} isCompareMode={isCompareMode} />)}
+            {loading && [1, 2, 3, 4, 5].map(i => <SkeletonRow key={i} isCompareMode={isCompareMode} />)}
 
             {!loading && filtered.map(scan => (
               <tr
                 key={scan._id}
                 onClick={() => isCompareMode && handleSelect(scan._id)}
-                className={`transition-colors group ${isCompareMode ? 'cursor-pointer hover:bg-[#5B5FEF]/5' : 'hover:bg-white/[0.015]'
-                  } ${selectedIds.includes(scan._id) ? 'bg-[#5B5FEF]/10' : ''}`}
+                className={`transition-all duration-200 group relative ${isCompareMode ? 'cursor-pointer' : ''} ${
+                  selectedIds.includes(scan._id) 
+                    ? 'bg-[#5B5FEF]/10 shadow-[inset_4px_0_0_0_#5B5FEF]' 
+                    : 'hover:bg-white/[0.02] hover:shadow-[inset_0_0_0_1px_rgba(255,255,255,0.05)]'
+                }`}
               >
                 {isCompareMode && (
                   <td className="px-5 py-4">
-                    <div className={`w-5 h-5 rounded border flex items-center justify-center transition-all ${selectedIds.includes(scan._id)
-                        ? 'bg-[#5B5FEF] border-[#5B5FEF]'
-                        : 'border-white/10 bg-[#0A0A0F]'
-                      }`}>
+                    <div className={`w-5 h-5 rounded flex items-center justify-center transition-all ${
+                      selectedIds.includes(scan._id)
+                        ? 'bg-[#5B5FEF] shadow-[0_0_10px_rgba(91,95,239,0.5)]'
+                        : 'bg-[#13131A] border border-white/10 group-hover:border-white/20'
+                    }`}>
                       {selectedIds.includes(scan._id) && <CheckCircle2 size={12} className="text-white" />}
                     </div>
                   </td>
                 )}
 
                 <td className="px-5 py-4">
-                  <p className="text-sm font-semibold text-[#EEEEF0] truncate max-w-[200px]">
+                  <p className="text-sm font-bold text-white truncate max-w-[200px] mb-1">
                     {scan.jobId?.companyName || 'Unknown'}
                   </p>
-                  <p className="text-xs text-[#6B6B7E] font-mono mt-0.5 truncate max-w-[200px]">
+                  <p className="text-xs text-[#6B6B7E] font-mono truncate max-w-[200px]">
                     {scan.jobId?.jobTitle || 'Unknown Role'}
                   </p>
                 </td>
 
                 <td className="px-5 py-4 hidden sm:table-cell">
-                  <p className="text-xs text-[#6B6B7E] font-mono truncate max-w-[160px]">
+                  <p className="text-xs text-[#6B6B7E] font-mono truncate max-w-[160px] group-hover:text-gray-400 transition-colors">
                     {scan.resumeId?.originalName || '—'}
                   </p>
                 </td>
@@ -252,9 +268,9 @@ export default function HistoryPage() {
                 </td>
 
                 <td className="px-5 py-4 text-center hidden md:table-cell">
-                  <span className="text-xs text-[#6B6B7E] font-mono flex items-center justify-center gap-1">
-                    <Clock size={11} />
-                    {new Date(scan.createdAt).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}
+                  <span className="text-[11px] text-[#6B6B7E] font-mono flex items-center justify-center gap-1.5 group-hover:text-gray-400 transition-colors">
+                    <Clock size={12} />
+                    {new Date(scan.createdAt).toLocaleDateString('en-US', { day: '2-digit', month: 'short', year: 'numeric' })}
                   </span>
                 </td>
 
@@ -262,14 +278,27 @@ export default function HistoryPage() {
                   <Link
                     to={`/scan/results/${scan._id}`}
                     onClick={(e) => isCompareMode && e.preventDefault()}
-                    className={`inline-flex items-center gap-1.5 text-xs font-medium transition-colors ${isCompareMode ? 'text-[#6B6B7E] cursor-not-allowed' : 'text-[#5B5FEF] hover:text-white'
-                      }`}
+                    className={`inline-flex items-center gap-2 text-xs font-bold transition-all px-3 py-1.5 rounded-lg ${
+                      isCompareMode 
+                        ? 'text-[#6B6B7E] cursor-not-allowed' 
+                        : 'text-white bg-white/5 hover:bg-white/10 hover:shadow-sm'
+                    }`}
                   >
-                    View <ExternalLink size={12} />
+                    View <ExternalLink size={14} />
                   </Link>
                 </td>
               </tr>
             ))}
+            
+            {!loading && filtered.length === 0 && (
+              <tr>
+                <td colSpan={isCompareMode ? 6 : 5} className="px-5 py-16 text-center">
+                  <Inbox size={32} className="mx-auto text-white/10 mb-4" />
+                  <p className="text-[#EEEEF0] font-medium">No scans found</p>
+                  <p className="text-sm text-[#6B6B7E] mt-1">Try adjusting your filters or search term.</p>
+                </td>
+              </tr>
+            )}
           </tbody>
         </table>
       </div>
