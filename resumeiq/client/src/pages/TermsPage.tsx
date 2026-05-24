@@ -22,7 +22,7 @@ export default function TermsPage() {
 
             <main className="flex-1 max-w-4xl mx-auto px-6 py-16 w-full">
                 <h1 className="text-4xl font-black mb-8">Terms of Service</h1>
-                <div className="space-y-6 text-gray-400 leading-relaxed text-sm">
+                <div className="bg-[#13131A]/80 backdrop-blur-xl p-8 md:p-12 rounded-[32px] border border-white/5 shadow-2xl space-y-8 text-gray-400 leading-relaxed text-sm">
                     <section>
                         <h2 className="text-lg font-bold text-white mb-2">1. Acceptance of Terms</h2>
                         <p>By accessing and using hyrr, you accept and agree to be bound by the terms and provision of this agreement.</p>

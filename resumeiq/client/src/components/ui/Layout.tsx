@@ -31,7 +31,7 @@ export default function Layout() {
         onMouseEnter={() => setExpanded(true)}
         onMouseLeave={() => setExpanded(false)}
         className={`
-          flex-shrink-0 bg-hyrr-surface border-r border-white/[0.05] flex flex-col
+          flex-shrink-0 bg-[#0A0A0F]/80 backdrop-blur-2xl border-r border-white/[0.05] flex flex-col
           transition-all duration-300 ease-in-out overflow-hidden z-30
           ${expanded ? 'w-[240px]' : 'w-[72px]'}
         `}

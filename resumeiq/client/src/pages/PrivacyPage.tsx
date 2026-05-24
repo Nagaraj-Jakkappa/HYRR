@@ -22,7 +22,7 @@ export default function PrivacyPage() {
 
             <main className="flex-1 max-w-4xl mx-auto px-6 py-16 w-full">
                 <h1 className="text-4xl font-black mb-8">Privacy Policy</h1>
-                <div className="space-y-6 text-gray-400 leading-relaxed text-sm">
+                <div className="bg-[#13131A]/80 backdrop-blur-xl p-8 md:p-12 rounded-[32px] border border-white/5 shadow-2xl space-y-8 text-gray-400 leading-relaxed text-sm">
                     <section>
                         <h2 className="text-lg font-bold text-white mb-2">1. Information We Collect</h2>
                         <p>We only collect information about you if we have a reason to do so — for example, to provide our Services, to communicate with you, or to make our Services better. We collect this information from three sources: if and when you provide information to us, automatically through operating our Services, and from outside sources.</p>

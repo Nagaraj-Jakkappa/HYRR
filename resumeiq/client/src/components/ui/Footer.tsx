@@ -56,7 +56,7 @@ const socialLinks = [
 
 export default function Footer() {
   return (
-    <footer className="bg-[#0D0D14] border-t border-white/[0.04]">
+    <footer className="bg-[#0A0A0F]/90 backdrop-blur-xl border-t border-white/[0.04] relative z-10">
       {/* Social Icons Row */}
       <div className="max-w-7xl mx-auto px-6 pt-12 pb-6">
         <div className="flex flex-wrap items-center justify-center gap-6 md:gap-10">
