@@ -21,6 +21,7 @@ import {
     Cpu,
     Layers,
     MousePointerClick,
+    Copy,
 } from 'lucide-react';
 
 export default function LandingPage() {
@@ -28,6 +29,7 @@ export default function LandingPage() {
     const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
     const [selectedPlan, setSelectedPlan] = useState<{ title: string, price: string } | null>(null);
     const [utrNumber, setUtrNumber] = useState('');
+    const [copied, setCopied] = useState(false);
 
     const handlePlanSelect = (title: string, price: string) => {
         if (title.toLowerCase() === 'free') {
@@ -606,9 +608,22 @@ export default function LandingPage() {
                             />
                         </div>
 
-                        <div className="bg-black/40 border border-white/5 rounded-xl p-4 mb-6">
-                            <p className="text-xs text-gray-500 mb-1">UPI ID</p>
-                            <p className="font-mono text-[#3DEBA6] font-bold tracking-tight">nagupoojary33-3@oksbi</p>
+                        <div className="bg-black/40 border border-white/5 rounded-xl p-4 mb-6 flex items-center justify-between">
+                            <div className="text-left">
+                                <p className="text-xs text-gray-500 mb-1">UPI ID</p>
+                                <p className="font-mono text-[#3DEBA6] font-bold tracking-tight">nagupoojary33-3@oksbi</p>
+                            </div>
+                            <button
+                                onClick={() => {
+                                    navigator.clipboard.writeText('nagupoojary33-3@oksbi');
+                                    setCopied(true);
+                                    setTimeout(() => setCopied(false), 2000);
+                                }}
+                                className="p-2 bg-white/5 hover:bg-white/10 rounded-lg transition text-gray-400 hover:text-white flex items-center gap-2 text-xs font-bold"
+                            >
+                                {copied ? <Check size={14} className="text-[#3DEBA6]" /> : <Copy size={14} />}
+                                {copied ? 'Copied' : 'Copy'}
+                            </button>
                         </div>
                         
                         <div className="bg-black/40 border border-white/5 rounded-xl p-4 mb-6 text-left">
