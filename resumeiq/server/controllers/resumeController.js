@@ -135,78 +135,86 @@ exports.viewResumeFile = async (req, res, next) => {
     const resume = await Resume.findOne({ _id: req.params.id, userId: req.user._id });
     if (!resume) return res.status(404).json({ success: false, message: 'Resume not found' });
 
-    const contentType = resume.fileType === 'pdf'
+    const cloudName = process.env.CLOUDINARY_CLOUD_NAME;
+    const apiKey = process.env.CLOUDINARY_API_KEY;
+    const apiSecret = process.env.CLOUDINARY_API_SECRET;
+    const timestamp = Math.floor(Date.now() / 1000);
+    const format = resume.fileType; // 'pdf' or 'docx'
+
+    const contentType = format === 'pdf'
       ? 'application/pdf'
       : 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
 
-    // Strategy 1: Extract the exact public path from the stored fileUrl
-    // URL format: https://res.cloudinary.com/{cloud}/raw/upload/v{ver}/{folder}/{file}.{ext}
-    // We extract everything after /upload/ (including version) and use it to build a signed URL
-    let fileResponse;
+    // For Cloudinary raw resources, the public_id includes the extension.
+    // The download API endpoint also appends the format, creating double-extension bugs.
+    // We try multiple public_id variants to handle this.
+    const rawId = resume.cloudinaryId;
+    const strippedId = rawId.replace(/\.(pdf|docx|doc)$/i, '');
 
-    try {
-      // Parse the public_id from the stored URL (this is guaranteed to be correct)
-      const urlObj = new URL(resume.fileUrl);
-      const pathAfterUpload = urlObj.pathname.split('/upload/')[1]; // v123/folder/file.pdf
-      const withoutVersion = pathAfterUpload.replace(/^v\d+\//, ''); // folder/file.pdf
+    // Build a list of download URL attempts
+    const attempts = [
+      // Attempt 1: public_id WITHOUT extension + format (standard approach)
+      { publicId: strippedId, fmt: format },
+      // Attempt 2: public_id WITH extension + NO format (raw resource approach)
+      { publicId: rawId, fmt: '' },
+      // Attempt 3: public_id WITH extension + same format (some Cloudinary configs need this)
+      { publicId: rawId, fmt: format },
+    ];
 
-      // Generate a signed URL using cloudinary.url()
-      // For raw resources, the full path INCLUDING extension is the public_id
-      const signedUrl = cloudinary.url(withoutVersion, {
-        resource_type: 'raw',
-        type: 'upload',
-        sign_url: true,
-        secure: true,
-      });
-
-      console.log('[ViewFile] Trying signed URL for:', withoutVersion);
-      fileResponse = await axios.get(signedUrl, { responseType: 'stream' });
-    } catch (signedErr) {
-      console.warn('[ViewFile] Signed URL failed, trying Admin API download...', signedErr.message);
-
-      // Strategy 2: Use the Cloudinary Admin API download endpoint with Basic Auth
-      // This uses api_key:api_secret as HTTP Basic Auth credentials
-      const cloudName = process.env.CLOUDINARY_CLOUD_NAME;
-      const apiKey = process.env.CLOUDINARY_API_KEY;
-      const apiSecret = process.env.CLOUDINARY_API_SECRET;
-
-      // Try private_download_url with the public_id extracted from the URL
-      const urlObj = new URL(resume.fileUrl);
-      const pathAfterUpload = urlObj.pathname.split('/upload/')[1];
-      const withoutVersion = pathAfterUpload.replace(/^v\d+\//, '');
-
-      // For private_download_url, we need public_id WITHOUT extension and format separately
-      const lastDotIdx = withoutVersion.lastIndexOf('.');
-      const publicIdNoExt = lastDotIdx > -1 ? withoutVersion.substring(0, lastDotIdx) : withoutVersion;
-      const format = lastDotIdx > -1 ? withoutVersion.substring(lastDotIdx + 1) : resume.fileType;
-
+    for (const attempt of attempts) {
       try {
-        const downloadUrl = cloudinary.utils.private_download_url(
-          publicIdNoExt,
-          format,
-          { resource_type: 'raw' }
-        );
-        console.log('[ViewFile] Trying private_download_url for:', publicIdNoExt, 'format:', format);
-        fileResponse = await axios.get(downloadUrl, { responseType: 'stream' });
-      } catch (dlErr) {
-        console.warn('[ViewFile] private_download_url failed, trying direct fetch with API auth...', dlErr.message);
+        // Build signed params (exclude empty values from signature)
+        const signParams = { public_id: attempt.publicId, timestamp };
+        if (attempt.fmt) signParams.format = attempt.fmt;
 
-        // Strategy 3: Direct download from Cloudinary CDN with API key as query param
-        const directUrl = `https://res.cloudinary.com/${cloudName}/raw/upload/${pathAfterUpload}`;
-        fileResponse = await axios.get(directUrl, {
-          responseType: 'stream',
-          auth: { username: apiKey, password: apiSecret },
-        });
+        const signature = cloudinary.utils.api_sign_request(signParams, apiSecret);
+
+        let downloadUrl = `https://api.cloudinary.com/v1_1/${cloudName}/raw/download` +
+          `?public_id=${encodeURIComponent(attempt.publicId)}` +
+          `&timestamp=${timestamp}` +
+          `&signature=${signature}` +
+          `&api_key=${apiKey}`;
+        if (attempt.fmt) downloadUrl += `&format=${attempt.fmt}`;
+
+        console.log('[ViewFile] Trying:', attempt.publicId, 'format:', attempt.fmt || '(none)');
+        const fileResponse = await axios.get(downloadUrl, { responseType: 'stream' });
+
+        // Success — stream back to client
+        res.setHeader('Content-Type', contentType);
+        res.setHeader('Content-Disposition', `inline; filename="${resume.originalName}"`);
+        fileResponse.data.pipe(res);
+        return;
+      } catch (err) {
+        console.warn('[ViewFile] Failed:', attempt.publicId, '→', err.response?.status || err.message);
       }
     }
 
-    // Stream the file back to the browser
-    res.setHeader('Content-Type', contentType);
-    res.setHeader('Content-Disposition', `inline; filename="${resume.originalName}"`);
-    fileResponse.data.pipe(res);
+    // Final fallback: make the file public on-the-fly using explicit(), then redirect
+    console.log('[ViewFile] All download attempts failed. Trying explicit() to make file public...');
+    const explicitVariants = [strippedId, rawId];
+    for (const pid of explicitVariants) {
+      try {
+        const result = await cloudinary.uploader.explicit(pid, {
+          type: 'upload',
+          resource_type: 'raw',
+          access_mode: 'public',
+        });
+        console.log('[ViewFile] explicit() succeeded for:', pid, '→', result.secure_url);
+        return res.redirect(result.secure_url);
+      } catch (expErr) {
+        console.warn('[ViewFile] explicit() failed for:', pid, '→', expErr.message);
+      }
+    }
+
+    // Nothing worked
+    res.status(500).json({
+      success: false,
+      message: 'Unable to retrieve file. Please re-upload your resume.',
+      debug: { cloudinaryId: rawId, strippedId }
+    });
   } catch (err) {
-    console.error('[ViewFile] All strategies failed:', err.message);
-    res.status(500).json({ success: false, message: 'Unable to retrieve file. The file may no longer exist in cloud storage.' });
+    console.error('[ViewFile] Fatal error:', err.message);
+    res.status(500).json({ success: false, message: 'Unable to retrieve file.' });
   }
 };
 

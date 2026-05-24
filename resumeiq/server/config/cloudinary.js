@@ -21,6 +21,7 @@ const storage = new CloudinaryStorage({
       resource_type: 'raw', // Critical for PDF/DOCX to prevent Cloudinary from treating them as images
       public_id: `${Date.now()}-${file.originalname.replace(/\.[^/.]+$/, "")}`, // Unique filename
       format: extension,
+      access_mode: 'public', // Make files publicly accessible (bypasses "Restrict unsigned raw" ACL)
     };
   },
 });
