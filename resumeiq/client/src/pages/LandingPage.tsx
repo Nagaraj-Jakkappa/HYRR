@@ -599,7 +599,7 @@ export default function LandingPage() {
 
                         <div className="bg-white p-4 rounded-2xl inline-block mb-4 shadow-xl">
                             <img 
-                                src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=upi://pay?pa=nagupoojary33-3@oksbi&pn=HYRR%20${selectedPlan.title}`} 
+                                src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(`upi://pay?pa=nagupoojary33-3@oksbi&pn=HYRR ${selectedPlan.title}&am=${selectedPlan.price.replace(/[^0-9.]/g, '')}`)}`} 
                                 alt="UPI QR Code" 
                                 className="w-48 h-48"
                             />
