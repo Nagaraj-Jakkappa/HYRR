@@ -113,4 +113,16 @@ export const scanAPI = {
   getPublicReport: (id: string) => api.get(`/scans/report/${id}`),
 };
 
+// --- Admin Controls ---
+export const adminAPI = {
+  getStats: () => api.get('/admin/stats'),
+  getUsers: (page = 1, search = '') => api.get(`/admin/users?page=${page}&search=${search}`),
+  updateRole: (id: string, data: { role?: string; plan?: string }) => api.patch(`/admin/users/${id}/role`, data),
+  toggleStatus: (id: string) => api.put(`/admin/users/${id}/status`),
+  deleteUser: (id: string) => api.delete(`/admin/users/${id}`),
+  getAllScans: (page = 1) => api.get(`/admin/scans?page=${page}`),
+  getSettings: () => api.get('/admin/settings'),
+  updateSettings: (data: any) => api.put('/admin/settings', data),
+};
+
 export default api;

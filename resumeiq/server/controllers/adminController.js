@@ -1,6 +1,7 @@
 const User = require('../models/User');
 const Scan = require('../models/Scan');
 const Resume = require('../models/Resume');
+const Settings = require('../models/Settings');
 const { getScansLimitForPlan } = require('../middleware/planGate');
 
 /**
@@ -95,6 +96,18 @@ exports.getAdminStats = async (req, res, next) => {
         { $limit: 5 }
       ]),
 
+      // E. Daily Signups (Last 7 days)
+      User.aggregate([
+        { $match: { createdAt: { $gte: last7Days } } },
+        {
+          $group: {
+            _id: { $dateToString: { format: "%Y-%m-%d", date: "$createdAt" } },
+            signups: { $sum: 1 }
+          }
+        },
+        { $sort: { _id: 1 } }
+      ]),
+
       User.countDocuments(),
       Scan.countDocuments({ status: 'done' }),
     ]);
@@ -106,6 +119,7 @@ exports.getAdminStats = async (req, res, next) => {
         topKeywords,
         scoreDistribution,
         userPerformance,
+        dailySignups,
         totalUsers,
         totalScans
       }
@@ -191,5 +205,80 @@ exports.toggleUserStatus = async (req, res, next) => {
       message: `User ${user.isActive ? 'activated' : 'deactivated'} successfully`,
       data: { isActive: user.isActive }
     });
+  } catch (err) { next(err); }
+};
+
+/**
+ * 5. DELETE USER (Permanent)
+ */
+exports.deleteUser = async (req, res, next) => {
+  try {
+    const user = await User.findById(req.params.id);
+    if (!user) return res.status(404).json({ success: false, message: 'User not found' });
+
+    // Delete associated data
+    await Scan.deleteMany({ userId: user._id });
+    await Resume.deleteMany({ userId: user._id });
+    await User.findByIdAndDelete(user._id);
+
+    res.json({ success: true, message: 'User deleted permanently' });
+  } catch (err) { next(err); }
+};
+
+/**
+ * 6. GET ALL SCANS GLOBALLY
+ */
+exports.getAllScans = async (req, res, next) => {
+  try {
+    const { page = 1, limit = 20, search } = req.query;
+    
+    // We can populate user data and search by user email if needed, 
+    // but here we simply sort by newest.
+    const scans = await Scan.find()
+      .populate('userId', 'name email')
+      .sort({ createdAt: -1 })
+      .limit(limit * 1)
+      .skip((page - 1) * limit);
+
+    const total = await Scan.countDocuments();
+
+    res.json({
+      success: true,
+      data: {
+        scans,
+        total,
+        page: +page,
+        pages: Math.ceil(total / limit)
+      }
+    });
+  } catch (err) { next(err); }
+};
+
+/**
+ * 7. GET SETTINGS
+ */
+exports.getSettings = async (req, res, next) => {
+  try {
+    const settings = await Settings.getGlobalSettings();
+    res.json({ success: true, data: settings });
+  } catch (err) { next(err); }
+};
+
+/**
+ * 8. UPDATE SETTINGS
+ */
+exports.updateSettings = async (req, res, next) => {
+  try {
+    const settings = await Settings.getGlobalSettings();
+    const allowedUpdates = ['maintenanceMode', 'freePlanScans', 'proPlanScans', 'careerPlusPlanScans', 'allowNewRegistrations'];
+    
+    allowedUpdates.forEach(field => {
+      if (req.body[field] !== undefined) {
+        settings[field] = req.body[field];
+      }
+    });
+
+    await settings.save();
+    res.json({ success: true, data: settings, message: 'Settings updated' });
   } catch (err) { next(err); }
 };

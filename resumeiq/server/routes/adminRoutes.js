@@ -6,7 +6,11 @@ const {
     getAdminStats,
     getAllUsers,
     updateUserRole,
-    toggleUserStatus
+    toggleUserStatus,
+    deleteUser,
+    getAllScans,
+    getSettings,
+    updateSettings
 } = require('../controllers/adminController');
 
 // Import authentication middleware
@@ -38,5 +42,20 @@ router.patch('/users/:id/role', updateUserRole);
 
 // Ban or Unban a user (Toggles isActive status)
 router.put('/users/:id/status', toggleUserStatus);
+
+// Delete a user permanently
+router.delete('/users/:id', deleteUser);
+
+/**
+ * Scans Management Routes
+ */
+// Get all scans globally
+router.get('/scans', getAllScans);
+
+/**
+ * Settings Routes
+ */
+router.get('/settings', getSettings);
+router.put('/settings', updateSettings);
 
 module.exports = router;
