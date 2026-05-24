@@ -260,7 +260,7 @@ export default function HistoryPage() {
 
                 <td className="px-5 py-4 text-right">
                   <Link
-                    to={`/scan/${scan._id}`}
+                    to={`/scan/results/${scan._id}`}
                     onClick={(e) => isCompareMode && e.preventDefault()}
                     className={`inline-flex items-center gap-1.5 text-xs font-medium transition-colors ${isCompareMode ? 'text-[#6B6B7E] cursor-not-allowed' : 'text-[#5B5FEF] hover:text-white'
                       }`}
