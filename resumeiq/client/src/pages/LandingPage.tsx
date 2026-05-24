@@ -27,6 +27,7 @@ export default function LandingPage() {
     const navigate = useNavigate();
     const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
     const [selectedPlan, setSelectedPlan] = useState<{ title: string, price: string } | null>(null);
+    const [utrNumber, setUtrNumber] = useState('');
 
     const handlePlanSelect = (title: string, price: string) => {
         if (title.toLowerCase() === 'free') {
@@ -610,13 +611,30 @@ export default function LandingPage() {
                             <p className="font-mono text-[#3DEBA6] font-bold tracking-tight">nagupoojary33-3@oksbi</p>
                         </div>
                         
-                        <p className="text-xs text-gray-500 mb-6">Scan to pay with any UPI app (GPay, PhonePe, Paytm)</p>
-
+                        <div className="bg-black/40 border border-white/5 rounded-xl p-4 mb-6 text-left">
+                            <label className="block text-xs font-bold text-gray-400 mb-2 uppercase tracking-wider">
+                                Enter 12-Digit UTR / Transaction ID
+                            </label>
+                            <input
+                                type="text"
+                                placeholder="e.g. 312345678901"
+                                value={utrNumber}
+                                onChange={(e) => setUtrNumber(e.target.value.replace(/[^0-9]/g, '').slice(0, 12))}
+                                className="w-full bg-[#0A0A0F] border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-[#3DEBA6] transition-colors font-mono"
+                            />
+                            <p className="text-[10px] text-gray-500 mt-2">Required to verify your payment automatically.</p>
+                        </div>
+                        
                         <button
-                            onClick={() => navigate(`/register?plan=${selectedPlan.title.toLowerCase()}`)}
-                            className="w-full bg-gradient-to-r from-[#5B5FEF] to-[#8E5BEF] hover:from-[#6c70fc] hover:to-[#9f6dfc] text-white font-bold py-4 rounded-[16px] transition-all shadow-[0_0_20px_rgba(91,95,239,0.3)] hover:shadow-[0_0_30px_rgba(91,95,239,0.5)] active:scale-[0.98]"
+                            disabled={utrNumber.length !== 12}
+                            onClick={() => {
+                                setIsPaymentModalOpen(false);
+                                setUtrNumber('');
+                                navigate(`/register?plan=${selectedPlan.title.toLowerCase()}&utr=${utrNumber}`);
+                            }}
+                            className="w-full bg-gradient-to-r from-[#5B5FEF] to-[#8E5BEF] hover:from-[#6c70fc] hover:to-[#9f6dfc] disabled:opacity-50 disabled:from-gray-600 disabled:to-gray-700 disabled:cursor-not-allowed text-white font-bold py-4 rounded-[16px] transition-all shadow-[0_0_20px_rgba(91,95,239,0.3)] hover:shadow-[0_0_30px_rgba(91,95,239,0.5)] active:scale-[0.98] disabled:shadow-none"
                         >
-                            I have made the payment
+                            {utrNumber.length === 12 ? "I have made the payment" : "Enter UTR to Continue"}
                         </button>
                     </div>
                 </div>
