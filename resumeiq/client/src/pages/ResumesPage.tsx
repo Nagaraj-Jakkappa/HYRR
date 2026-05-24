@@ -192,9 +192,17 @@ export default function ResumesPage() {
                       {activeMenuId === resume._id && (
                         <div className="absolute right-0 top-full mt-2 w-36 bg-[#1a1a24] border border-white/10 rounded-xl shadow-2xl py-1 z-10 animate-in fade-in zoom-in-95 duration-150">
                           <a 
-                            href={resume.fileUrl} 
+                            href={`${import.meta.env.VITE_API_URL || 'http://localhost:5000/api'}/resumes/${resume._id}/view`} 
                             target="_blank" 
                             rel="noopener noreferrer" 
+                            onClick={(e) => {
+                              // Attach auth token as a query param since this opens in a new tab
+                              const token = localStorage.getItem('accessToken');
+                              if (token) {
+                                e.preventDefault();
+                                window.open(`${import.meta.env.VITE_API_URL || 'http://localhost:5000/api'}/resumes/${resume._id}/view?token=${token}`, '_blank');
+                              }
+                            }}
                             className="w-full text-left px-4 py-2 text-sm text-gray-300 hover:bg-white/5 hover:text-white flex items-center gap-2"
                           >
                             <ExternalLink size={14} /> View File

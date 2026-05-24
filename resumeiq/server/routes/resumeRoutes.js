@@ -8,6 +8,7 @@ const {
     getMyResumes,
     getResume,
     deleteResume,
+    viewResumeFile,
     magicRewrite,
     importLinkedInPDF,
     generateCoverLetter // --- NEW: Connected Feature 5 Entrypoint ---
@@ -36,6 +37,9 @@ router.post('/rewrite', magicRewrite);
 
 // --- AI Cover Letter Generator (Pro+ only) ---
 router.post('/cover-letter', requirePlan('pro', 'career+'), generateCoverLetter);
+
+// --- Proxy File Viewer (streams from Cloudinary through server) ---
+router.get('/:id/view', viewResumeFile);
 
 // --- Dynamic Database ID Resource Controllers ---
 router.get('/:id', getResume);

@@ -72,7 +72,19 @@ exports.uploadResume = async (req, res, next) => {
 exports.getMyResumes = async (req, res, next) => {
   try {
     const resumes = await Resume.find({ userId: req.user._id, isActive: true }).sort({ createdAt: -1 });
-    res.json({ success: true, data: { resumes, count: resumes.length } });
+    // Generate signed URLs for each resume (raw resources require authentication)
+    const signedResumes = resumes.map(r => {
+      // cloudinaryId stores the public_id; generate a signed URL for raw resource
+      const signedUrl = cloudinary.url(r.cloudinaryId, {
+        resource_type: 'raw',
+        type: 'upload',
+        sign_url: true,
+        // optional: set short expiration (e.g., 1 hour)
+        expires_at: Math.floor(Date.now() / 1000) + 60 * 60,
+      });
+      return { ...r.toObject(), fileUrl: signedUrl };
+    });
+    res.json({ success: true, data: { resumes: signedResumes, count: signedResumes.length } });
   } catch (err) {
     next(err);
   }
@@ -82,7 +94,15 @@ exports.getResume = async (req, res, next) => {
   try {
     const resume = await Resume.findOne({ _id: req.params.id, userId: req.user._id });
     if (!resume) return res.status(404).json({ success: false, message: 'Resume not found' });
-    res.json({ success: true, data: { resume } });
+    // Generate signed URL for the specific resume
+    const signedUrl = cloudinary.url(resume.cloudinaryId, {
+      resource_type: 'raw',
+      type: 'upload',
+      sign_url: true,
+      expires_at: Math.floor(Date.now() / 1000) + 60 * 60,
+    });
+    const resumeObj = { ...resume.toObject(), fileUrl: signedUrl };
+    res.json({ success: true, data: { resume: resumeObj } });
   } catch (err) {
     next(err);
   }
@@ -105,6 +125,35 @@ exports.deleteResume = async (req, res, next) => {
     await Resume.findByIdAndDelete(req.params.id);
     res.json({ success: true, message: 'Resume deleted' });
   } catch (err) {
+    next(err);
+  }
+};
+
+// --- Proxy File Viewer (bypasses Cloudinary ACL restrictions) ---
+exports.viewResumeFile = async (req, res, next) => {
+  try {
+    const resume = await Resume.findOne({ _id: req.params.id, userId: req.user._id });
+    if (!resume) return res.status(404).json({ success: false, message: 'Resume not found' });
+
+    // Generate a signed Cloudinary URL using the Admin/Download API
+    // This uses the API secret to create a time-limited authenticated URL
+    const signedUrl = cloudinary.utils.private_download_url(
+      resume.cloudinaryId,
+      resume.fileType === 'pdf' ? 'pdf' : 'docx',
+      { resource_type: 'raw', expires_at: Math.floor(Date.now() / 1000) + 300 }
+    );
+
+    // Stream the file from Cloudinary through our server to the client
+    const fileResponse = await axios.get(signedUrl, { responseType: 'stream' });
+
+    // Set proper headers so the browser displays / downloads the file
+    const contentType = resume.fileType === 'pdf' ? 'application/pdf' : 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
+    res.setHeader('Content-Type', contentType);
+    res.setHeader('Content-Disposition', `inline; filename="${resume.originalName}"`);
+
+    fileResponse.data.pipe(res);
+  } catch (err) {
+    console.error('Resume proxy view error:', err.message);
     next(err);
   }
 };
