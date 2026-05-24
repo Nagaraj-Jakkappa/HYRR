@@ -39,8 +39,20 @@ const Protected = ({ children, adminOnly = false }: { children: any; adminOnly?:
   return children;
 };
 
-const App = () => (
-  <AuthProvider>
+import React, { useEffect } from 'react';
+
+const App = () => {
+  useEffect(() => {
+    const theme = localStorage.getItem('hyrr_theme');
+    if (theme === 'light') {
+      document.documentElement.classList.add('light-theme');
+    } else {
+      document.documentElement.classList.remove('light-theme');
+    }
+  }, []);
+
+  return (
+    <AuthProvider>
     <BrowserRouter
       future={{
         v7_startTransition: true,
@@ -97,6 +109,7 @@ const App = () => (
       </Routes>
     </BrowserRouter>
   </AuthProvider>
-);
+  );
+};
 
 export default App;

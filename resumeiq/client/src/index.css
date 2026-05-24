@@ -120,3 +120,16 @@
     break-inside: avoid !important;
   }
 }
+
+/* --- GLOBAL LIGHT THEME (CSS FILTER HACK FOR HARDCODED DARK APP) --- */
+html.light-theme {
+  filter: invert(1) hue-rotate(180deg);
+  background-color: white; /* Ensures consistent inversion */
+}
+/* Prevent images, videos, and specific elements from being inverted */
+html.light-theme img,
+html.light-theme video,
+html.light-theme canvas,
+html.light-theme .no-invert {
+  filter: invert(1) hue-rotate(180deg);
+}

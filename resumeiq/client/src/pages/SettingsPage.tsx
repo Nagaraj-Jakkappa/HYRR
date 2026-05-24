@@ -82,8 +82,12 @@ const SettingsPage: React.FC = () => {
     const handleThemeChange = (newTheme: 'dark' | 'light') => {
         setTheme(newTheme);
         localStorage.setItem('hyrr_theme', newTheme);
-        toast.success(`Theme set to ${newTheme} (Local)`);
-        // Note: For full global theme support, you'd add this to the <html> class in index.html
+        if (newTheme === 'light') {
+            document.documentElement.classList.add('light-theme');
+        } else {
+            document.documentElement.classList.remove('light-theme');
+        }
+        toast.success(`Theme set to ${newTheme} globally`);
     };
 
     // Handle Account Deletion
@@ -256,7 +260,9 @@ const SettingsPage: React.FC = () => {
                                     <div className="text-4xl font-black tracking-tighter capitalize mb-2">{user?.plan || 'Free'}</div>
                                     <p className="text-sm text-gray-500 mb-8">Optimal for getting started with AI resume optimization.</p>
                                     
-                                    <button className="w-full bg-[#5B5FEF]/10 hover:bg-[#5B5FEF]/20 text-[#5B5FEF] border border-[#5B5FEF]/20 font-bold py-3 rounded-xl transition-all">
+                                    <button 
+                                        onClick={() => window.location.href = '/#pricing'}
+                                        className="w-full bg-[#5B5FEF]/10 hover:bg-[#5B5FEF]/20 text-[#5B5FEF] border border-[#5B5FEF]/20 font-bold py-3 rounded-xl transition-all">
                                         Upgrade Plan
                                     </button>
                                 </div>
@@ -317,7 +323,7 @@ const SettingsPage: React.FC = () => {
                                         <span className={`text-sm font-bold ${theme === 'light' ? 'text-gray-900' : 'text-gray-400'}`}>Light Mode</span>
                                     </button>
                                 </div>
-                                <p className="text-[10px] text-gray-500 mt-4 font-mono">Note: Local theme toggle only applies to this settings page temporarily as we roll out full global theme support.</p>
+                                <p className="text-[10px] text-gray-500 mt-4 font-mono">Note: The Light Mode theme applies globally using dynamic filter inversion.</p>
                             </div>
                         </div>
                     )}
