@@ -481,13 +481,13 @@ export default function ResumeBuilderPage() {
             {isTemplateModalOpen && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 overflow-y-auto">
                     <div className="bg-[#0A0A0F] border border-white/10 rounded-3xl w-full max-w-[1400px] my-8 relative shadow-[0_20px_60px_rgba(0,0,0,0.8)] flex flex-col max-h-[90vh]">
-                        
+
                         <div className="flex items-center justify-between p-6 border-b border-white/5 shrink-0">
                             <div>
                                 <h2 className="text-2xl font-black text-white">Template Library</h2>
                                 <p className="text-sm text-gray-400 mt-1">Select an ATS-friendly layout for your resume.</p>
                             </div>
-                            <button 
+                            <button
                                 onClick={() => setIsTemplateModalOpen(false)}
                                 className="p-2 bg-white/5 hover:bg-white/10 rounded-full text-white transition-colors"
                             >
@@ -503,13 +503,13 @@ export default function ResumeBuilderPage() {
                                     { id: 'serif', name: 'Elegant', tag: 'COLUMN', desc: 'A beautiful template that highlights the strengths & uniqueness of the applicant in a dedicated column, while leaving most of the space for the employment history & education.', image: '/image_614f52.jpg' },
                                     { id: 'executive', name: 'Polished', tag: 'PREMIUM', desc: 'A stand-out design that looks professional, but also invites the recruiter to spend more time on the resume.', image: '/image_614fce.jpg' },
                                     { id: 'minimalist', name: 'Single Column', tag: 'OCR RIGID', desc: 'A classic design enhanced to stand out subtly. Highlighted headings improve readability, allowing recruiters to quickly grasp your application and see how you fit the role.', image: '/image_61534c.jpg' },
-                                    { id: 'tech', name: 'Single Column Refined', tag: 'TRADITIONAL', desc: 'A traditional, simple resume template perfect for someone who\'s just starting out their professional career.', image: null },
-                                    { id: 'creative', name: 'Creative', tag: 'DESIGN', desc: 'This design accentuates your header in a way that captures recruiters\' attention, encouraging them to explore further. Versatile and adaptable, it\'s suitable for a broad range of industries.', image: null },
-                                    { id: 'infographic', name: 'Double Column', tag: 'STRUCTURED', desc: 'The structure and layout of this template are easy to follow, ensuring your application will get more attention than the 20 other resumes waiting for the recruiter to check.', image: null },
-                                    { id: 'european', name: 'Elite', tag: 'OPTIMIZED', desc: 'A resume template that features a refined layout that impresses recruiters and an optimized structure for superior ATS performance.', image: null },
-                                    { id: 'metric', name: 'Monochrome', tag: 'CLASSIC', desc: 'Perfect choice for job seekers in conservative industries. This template is designed with a professional and classic layout.', image: null },
+                                    { id: 'tech', name: 'Single Column Refined', tag: 'TRADITIONAL', desc: 'A traditional, simple resume template perfect for someone who\'s just starting out their professional career.', image: '/image_61535c.jpg' },
+                                    { id: 'creative', name: 'Creative', tag: 'DESIGN', desc: 'This design accentuates your header in a way that captures recruiters\' attention, encouraging them to explore further. Versatile and adaptable, it\'s suitable for a broad range of industries.', image: '/image_61536c.jpg' },
+                                    { id: 'infographic', name: 'Double Column', tag: 'STRUCTURED', desc: 'The structure and layout of this template are easy to follow, ensuring your application will get more attention than the 20 other resumes waiting for the recruiter to check.', image: '/image_61537c.jpg' },
+                                    { id: 'european', name: 'Elite', tag: 'OPTIMIZED', desc: 'A resume template that features a refined layout that impresses recruiters and an optimized structure for superior ATS performance.', image: '/image_61538c.jpg' },
+                                    { id: 'metric', name: 'Monochrome', tag: 'CLASSIC', desc: 'Perfect choice for job seekers in conservative industries. This template is designed with a professional and classic layout.', image: '/image_61539c.jpg' },
                                 ].map(t => (
-                                    <div 
+                                    <div
                                         key={t.id}
                                         onClick={() => { setActiveTemplate(t.id as TemplateKey); setIsTemplateModalOpen(false); }}
                                         className={`bg-[#13131A] border rounded-3xl p-4 transition-all flex flex-col justify-between group cursor-pointer shadow-xl ${activeTemplate === t.id ? 'border-[#5B5FEF] ring-2 ring-[#5B5FEF]/30 bg-[#5B5FEF]/5' : 'border-white/[0.05] hover:border-[#5B5FEF]/30'}`}
@@ -525,7 +525,7 @@ export default function ResumeBuilderPage() {
                                                 ) : (
                                                     <div className="text-white/10 font-black text-2xl tracking-widest uppercase transform -rotate-45">HYRR</div>
                                                 )}
-                                                
+
                                                 {activeTemplate === t.id && (
                                                     <div className="absolute inset-0 bg-[#5B5FEF]/20 flex items-center justify-center backdrop-blur-[2px]">
                                                         <div className="bg-[#5B5FEF] text-white px-3 py-1.5 rounded-lg text-xs font-bold shadow-lg flex items-center gap-1.5">
