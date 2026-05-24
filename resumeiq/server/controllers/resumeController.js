@@ -135,26 +135,78 @@ exports.viewResumeFile = async (req, res, next) => {
     const resume = await Resume.findOne({ _id: req.params.id, userId: req.user._id });
     if (!resume) return res.status(404).json({ success: false, message: 'Resume not found' });
 
-    // Generate a signed Cloudinary URL using the Admin/Download API
-    // This uses the API secret to create a time-limited authenticated URL
-    const signedUrl = cloudinary.utils.private_download_url(
-      resume.cloudinaryId,
-      resume.fileType === 'pdf' ? 'pdf' : 'docx',
-      { resource_type: 'raw', expires_at: Math.floor(Date.now() / 1000) + 300 }
-    );
+    const contentType = resume.fileType === 'pdf'
+      ? 'application/pdf'
+      : 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
 
-    // Stream the file from Cloudinary through our server to the client
-    const fileResponse = await axios.get(signedUrl, { responseType: 'stream' });
+    // Strategy 1: Extract the exact public path from the stored fileUrl
+    // URL format: https://res.cloudinary.com/{cloud}/raw/upload/v{ver}/{folder}/{file}.{ext}
+    // We extract everything after /upload/ (including version) and use it to build a signed URL
+    let fileResponse;
 
-    // Set proper headers so the browser displays / downloads the file
-    const contentType = resume.fileType === 'pdf' ? 'application/pdf' : 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
+    try {
+      // Parse the public_id from the stored URL (this is guaranteed to be correct)
+      const urlObj = new URL(resume.fileUrl);
+      const pathAfterUpload = urlObj.pathname.split('/upload/')[1]; // v123/folder/file.pdf
+      const withoutVersion = pathAfterUpload.replace(/^v\d+\//, ''); // folder/file.pdf
+
+      // Generate a signed URL using cloudinary.url()
+      // For raw resources, the full path INCLUDING extension is the public_id
+      const signedUrl = cloudinary.url(withoutVersion, {
+        resource_type: 'raw',
+        type: 'upload',
+        sign_url: true,
+        secure: true,
+      });
+
+      console.log('[ViewFile] Trying signed URL for:', withoutVersion);
+      fileResponse = await axios.get(signedUrl, { responseType: 'stream' });
+    } catch (signedErr) {
+      console.warn('[ViewFile] Signed URL failed, trying Admin API download...', signedErr.message);
+
+      // Strategy 2: Use the Cloudinary Admin API download endpoint with Basic Auth
+      // This uses api_key:api_secret as HTTP Basic Auth credentials
+      const cloudName = process.env.CLOUDINARY_CLOUD_NAME;
+      const apiKey = process.env.CLOUDINARY_API_KEY;
+      const apiSecret = process.env.CLOUDINARY_API_SECRET;
+
+      // Try private_download_url with the public_id extracted from the URL
+      const urlObj = new URL(resume.fileUrl);
+      const pathAfterUpload = urlObj.pathname.split('/upload/')[1];
+      const withoutVersion = pathAfterUpload.replace(/^v\d+\//, '');
+
+      // For private_download_url, we need public_id WITHOUT extension and format separately
+      const lastDotIdx = withoutVersion.lastIndexOf('.');
+      const publicIdNoExt = lastDotIdx > -1 ? withoutVersion.substring(0, lastDotIdx) : withoutVersion;
+      const format = lastDotIdx > -1 ? withoutVersion.substring(lastDotIdx + 1) : resume.fileType;
+
+      try {
+        const downloadUrl = cloudinary.utils.private_download_url(
+          publicIdNoExt,
+          format,
+          { resource_type: 'raw' }
+        );
+        console.log('[ViewFile] Trying private_download_url for:', publicIdNoExt, 'format:', format);
+        fileResponse = await axios.get(downloadUrl, { responseType: 'stream' });
+      } catch (dlErr) {
+        console.warn('[ViewFile] private_download_url failed, trying direct fetch with API auth...', dlErr.message);
+
+        // Strategy 3: Direct download from Cloudinary CDN with API key as query param
+        const directUrl = `https://res.cloudinary.com/${cloudName}/raw/upload/${pathAfterUpload}`;
+        fileResponse = await axios.get(directUrl, {
+          responseType: 'stream',
+          auth: { username: apiKey, password: apiSecret },
+        });
+      }
+    }
+
+    // Stream the file back to the browser
     res.setHeader('Content-Type', contentType);
     res.setHeader('Content-Disposition', `inline; filename="${resume.originalName}"`);
-
     fileResponse.data.pipe(res);
   } catch (err) {
-    console.error('Resume proxy view error:', err.message);
-    next(err);
+    console.error('[ViewFile] All strategies failed:', err.message);
+    res.status(500).json({ success: false, message: 'Unable to retrieve file. The file may no longer exist in cloud storage.' });
   }
 };
 
