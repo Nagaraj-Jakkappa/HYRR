@@ -498,16 +498,16 @@ export default function ResumeBuilderPage() {
                         <div className="p-8 overflow-y-auto custom-scrollbar flex-1">
                             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
                                 {[
-                                    { id: 'modern', name: 'Classic', tag: 'ATS GOLD', desc: 'Classically structured resume template, for a robust career history.', image: '/image_614ba7.jpg' },
-                                    { id: 'academic', name: 'Traditional', tag: 'HARVARD', desc: 'Classic full-page resume template with sizable resume sections.', image: '/image_614c06.jpg' },
-                                    { id: 'serif', name: 'Prime ATS', tag: 'COLUMN', desc: 'Professional, streamlined resume template optimized for maximum ATS compatibility and readability.', image: '/image_614f52.jpg' },
-                                    { id: 'executive', name: 'Pure ATS', tag: 'PREMIUM', desc: 'A distraction-free, highly readable layout engineered specifically for ATS parsing engines.', image: '/image_614fce.jpg' },
-                                    { id: 'minimalist', name: 'Header ATS', tag: 'OCR RIGID', desc: 'Dedicated achievements section to highlight successes. Use an ATS-optimized template to increase visibility.', image: '/image_61534c.jpg' },
-                                    { id: 'tech', name: 'Tech Mono', tag: 'DEVELOPER', desc: 'Monospaced fonts and a terminal-like aesthetic for software engineers.', image: null },
-                                    { id: 'creative', name: 'Creative Split', tag: 'DESIGN', desc: 'A bold, two-column layout with contrasting colors for creative professionals.', image: null },
-                                    { id: 'infographic', name: 'Infographic', tag: 'VISUAL', desc: 'Visual representation of your skills and timeline. Great for non-traditional applications.', image: null },
-                                    { id: 'european', name: 'EuroPass', tag: 'EU STANDARD', desc: 'Strict adherence to European CV standards. Perfect for overseas applications.', image: null },
-                                    { id: 'metric', name: 'Metric Matrix', tag: 'DATA DRIVEN', desc: 'Focuses heavily on numbers, KPIs, and deliverables. Ideal for product and sales.', image: null },
+                                    { id: 'modern', name: 'Modern Template', tag: 'ATS GOLD', desc: 'Clean, structured layout that fits detailed experience on a single page.', image: '/image_614ba7.jpg' },
+                                    { id: 'academic', name: 'Ivy League', tag: 'HARVARD', desc: 'Modernized Harvard format with a compact summary section and balanced white space.', image: '/image_614c06.jpg' },
+                                    { id: 'serif', name: 'Elegant Layout', tag: 'COLUMN', desc: 'Side-column design that highlights skills and strengths while dedicating prime real estate.', image: '/image_614f52.jpg' },
+                                    { id: 'executive', name: 'Polished Slate', tag: 'PREMIUM', desc: 'Professional design that invites recruiters to spend more time on your application.', image: '/image_614fce.jpg' },
+                                    { id: 'minimalist', name: 'Single Column', tag: 'OCR RIGID', desc: 'Classic single-column with highlighted section headings. Maximum ATS compatibility.', image: '/image_61534c.jpg' },
+                                    { id: 'tech', name: 'Classic', tag: 'CLASSIC', desc: 'Classically structured resume template, for a robust career history.', image: null },
+                                    { id: 'creative', name: 'Traditional', tag: 'TRADITIONAL', desc: 'Classic full-page resume template with sizable resume sections.', image: null },
+                                    { id: 'infographic', name: 'Prime ATS', tag: 'OPTIMIZED', desc: 'Professional, streamlined resume template optimized for maximum ATS compatibility and readability.', image: null },
+                                    { id: 'european', name: 'Pure ATS', tag: 'MINIMAL', desc: 'Minimalist layout focused entirely on semantic ATS parsing and content clarity. Zero visual distractions.', image: null },
+                                    { id: 'metric', name: 'Header ATS', tag: 'ACHIEVEMENT', desc: 'Dedicated achievements section to highlight successes. Use an ATS-optimized template to increase visibility.', image: null },
                                 ].map(t => (
                                     <div 
                                         key={t.id}
