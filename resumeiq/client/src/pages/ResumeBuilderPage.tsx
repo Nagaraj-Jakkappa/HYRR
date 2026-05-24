@@ -40,6 +40,19 @@ import toast from 'react-hot-toast';
 type TemplateKey = 'minimalist' | 'modern' | 'executive' | 'tech' | 'creative' | 'academic' | 'serif' | 'infographic' | 'european' | 'metric';
 type WorkspaceMode = 'resume' | 'coverLetter';
 
+const TEMPLATES_DATA = [
+    { id: 'modern', name: 'Modern', tag: 'ATS GOLD', desc: 'A clean and structured template that fits detailed experience on a single page while remaining easy to read—making it a strong, ATS-friendly choice for many roles.', image: '/image_614ba7.jpg' },
+    { id: 'academic', name: 'Ivy League', tag: 'HARVARD', desc: 'A modernized Harvard template featuring a stand-out design and a sophisticated feel. Compact enough to fit a stand-out section like a tailored summary and a strengths section, yet features enough white space.', image: '/image_614c06.jpg' },
+    { id: 'serif', name: 'Elegant', tag: 'COLUMN', desc: 'A beautiful template that highlights the strengths & uniqueness of the applicant in a dedicated column, while leaving most of the space for the employment history & education.', image: '/image_614f52.jpg' },
+    { id: 'executive', name: 'Polished', tag: 'PREMIUM', desc: 'A stand-out design that looks professional, but also invites the recruiter to spend more time on the resume.', image: '/image_614fce.jpg' },
+    { id: 'minimalist', name: 'Single Column', tag: 'OCR RIGID', desc: 'A classic design enhanced to stand out subtly. Highlighted headings improve readability, allowing recruiters to quickly grasp your application and see how you fit the role.', image: '/image_61534c.jpg' },
+    { id: 'tech', name: 'Single Column Refined', tag: 'TRADITIONAL', desc: 'A traditional, simple resume template perfect for someone who\'s just starting out their professional career.', image: '/image_61535c.jpg' },
+    { id: 'creative', name: 'Creative', tag: 'DESIGN', desc: 'This design accentuates your header in a way that captures recruiters\' attention, encouraging them to explore further. Versatile and adaptable, it\'s suitable for a broad range of industries.', image: '/image_61536c.jpg' },
+    { id: 'infographic', name: 'Double Column', tag: 'STRUCTURED', desc: 'The structure and layout of this template are easy to follow, ensuring your application will get more attention than the 20 other resumes waiting for the recruiter to check.', image: '/image_61537c.jpg' },
+    { id: 'european', name: 'Elite', tag: 'OPTIMIZED', desc: 'A resume template that features a refined layout that impresses recruiters and an optimized structure for superior ATS performance.', image: '/image_61538c.jpg' },
+    { id: 'metric', name: 'Monochrome', tag: 'CLASSIC', desc: 'Perfect choice for job seekers in conservative industries. This template is designed with a professional and classic layout.', image: '/image_61539c.jpg' },
+];
+
 export default function ResumeBuilderPage() {
     // --- INITIAL STATES ---
     const [resumeData, setResumeData] = useState<ResumeData>({
@@ -73,7 +86,7 @@ export default function ResumeBuilderPage() {
         skills: ['React', 'TypeScript', 'Node.js', 'Python', 'MERN Stack', 'Deep Learning', 'Redis']
     });
 
-    const [activeTemplate, setActiveTemplate] = useState<TemplateKey>('minimalist');
+    const [activeTemplate, setActiveTemplate] = useState<TemplateKey>('modern');
     const [isTemplateModalOpen, setIsTemplateModalOpen] = useState(false);
     const [activeMode, setActiveMode] = useState<WorkspaceMode>('resume');
     const [exporting, setExporting] = useState(false);
@@ -275,7 +288,7 @@ export default function ResumeBuilderPage() {
                             className="flex items-center gap-2 bg-[#13131A] hover:bg-white/5 text-xs font-semibold px-4 py-2.5 rounded-xl border border-white/10 text-white cursor-pointer transition-all"
                         >
                             <LayoutTemplate size={14} className="text-[#5B5FEF]" />
-                            <span className="capitalize">{activeTemplate} Template</span>
+                            <span>{TEMPLATES_DATA.find(t => t.id === activeTemplate)?.name || activeTemplate}</span>
                         </button>
                     )}
 
@@ -463,15 +476,22 @@ export default function ResumeBuilderPage() {
                 </div>
 
                 {/* RIGHT COLUMN VIEWPORT PANE PANEL PREVIEW */}
-                <div className="lg:col-span-7 bg-[#14141A] p-4 rounded-2xl border border-white/5 flex flex-col items-center justify-start overflow-x-auto min-h-[calc(100vh-180px)]">
-                    <div className="w-full flex items-center gap-1.5 text-[10px] font-bold font-mono tracking-widest text-gray-500 uppercase mb-3 pl-1 border-b border-white/5 pb-2">
-                        <Eye size={12} /> Live Blueprint Canvas Simulation Screen
+                <div className="lg:col-span-7 bg-[#1A1A24] rounded-2xl border border-white/5 flex flex-col min-h-[calc(100vh-180px)] overflow-hidden relative">
+                    <div className="flex-shrink-0 w-full flex items-center justify-between p-4 border-b border-white/5 bg-[#14141A] z-10">
+                        <div className="flex items-center gap-2 text-xs font-bold text-gray-400">
+                            <Eye size={14} className="text-[#5B5FEF]" />
+                            Live Blueprint Canvas Simulation
+                        </div>
                     </div>
-                    <div
-                        ref={printAreaRef}
-                        className="shadow-[0_24px_60px_rgba(0,0,0,0.4)] bg-white rounded-sm origin-top scale-[0.75] sm:scale-[0.85] md:scale-100 transition-all duration-300 min-w-[210mm]"
-                    >
-                        {renderSelectedTemplate()}
+
+                    <div className="flex-1 overflow-auto custom-scrollbar bg-[#0A0A0F]/50 flex justify-center p-8">
+                        <div
+                            className="shadow-[0_0_80px_rgba(0,0,0,0.8)] bg-white transform origin-top mx-auto min-w-[210mm] min-h-[297mm] h-max scale-[0.6] sm:scale-[0.7] md:scale-[0.8] lg:scale-[0.9] xl:scale-100 transition-transform duration-300 ring-1 ring-white/10"
+                        >
+                            <div ref={printAreaRef} className="w-full h-full bg-white text-black">
+                                {renderSelectedTemplate()}
+                            </div>
+                        </div>
                     </div>
                 </div>
 
@@ -497,18 +517,7 @@ export default function ResumeBuilderPage() {
 
                         <div className="p-8 overflow-y-auto custom-scrollbar flex-1">
                             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
-                                {[
-                                    { id: 'modern', name: 'Modern', tag: 'ATS GOLD', desc: 'A clean and structured template that fits detailed experience on a single page while remaining easy to read—making it a strong, ATS-friendly choice for many roles.', image: '/image_614ba7.jpg' },
-                                    { id: 'academic', name: 'Ivy League', tag: 'HARVARD', desc: 'A modernized Harvard template featuring a stand-out design and a sophisticated feel. Compact enough to fit a stand-out section like a tailored summary and a strengths section, yet features enough white space.', image: '/image_614c06.jpg' },
-                                    { id: 'serif', name: 'Elegant', tag: 'COLUMN', desc: 'A beautiful template that highlights the strengths & uniqueness of the applicant in a dedicated column, while leaving most of the space for the employment history & education.', image: '/image_614f52.jpg' },
-                                    { id: 'executive', name: 'Polished', tag: 'PREMIUM', desc: 'A stand-out design that looks professional, but also invites the recruiter to spend more time on the resume.', image: '/image_614fce.jpg' },
-                                    { id: 'minimalist', name: 'Single Column', tag: 'OCR RIGID', desc: 'A classic design enhanced to stand out subtly. Highlighted headings improve readability, allowing recruiters to quickly grasp your application and see how you fit the role.', image: '/image_61534c.jpg' },
-                                    { id: 'tech', name: 'Single Column Refined', tag: 'TRADITIONAL', desc: 'A traditional, simple resume template perfect for someone who\'s just starting out their professional career.', image: '/image_61535c.jpg' },
-                                    { id: 'creative', name: 'Creative', tag: 'DESIGN', desc: 'This design accentuates your header in a way that captures recruiters\' attention, encouraging them to explore further. Versatile and adaptable, it\'s suitable for a broad range of industries.', image: '/image_61536c.jpg' },
-                                    { id: 'infographic', name: 'Double Column', tag: 'STRUCTURED', desc: 'The structure and layout of this template are easy to follow, ensuring your application will get more attention than the 20 other resumes waiting for the recruiter to check.', image: '/image_61537c.jpg' },
-                                    { id: 'european', name: 'Elite', tag: 'OPTIMIZED', desc: 'A resume template that features a refined layout that impresses recruiters and an optimized structure for superior ATS performance.', image: '/image_61538c.jpg' },
-                                    { id: 'metric', name: 'Monochrome', tag: 'CLASSIC', desc: 'Perfect choice for job seekers in conservative industries. This template is designed with a professional and classic layout.', image: '/image_61539c.jpg' },
-                                ].map(t => (
+                                {TEMPLATES_DATA.map(t => (
                                     <div
                                         key={t.id}
                                         onClick={() => { setActiveTemplate(t.id as TemplateKey); setIsTemplateModalOpen(false); }}
