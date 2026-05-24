@@ -116,19 +116,23 @@ export default function ScanPage() {
   // Visual Live Progress Component Layout Layout Output
   if (scanning) return (
     <div className="flex items-center justify-center h-full min-h-[450px]">
-      <div className="text-center max-w-sm w-full p-6 bg-[#13131A] border border-white/5 rounded-2xl shadow-2xl">
-        <div className="w-16 h-16 rounded-2xl bg-blue-600/20 flex items-center justify-center mx-auto mb-4 border border-blue-500/10">
-          <Zap size={28} className="text-blue-400 animate-pulse" />
+      <div className="text-center max-w-sm w-full p-6 bg-[#13131A]/80 backdrop-blur-xl border border-[#5B5FEF]/20 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.5),0_0_30px_rgba(91,95,239,0.15)] relative overflow-hidden">
+        {/* Ambient background glow */}
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-1/2 bg-[#5B5FEF]/10 blur-3xl pointer-events-none rounded-full"></div>
+        
+        <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-[#5B5FEF]/20 to-[#8E5BEF]/20 flex items-center justify-center mx-auto mb-4 border border-[#5B5FEF]/30 shadow-[0_0_20px_rgba(91,95,239,0.2)] relative z-10">
+          <Zap size={28} className="text-white animate-pulse" />
         </div>
-        <h2 className="text-lg font-bold mb-2 text-white tracking-wide">Analyzing Your Resume</h2>
-        <p className="text-sm text-gray-400 font-mono mb-6 min-h-[20px]">{progress.step}</p>
-        <div className="h-2 bg-white/5 rounded-full overflow-hidden border border-white/5">
+        <h2 className="text-lg font-bold mb-2 text-white tracking-wide relative z-10">Running AI Analysis</h2>
+        <p className="text-sm text-gray-400 font-mono mb-6 min-h-[20px] relative z-10">{progress.step}</p>
+        
+        <div className="h-2.5 bg-white/5 rounded-full overflow-hidden border border-white/10 relative z-10">
           <div
-            className="h-full bg-blue-500 rounded-full transition-all duration-500 ease-out shadow-[0_0_12px_rgba(59,130,246,0.5)]"
+            className="h-full bg-gradient-to-r from-[#5B5FEF] to-[#8E5BEF] rounded-full transition-all duration-500 ease-out shadow-[0_0_15px_rgba(91,95,239,0.8)]"
             style={{ width: `${progress.pct}%` }}
           />
         </div>
-        <p className="text-xs text-gray-600 font-mono mt-2.5">{progress.pct}% complete</p>
+        <p className="text-xs text-[#5B5FEF] font-mono font-bold mt-3 relative z-10">{progress.pct}% optimized</p>
       </div>
     </div>
   )
@@ -148,14 +152,17 @@ export default function ScanPage() {
           </label>
           {resumes.length === 0 ? (
             <p className="text-sm text-gray-500 py-2">
-              No matching profiles extracted. <a href="/resumes" className="text-blue-400 underline hover:text-blue-300">Upload document models here</a>
+              No matching profiles extracted. <a href="/resumes" className="text-[#5B5FEF] underline hover:text-white transition-colors">Upload document models here</a>
             </p>
           ) : (
-            <div className="grid grid-cols-1 gap-2">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               {resumes.map(r => (
                 <label
                   key={r._id}
-                  className={`flex items-center gap-3 p-3 rounded-xl border cursor-pointer transition-all ${form.resumeId === r._id ? 'border-blue-500 bg-blue-500/10' : 'border-white/5 bg-[#0A0A0F]/50 hover:border-white/20'
+                  className={`flex items-center gap-3 p-3.5 rounded-xl border cursor-pointer transition-all ${
+                    form.resumeId === r._id 
+                      ? 'border-[#5B5FEF] bg-[#5B5FEF]/10 shadow-[inset_0_0_0_1px_rgba(91,95,239,0.3)]' 
+                      : 'border-white/[0.06] bg-[#0A0A0F]/50 hover:border-white/20 hover:bg-white/[0.02]'
                     }`}
                 >
                   <input
@@ -166,8 +173,14 @@ export default function ScanPage() {
                     onChange={e => setForm(f => ({ ...f, resumeId: e.target.value }))}
                     className="hidden"
                   />
-                  <FileText size={14} className={form.resumeId === r._id ? 'text-blue-400' : 'text-gray-500'} />
-                  <span className="text-sm flex-1 truncate font-medium">{r.originalName}</span>
+                  <div className={`w-8 h-8 rounded-lg flex items-center justify-center transition-colors ${
+                    form.resumeId === r._id ? 'bg-[#5B5FEF] text-white shadow-md' : 'bg-white/5 text-gray-400'
+                  }`}>
+                    <FileText size={14} />
+                  </div>
+                  <span className={`text-sm flex-1 truncate transition-colors ${
+                    form.resumeId === r._id ? 'font-bold text-white' : 'font-medium text-gray-300'
+                  }`}>{r.originalName}</span>
                 </label>
               ))}
             </div>
@@ -182,12 +195,12 @@ export default function ScanPage() {
             </label>
             <select
               onChange={handleLibrarySelect}
-              className="w-full bg-[#0A0A0F] border border-white/10 rounded-xl p-2.5 text-sm text-gray-300 outline-none focus:border-blue-500 transition-all cursor-pointer"
+              className="w-full bg-[#0A0A0F]/50 border border-white/[0.06] rounded-xl p-3 text-sm text-white outline-none focus:border-[#5B5FEF]/50 focus:ring-1 focus:ring-[#5B5FEF]/30 transition-all cursor-pointer hover:border-white/10"
               defaultValue=""
             >
-              <option value="" disabled>Select previous tracking target criteria properties...</option>
+              <option value="" disabled className="text-gray-500">Select previous tracking target criteria properties...</option>
               {savedJobs.map(job => (
-                <option key={job._id} value={job._id}>
+                <option key={job._id} value={job._id} className="bg-[#13131A] text-white">
                   {job.jobTitle} at {job.companyName}
                 </option>
               ))}
@@ -197,13 +210,13 @@ export default function ScanPage() {
 
         {/* Input Text Form Parameters Controls Card */}
         <div className="card bg-[#13131A] p-4 space-y-4 border border-white/5 rounded-2xl">
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
             <div>
-              <label className="label text-gray-400 text-[10px] uppercase mb-1.5 flex items-center gap-1 font-semibold">
+              <label className="label text-gray-400 text-[10px] uppercase mb-2 flex items-center gap-1.5 font-bold tracking-wider">
                 <Building2 size={12} /> Company Name
               </label>
               <input
-                className="w-full bg-[#0A0A0F] border border-white/10 rounded-xl p-2.5 text-sm outline-none focus:border-blue-500 transition-all text-white"
+                className="w-full bg-[#0A0A0F]/50 border border-white/[0.06] rounded-xl p-3 text-sm outline-none focus:border-[#5B5FEF]/50 focus:ring-1 focus:ring-[#5B5FEF]/30 transition-all text-white hover:border-white/10"
                 placeholder="e.g. GoComet"
                 value={form.companyName}
                 onChange={e => setForm(f => ({ ...f, companyName: e.target.value }))}
@@ -211,11 +224,11 @@ export default function ScanPage() {
               />
             </div>
             <div>
-              <label className="label text-gray-400 text-[10px] uppercase mb-1.5 flex items-center gap-1 font-semibold">
+              <label className="label text-gray-400 text-[10px] uppercase mb-2 flex items-center gap-1.5 font-bold tracking-wider">
                 <Briefcase size={12} /> Job Title Target
               </label>
               <input
-                className="w-full bg-[#0A0A0F] border border-white/10 rounded-xl p-2.5 text-sm outline-none focus:border-blue-500 transition-all text-white"
+                className="w-full bg-[#0A0A0F]/50 border border-white/[0.06] rounded-xl p-3 text-sm outline-none focus:border-[#5B5FEF]/50 focus:ring-1 focus:ring-[#5B5FEF]/30 transition-all text-white hover:border-white/10"
                 placeholder="e.g. Frontend Engineer"
                 value={form.jobTitle}
                 onChange={e => setForm(f => ({ ...f, jobTitle: e.target.value }))}
@@ -223,20 +236,22 @@ export default function ScanPage() {
               />
             </div>
           </div>
-          <div>
-            <label className="label text-gray-400 text-[10px] uppercase mb-1.5 flex items-center gap-1 font-semibold">
+          <div className="pt-2">
+            <label className="label text-gray-400 text-[10px] uppercase mb-2 flex items-center gap-1.5 font-bold tracking-wider">
               <Search size={12} /> Full Job Description Text Parameters
             </label>
             <textarea
-              className="w-full bg-[#0A0A0F] border border-white/10 rounded-xl p-2.5 text-sm outline-none focus:border-blue-500 transition-all resize-none text-white font-sans"
+              className="w-full bg-[#0A0A0F]/50 border border-white/[0.06] rounded-xl p-3.5 text-sm outline-none focus:border-[#5B5FEF]/50 focus:ring-1 focus:ring-[#5B5FEF]/30 transition-all resize-none text-white font-sans hover:border-white/10"
               rows={8}
               placeholder="Paste raw target structural vacancy posting description texts here directly..."
               value={form.jobDescription}
               onChange={e => setForm(f => ({ ...f, jobDescription: e.target.value }))}
               required
             />
-            <p className="text-[10px] text-gray-600 font-mono mt-1 text-right">
-              {form.jobDescription?.length || 0} characters mapped
+            <p className="text-[10px] text-gray-500 font-mono mt-1.5 text-right">
+              <span className={form.jobDescription?.length > 50 ? 'text-[#3DEBA6]' : 'text-amber-500'}>
+                {form.jobDescription?.length || 0} characters mapped
+              </span>
             </p>
           </div>
         </div>
@@ -245,9 +260,9 @@ export default function ScanPage() {
         <button
           type="submit"
           disabled={scanning || !form.resumeId}
-          className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-800 disabled:text-gray-500 text-white w-full justify-center py-3.5 rounded-xl text-sm font-bold transition-all shadow-lg shadow-blue-600/5 active:scale-[0.99]"
+          className="flex items-center gap-2 bg-gradient-to-r from-[#5B5FEF] to-[#8E5BEF] hover:from-[#6c70fc] hover:to-[#9f6dfc] disabled:from-gray-800 disabled:to-gray-800 disabled:text-gray-500 disabled:border disabled:border-white/5 disabled:shadow-none text-white w-full justify-center py-4 rounded-xl text-sm font-black uppercase tracking-wider transition-all shadow-[0_0_15px_rgba(91,95,239,0.3)] hover:shadow-[0_0_25px_rgba(91,95,239,0.5)] active:scale-[0.99]"
         >
-          {scanning ? <Loader size={15} className="animate-spin" /> : <Zap size={15} />}
+          {scanning ? <Loader size={16} className="animate-spin" /> : <Zap size={16} />}
           {scanning ? 'Processing System Execution Run...' : 'Run ATS Analysis'}
         </button>
       </form>
