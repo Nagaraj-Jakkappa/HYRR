@@ -272,6 +272,8 @@ exports.getScan = async (req, res, next) => {
 exports.getDashboardStats = async (req, res, next) => {
   try {
     const userId = req.user._id;
+    
+    // 1. User specific stats
     const stats = await Scan.aggregate([
       { $match: { userId, status: 'done' } },
       {
@@ -285,17 +287,44 @@ exports.getDashboardStats = async (req, res, next) => {
       }
     ]);
 
+    // 2. Global Average stats
+    const globalStats = await Scan.aggregate([
+      { $match: { status: 'done' } },
+      {
+        $group: {
+          _id: null,
+          avgATS: { $avg: '$atsScore' }
+        }
+      }
+    ]);
+    const globalAvgATS = Math.round(globalStats[0]?.avgATS || 0);
+
+    // 3. Recent Scans
     const recentScans = await Scan.find({ userId, status: 'done' })
       .populate('resumeId', 'originalName')
       .populate('jobId', 'companyName jobTitle')
       .sort({ createdAt: -1 }).limit(5);
+      
+    // 4. Recent Resumes
+    const recentResumes = await Resume.find({ userId })
+      .select('originalName fileType createdAt')
+      .sort({ createdAt: -1 }).limit(4);
 
+    // 5. Contextual Top Recommendation
     let topMissingKeyword = null;
+    let recommendationContext = "You're hitting the primary keywords for your target roles effectively.";
+    
     if (stats[0]?.allMissingKeywords) {
       const flat = stats[0].allMissingKeywords.flat();
       const freq = {};
       flat.forEach(k => { freq[k] = (freq[k] || 0) + 1; });
-      topMissingKeyword = Object.entries(freq).sort((a, b) => b[1] - a[1])[0]?.[0] || null;
+      
+      const sortedKeys = Object.entries(freq).sort((a, b) => b[1] - a[1]);
+      if (sortedKeys.length > 0) {
+        topMissingKeyword = sortedKeys[0][0];
+        const count = sortedKeys[0][1];
+        recommendationContext = `You missed "${topMissingKeyword}" in ${count} recent scan${count > 1 ? 's' : ''}. Integrating this keyword could boost your match rate significantly.`;
+      }
     }
 
     res.json({
@@ -305,7 +334,10 @@ exports.getDashboardStats = async (req, res, next) => {
         bestScore: stats[0]?.bestScore || 0,
         totalScans: stats[0]?.totalScans || 0,
         topMissingKeyword,
+        recommendationContext,
+        globalAvgATS,
         recentScans,
+        recentResumes,
         scansUsed: req.user.scansUsed,
         scansLimit: req.user.scansLimit,
         plan: req.user.plan,

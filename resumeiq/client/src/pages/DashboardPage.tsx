@@ -9,7 +9,8 @@ import {
   YAxis,
   CartesianGrid,
   Tooltip,
-  ResponsiveContainer
+  ResponsiveContainer,
+  ReferenceLine
 } from 'recharts';
 import {
   TrendingUp,
@@ -22,7 +23,11 @@ import {
   Loader,
   Zap,
   ChevronRight,
-  Share2
+  Share2,
+  PlusCircle,
+  FileText,
+  History,
+  File
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 
@@ -37,12 +42,22 @@ interface ScanItem {
   createdAt: string;
 }
 
+interface ResumeItem {
+  _id: string;
+  originalName: string;
+  fileType: string;
+  createdAt: string;
+}
+
 interface Stats {
   avgATS: number;
+  globalAvgATS: number;
   bestScore: number;
   totalScans: number;
   topMissingKeyword: string | null;
+  recommendationContext: string;
   recentScans: ScanItem[];
+  recentResumes: ResumeItem[];
   scansUsed: number;
   scansLimit: number;
   plan: string;
@@ -170,7 +185,7 @@ export default function DashboardPage() {
 
   return (
     <div className="min-h-screen bg-[#0A0A0F] text-[#EEEEF0] p-6 lg:p-12 font-sans">
-      <div className="max-w-6xl mx-auto">
+      <div className="max-w-7xl mx-auto">
 
         {limitReached && (
           <div className="w-full bg-amber-500/10 border border-amber-500/20 p-4 rounded-2xl mb-8 flex flex-col sm:flex-row items-center justify-between gap-4">
@@ -186,7 +201,7 @@ export default function DashboardPage() {
           </div>
         )}
 
-        <header className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-6">
+        <header className="flex flex-col md:flex-row md:items-end justify-between mb-8 gap-6">
           <div>
             <h1 className="text-4xl font-black tracking-tight mb-2">My Insights</h1>
             <div className="flex items-center gap-4 text-gray-500 font-mono text-xs">
@@ -195,10 +210,32 @@ export default function DashboardPage() {
               <span className="text-[#5B5FEF] uppercase tracking-widest">{stats.plan} Member</span>
             </div>
           </div>
-          <Link to="/scan" className="bg-[#5B5FEF] hover:bg-[#4A4DDB] text-white px-8 py-4 rounded-2xl font-bold transition-all flex items-center gap-3 shadow-xl shadow-[#5B5FEF]/20 group">
-            New Analysis <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
-          </Link>
         </header>
+
+        {/* QUICK ACTIONS */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-10">
+          <Link to="/scan" className="bg-[#5B5FEF] hover:bg-[#4A4DDB] text-white p-6 rounded-2xl font-bold transition-all flex items-center justify-between shadow-xl shadow-[#5B5FEF]/20 group">
+            <div className="flex items-center gap-3">
+              <PlusCircle size={20} />
+              <span>New Analysis</span>
+            </div>
+            <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
+          </Link>
+          <Link to="/builder" className="bg-[#13131A] hover:bg-white/10 border border-white/5 text-white p-6 rounded-2xl font-bold transition-all flex items-center justify-between group">
+            <div className="flex items-center gap-3">
+              <FileText size={20} className="text-[#3DEBA6]" />
+              <span>Build Resume</span>
+            </div>
+            <ArrowRight size={18} className="text-gray-500 group-hover:translate-x-1 transition-transform" />
+          </Link>
+          <Link to="/history" className="bg-[#13131A] hover:bg-white/10 border border-white/5 text-white p-6 rounded-2xl font-bold transition-all flex items-center justify-between group">
+            <div className="flex items-center gap-3">
+              <History size={20} className="text-[#F0C060]" />
+              <span>My History</span>
+            </div>
+            <ArrowRight size={18} className="text-gray-500 group-hover:translate-x-1 transition-transform" />
+          </Link>
+        </div>
 
         {/* TOP ROW: ATS TREND CHART & RECOMMENDATION */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-10">
@@ -210,6 +247,16 @@ export default function DashboardPage() {
                   ATS Score Trend
                 </h3>
                 <p className="text-gray-500 text-[10px] uppercase font-mono tracking-widest mt-1">Growth over last 10 scans</p>
+              </div>
+              <div className="flex gap-4">
+                <div className="flex items-center gap-2">
+                  <span className="w-3 h-0.5 bg-[#3DEBA6] dashed" />
+                  <span className="text-[10px] text-gray-400 font-mono">Your Avg</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="w-3 h-0.5 bg-gray-500 dashed" />
+                  <span className="text-[10px] text-gray-400 font-mono">Global Avg</span>
+                </div>
               </div>
             </div>
 
@@ -247,6 +294,14 @@ export default function DashboardPage() {
                       cursor={{ stroke: '#5B5FEF', strokeWidth: 1, strokeDasharray: '4 4' }}
                       formatter={(value: number) => [`${value}%`, 'ATS Score']}
                     />
+                    
+                    {/* User Average Line */}
+                    <ReferenceLine y={stats.avgATS} stroke="#3DEBA6" strokeDasharray="3 3" strokeOpacity={0.5} />
+                    {/* Global Average Line */}
+                    {stats.globalAvgATS > 0 && (
+                      <ReferenceLine y={stats.globalAvgATS} stroke="#6b7280" strokeDasharray="3 3" strokeOpacity={0.5} />
+                    )}
+
                     <Area
                       type="monotone"
                       dataKey="score"
@@ -278,10 +333,8 @@ export default function DashboardPage() {
               <h4 className="text-xl font-bold text-white mb-2 italic">
                 {stats.topMissingKeyword ? `"${stats.topMissingKeyword}"` : "Keep it up!"}
               </h4>
-              <p className="text-gray-400 text-xs leading-relaxed">
-                {stats.topMissingKeyword
-                  ? "Integrating this keyword into your experience section could boost your match rate significantly."
-                  : "You're hitting the primary keywords for your target roles effectively."}
+              <p className="text-gray-400 text-sm leading-relaxed">
+                {stats.recommendationContext || "You're hitting the primary keywords for your target roles effectively."}
               </p>
             </div>
             <Link to="/scan" className="mt-6 text-[10px] font-black text-white uppercase tracking-widest flex items-center gap-2 group-hover:gap-3 transition-all">
@@ -293,63 +346,101 @@ export default function DashboardPage() {
         {/* STAT CARDS ROW */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
           <StatCard label="Peak Match" value={stats.bestScore} icon={TrendingUp} color="text-[#3DEBA6]" sub="All-time high" />
-          <StatCard label="Average ATS" value={stats.avgATS} icon={Target} color="text-[#5B5FEF]" sub="Global average" />
+          <StatCard label="Average ATS" value={stats.avgATS} icon={Target} color="text-[#5B5FEF]" sub={`Global Average: ${stats.globalAvgATS}%`} />
           <StatCard label="Scan Quota" value={`${stats.scansUsed}/${stats.scansLimit}`} icon={FileSearch} color="text-violet-400" sub="Monthly usage" isStatic />
         </div>
 
-        {/* RECENT ACTIVITY SECTION */}
-        <div className="bg-[#13131A] rounded-[40px] border border-white/5 overflow-hidden shadow-2xl">
-          <div className="px-10 py-7 border-b border-white/5 flex justify-between items-center bg-white/[0.01]">
-            <h3 className="font-bold text-lg tracking-tight">Recent Activity</h3>
-            <Link to="/history" className="text-[10px] font-black text-[#5B5FEF] uppercase tracking-[0.2em]">View All</Link>
-          </div>
+        {/* RECENT ACTIVITY GRID */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          
+          {/* Recent Scans */}
+          <div className="bg-[#13131A] rounded-[40px] border border-white/5 overflow-hidden shadow-2xl">
+            <div className="px-8 py-6 border-b border-white/5 flex justify-between items-center bg-white/[0.01]">
+              <h3 className="font-bold text-lg tracking-tight">Recent Scans</h3>
+              <Link to="/history" className="text-[10px] font-black text-[#5B5FEF] uppercase tracking-[0.2em]">View All</Link>
+            </div>
 
-          <div className="p-4 space-y-4">
-            {!stats.recentScans?.length ? (
-              <div className="p-20 text-center text-gray-500">No scan history found.</div>
-            ) : (
-              stats.recentScans.map((scan) => (
-                <div
-                  key={scan._id}
-                  className="flex items-center justify-between p-5 bg-[#0D0D14] rounded-[24px] border border-white/5 hover:border-[#5B5FEF]/30 transition-all group"
-                >
-                  <div className="flex items-center gap-6">
-                    <ScoreRing score={Number(scan.atsScore) || 0} size={56} stroke={4} />
-                    <div>
-                      <h4 className="font-bold text-gray-100 group-hover:text-[#5B5FEF] transition-colors">
-                        {scan.jobId?.companyName || 'Unknown Company'}
-                      </h4>
-                      <p className="text-xs text-gray-500 font-mono mt-0.5">
-                        {scan.jobId?.jobTitle || 'Role Not Specified'}
-                      </p>
-                      <div className="flex items-center gap-3 mt-2 text-[10px] text-gray-600 uppercase font-bold tracking-widest">
-                        <span className="flex items-center gap-1"><StatusIcon status={scan.status} /> {scan.status}</span>
-                        <span className="flex items-center gap-1"><Clock size={10} /> {new Date(scan.createdAt).toLocaleDateString()}</span>
+            <div className="p-4 space-y-3">
+              {!stats.recentScans?.length ? (
+                <div className="p-12 text-center text-gray-500 text-sm">No scan history found.</div>
+              ) : (
+                stats.recentScans.map((scan) => (
+                  <div
+                    key={scan._id}
+                    className="flex items-center justify-between p-4 bg-[#0D0D14] rounded-[24px] border border-white/5 hover:border-[#5B5FEF]/30 transition-all group"
+                  >
+                    <div className="flex items-center gap-4">
+                      <ScoreRing score={Number(scan.atsScore) || 0} size={48} stroke={3} />
+                      <div>
+                        <h4 className="font-bold text-gray-100 group-hover:text-[#5B5FEF] transition-colors truncate max-w-[150px] sm:max-w-[200px]">
+                          {scan.jobId?.companyName || 'Unknown Company'}
+                        </h4>
+                        <div className="flex items-center gap-3 mt-1 text-[10px] text-gray-600 uppercase font-bold tracking-widest">
+                          <span className="flex items-center gap-1"><StatusIcon status={scan.status} /> {scan.status}</span>
+                        </div>
                       </div>
                     </div>
-                  </div>
 
-                  <div className="flex items-center gap-2">
-                    {scan.status === 'done' && (
-                      <button
-                        onClick={(e) => handleShare(e, scan._id)}
-                        className="p-3 bg-white/5 rounded-xl text-gray-400 hover:text-[#3DEBA6] hover:bg-[#3DEBA6]/10 transition-all flex items-center gap-2"
-                        title="Share Report"
+                    <div className="flex items-center gap-2">
+                      <Link
+                        to={`/report/${scan._id}`}
+                        className="p-3 bg-white/5 rounded-xl text-gray-400 hover:text-white hover:bg-[#5B5FEF] transition-all"
                       >
-                        <Share2 size={18} />
-                      </button>
-                    )}
-                    <Link
-                      to={`/report/${scan._id}`}
-                      className="p-3 bg-white/5 rounded-xl text-gray-400 hover:text-white hover:bg-[#5B5FEF] transition-all"
-                    >
-                      <ChevronRight size={20} />
-                    </Link>
+                        <ChevronRight size={18} />
+                      </Link>
+                    </div>
                   </div>
-                </div>
-              ))
-            )}
+                ))
+              )}
+            </div>
           </div>
+
+          {/* Recent Resumes */}
+          <div className="bg-[#13131A] rounded-[40px] border border-white/5 overflow-hidden shadow-2xl">
+            <div className="px-8 py-6 border-b border-white/5 flex justify-between items-center bg-white/[0.01]">
+              <h3 className="font-bold text-lg tracking-tight">Recent Resumes</h3>
+              <Link to="/resumes" className="text-[10px] font-black text-[#5B5FEF] uppercase tracking-[0.2em]">View All</Link>
+            </div>
+
+            <div className="p-4 space-y-3">
+              {!stats.recentResumes?.length ? (
+                <div className="p-12 text-center text-gray-500 text-sm">No resumes uploaded yet.</div>
+              ) : (
+                stats.recentResumes.map((resume) => (
+                  <div
+                    key={resume._id}
+                    className="flex items-center justify-between p-4 bg-[#0D0D14] rounded-[24px] border border-white/5 hover:border-[#3DEBA6]/30 transition-all group"
+                  >
+                    <div className="flex items-center gap-4">
+                      <div className="w-12 h-12 rounded-xl bg-white/5 flex items-center justify-center text-gray-400 group-hover:text-[#3DEBA6] transition-colors">
+                        <File size={20} />
+                      </div>
+                      <div>
+                        <h4 className="font-bold text-gray-100 group-hover:text-[#3DEBA6] transition-colors truncate max-w-[150px] sm:max-w-[200px]">
+                          {resume.originalName}
+                        </h4>
+                        <div className="flex items-center gap-3 mt-1 text-[10px] text-gray-600 uppercase font-bold tracking-widest">
+                          <span className="flex items-center gap-1"><Clock size={10} /> {new Date(resume.createdAt).toLocaleDateString()}</span>
+                          <span>{resume.fileType?.toUpperCase() || 'PDF'}</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                      <Link
+                        to={`/builder`}
+                        className="p-3 bg-white/5 rounded-xl text-gray-400 hover:text-white hover:bg-[#3DEBA6] transition-all"
+                        title="Open in Builder"
+                      >
+                        <ChevronRight size={18} />
+                      </Link>
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
+
         </div>
       </div>
     </div>
