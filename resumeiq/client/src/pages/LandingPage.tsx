@@ -467,7 +467,7 @@ export default function LandingPage() {
                 <div className="grid lg:grid-cols-3 gap-8">
                     <PricingCard
                         title="Free"
-                        price="$0"
+                        price="₹0"
                         desc="Get started, no credit card required."
                         items={[
                             '3 ATS scans per month',
@@ -481,7 +481,7 @@ export default function LandingPage() {
                     <PricingCard
                         featured
                         title="Pro"
-                        price="$19"
+                        price="₹1499"
                         desc="For active job seekers."
                         items={[
                             'Unlimited ATS scans',
@@ -497,7 +497,7 @@ export default function LandingPage() {
                     />
                     <PricingCard
                         title="Career+"
-                        price="$39"
+                        price="₹2999"
                         desc="For power users & career coaches."
                         items={[
                             'Everything in Pro',
