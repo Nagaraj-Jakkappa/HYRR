@@ -48,20 +48,20 @@ const WinRateBadge = ({ score }: { score: number }) => {
 
   if (score >= 85) {
     label = "Top 10% of candidates";
-    colorClass = "bg-[#3DEBA6]/10 text-[#3DEBA6] border-[#3DEBA6]/20";
+    colorClass = "bg-[#3DEBA6]/10 text-[#3DEBA6] border-[#3DEBA6]/30 shadow-[0_0_15px_rgba(61,235,166,0.3)]";
   } else if (score >= 75) {
     label = "Better than 75% of users";
-    colorClass = "bg-[#5B5FEF]/10 text-[#5B5FEF] border-[#5B5FEF]/20";
+    colorClass = "bg-[#5B5FEF]/10 text-[#5B5FEF] border-[#5B5FEF]/30 shadow-[0_0_15px_rgba(91,95,239,0.3)]";
   } else if (score > avgATS) {
     label = "Better than average";
-    colorClass = "bg-amber-500/10 text-amber-500 border-amber-500/20";
+    colorClass = "bg-amber-500/10 text-amber-500 border-amber-500/30 shadow-[0_0_15px_rgba(245,158,11,0.3)]";
   } else {
     return null;
   }
 
   return (
-    <div className={`mt-3 inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider border ${colorClass} animate-in fade-in slide-in-from-top-1 duration-700`}>
-      <Zap size={10} fill="currentColor" />
+    <div className={`mt-4 inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-wider border ${colorClass} animate-in fade-in slide-in-from-top-1 duration-700 backdrop-blur-md`}>
+      <Zap size={12} fill="currentColor" className="drop-shadow-md" />
       {label}
     </div>
   );
@@ -200,35 +200,35 @@ export default function ScanResultPage() {
         </Link>
 
         {/* Score Card Header Module */}
-        <div className="bg-[#13131A] border border-white/5 rounded-[40px] p-10 mb-8 relative overflow-hidden">
+        <div className="bg-[#13131A]/80 backdrop-blur-xl border border-white/5 rounded-[40px] p-10 mb-8 relative overflow-hidden shadow-2xl">
           <div className="relative z-10 flex flex-col md:flex-row items-center gap-8">
             <div className="flex flex-col items-center">
-              <div className={`w-32 h-32 rounded-full border-[8px] flex items-center justify-center text-4xl font-black transition-all duration-1000 ${
-                scan.atsScore >= 80 ? 'border-[#3DEBA6] text-[#3DEBA6] shadow-[0_0_40px_rgba(61,235,166,0.25)]' :
-                scan.atsScore >= 60 ? 'border-[#F0C060] text-[#F0C060] shadow-[0_0_40px_rgba(240,192,96,0.25)]' :
-                'border-[#ef4444] text-[#ef4444] shadow-[0_0_40px_rgba(239,68,68,0.25)]'
+              <div className={`w-36 h-36 rounded-full border-[8px] flex items-center justify-center text-5xl font-black transition-all duration-1000 bg-[#0A0A0F]/50 ${
+                scan.atsScore >= 80 ? 'border-[#3DEBA6] text-[#3DEBA6] shadow-[0_0_50px_rgba(61,235,166,0.4),inset_0_0_20px_rgba(61,235,166,0.2)]' :
+                scan.atsScore >= 60 ? 'border-[#F0C060] text-[#F0C060] shadow-[0_0_50px_rgba(240,192,96,0.4),inset_0_0_20px_rgba(240,192,96,0.2)]' :
+                'border-[#ef4444] text-[#ef4444] shadow-[0_0_50px_rgba(239,68,68,0.4),inset_0_0_20px_rgba(239,68,68,0.2)]'
               }`}>
                 {Math.round(scan.atsScore)}<span className="text-xl ml-0.5">%</span>
               </div>
               <WinRateBadge score={scan.atsScore} />
             </div>
 
-            <div className="text-center md:text-left flex-1">
-              <h1 className="text-3xl font-black mb-1">{scan.jobId?.jobTitle || 'Target Vacancy'}</h1>
-              <p className="text-gray-500 font-mono uppercase tracking-[0.2em] text-xs">{scan.jobId?.companyName || 'Enterprise Profile'}</p>
+            <div className="text-center md:text-left flex-1 mt-4 md:mt-0">
+              <h1 className="text-3xl sm:text-4xl font-black mb-2 tracking-tight">{scan.jobId?.jobTitle || 'Target Vacancy'}</h1>
+              <p className="text-[#6B6B7E] font-mono uppercase tracking-[0.2em] text-xs font-bold">{scan.jobId?.companyName || 'Enterprise Profile'}</p>
             </div>
             <button
               onClick={handleShare}
-              className="flex items-center gap-2 px-5 py-2.5 bg-white/5 border border-white/10 rounded-xl hover:bg-[#5B5FEF]/10 hover:border-[#5B5FEF]/30 transition-all group"
+              className="mt-6 md:mt-0 flex items-center gap-2 px-6 py-3 bg-white/[0.02] border border-white/10 rounded-xl hover:bg-gradient-to-r hover:from-[#5B5FEF]/20 hover:to-[#8E5BEF]/20 hover:border-[#5B5FEF]/50 transition-all duration-300 group shadow-lg"
             >
-              <Share2 size={16} className="text-gray-400 group-hover:text-[#5B5FEF]" />
-              <span className="text-sm font-bold">Share Report</span>
+              <Share2 size={16} className="text-[#6B6B7E] group-hover:text-white transition-colors" />
+              <span className="text-sm font-bold text-white group-hover:text-white">Share Report</span>
             </button>
           </div>
-          <div className={`absolute -right-20 -top-20 w-64 h-64 blur-[100px] rounded-full ${
-            scan.atsScore >= 80 ? 'bg-[#3DEBA6]/10' :
-            scan.atsScore >= 60 ? 'bg-[#F0C060]/10' :
-            'bg-[#ef4444]/10'
+          <div className={`absolute -right-20 -top-20 w-80 h-80 blur-[120px] rounded-full pointer-events-none ${
+            scan.atsScore >= 80 ? 'bg-[#3DEBA6]/15' :
+            scan.atsScore >= 60 ? 'bg-[#F0C060]/15' :
+            'bg-[#ef4444]/15'
           }`}></div>
         </div>
 
@@ -251,7 +251,7 @@ export default function ScanResultPage() {
               <button
                 onClick={() => handleDownload('pdf')}
                 disabled={!!isGenerating}
-                className="flex items-center justify-center gap-3 bg-[#5B5FEF] hover:bg-[#4A4EDF] disabled:opacity-50 text-white px-8 py-4 rounded-2xl font-bold transition-all active:scale-95 shadow-lg shadow-[#5B5FEF]/20"
+                className="flex items-center justify-center gap-3 bg-gradient-to-r from-[#5B5FEF] to-[#8E5BEF] hover:from-[#6c70fc] hover:to-[#9f6dfc] disabled:opacity-50 text-white px-8 py-4 rounded-2xl font-black uppercase tracking-wider transition-all active:scale-[0.98] shadow-[0_0_20px_rgba(91,95,239,0.4)] hover:shadow-[0_0_30px_rgba(91,95,239,0.6)]"
               >
                 {isGenerating === 'pdf' ? <Loader2 className="animate-spin" size={18} /> : <FileDown size={18} />}
                 Download PDF
@@ -260,7 +260,7 @@ export default function ScanResultPage() {
               <button
                 onClick={() => handleDownload('docx')}
                 disabled={!!isGenerating}
-                className="flex items-center justify-center gap-3 bg-transparent border border-white/10 hover:bg-white/5 disabled:opacity-50 text-white px-8 py-4 rounded-2xl font-bold transition-all active:scale-95"
+                className="flex items-center justify-center gap-3 bg-[#0A0A0F]/50 border border-white/10 hover:bg-white/5 hover:border-white/20 disabled:opacity-50 text-white px-8 py-4 rounded-2xl font-black uppercase tracking-wider transition-all active:scale-[0.98] shadow-lg"
               >
                 {isGenerating === 'docx' ? <Loader2 className="animate-spin" size={18} /> : <FileText size={18} />}
                 Download DOCX
@@ -277,27 +277,29 @@ export default function ScanResultPage() {
 
         {/* Keywords Metrics Distributions Panel */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-          <div className="bg-[#13131A] p-8 rounded-[32px] border border-white/5">
-            <h3 className="text-xs font-black uppercase tracking-widest text-[#3DEBA6] mb-6 flex items-center gap-2">
-              <CheckCircle size={14} /> Matched Keywords ({scan.matchedKeywords?.length || 0})
+          <div className="bg-[#13131A]/80 backdrop-blur-xl p-8 rounded-[32px] border border-white/5 shadow-xl relative overflow-hidden">
+            <div className="absolute top-0 right-0 w-32 h-32 bg-[#3DEBA6]/5 blur-3xl rounded-full pointer-events-none"></div>
+            <h3 className="text-xs font-black uppercase tracking-widest text-[#3DEBA6] mb-6 flex items-center gap-2 relative z-10">
+              <CheckCircle size={16} /> Matched Keywords ({scan.matchedKeywords?.length || 0})
             </h3>
-            <div className="flex flex-wrap gap-2">
+            <div className="flex flex-wrap gap-2.5 relative z-10">
               {scan.matchedKeywords?.map(k => (
-                <span key={k} className="px-3 py-1 bg-[#3DEBA6]/5 border border-[#3DEBA6]/10 text-[#3DEBA6] text-[10px] font-bold rounded-lg uppercase">{k}</span>
+                <span key={k} className="px-3.5 py-1.5 bg-[#3DEBA6]/10 border border-[#3DEBA6]/30 text-[#3DEBA6] text-[11px] font-bold rounded-xl uppercase tracking-wide shadow-[inset_0_0_10px_rgba(61,235,166,0.1)]">{k}</span>
               ))}
               {(!scan.matchedKeywords || scan.matchedKeywords.length === 0) && (
-                <p className="text-xs text-gray-600 italic">No explicit semantic criteria matches flagged.</p>
+                <p className="text-xs text-[#6B6B7E] italic font-medium">No explicit semantic criteria matches flagged.</p>
               )}
             </div>
           </div>
 
-          <div className="bg-[#13131A] p-8 rounded-[32px] border border-white/5">
-            <h3 className="text-xs font-black uppercase tracking-widest text-red-400 mb-6 flex items-center gap-2">
-              <AlertCircle size={14} /> Missing Keywords ({scan.missingKeywords?.length || 0})
+          <div className="bg-[#13131A]/80 backdrop-blur-xl p-8 rounded-[32px] border border-white/5 shadow-xl relative overflow-hidden">
+            <div className="absolute top-0 right-0 w-32 h-32 bg-[#ef4444]/5 blur-3xl rounded-full pointer-events-none"></div>
+            <h3 className="text-xs font-black uppercase tracking-widest text-[#ef4444] mb-6 flex items-center gap-2 relative z-10">
+              <AlertCircle size={16} /> Missing Keywords ({scan.missingKeywords?.length || 0})
             </h3>
-            <div className="flex flex-wrap gap-2">
+            <div className="flex flex-wrap gap-2.5 relative z-10">
               {scan.missingKeywords?.map(k => (
-                <span key={k} className="px-3 py-1 bg-red-400/5 border border-red-400/10 text-red-400 text-[10px] font-bold rounded-lg uppercase">{k}</span>
+                <span key={k} className="px-3.5 py-1.5 bg-[#ef4444]/10 border border-[#ef4444]/30 text-[#ef4444] text-[11px] font-bold rounded-xl uppercase tracking-wide shadow-[inset_0_0_10px_rgba(239,68,68,0.1)]">{k}</span>
               ))}
               {(!scan.missingKeywords || scan.missingKeywords.length === 0) && (
                 <span className="text-xs text-[#3DEBA6] font-bold font-mono">✓ 100% Core Matrix Intersection Coverage</span>
@@ -326,41 +328,41 @@ export default function ScanResultPage() {
         </div>
 
         {/* Dynamic Interactive Checklist Tracker */}
-        <div className="bg-[#13131A] p-8 rounded-[32px] border border-white/5 mb-8">
-          <div className="flex items-center justify-between mb-6">
-            <h3 className="text-lg font-black flex items-center gap-2">
-              <ClipboardList size={20} className="text-[#3DEBA6]" />
-              Your improvement checklist
+        <div className="bg-[#13131A]/80 backdrop-blur-xl p-8 rounded-[32px] border border-white/5 mb-8 shadow-xl">
+          <div className="flex items-center justify-between mb-8">
+            <h3 className="text-xl font-black flex items-center gap-2">
+              <ClipboardList size={22} className="text-[#3DEBA6]" />
+              Optimization Checklist
             </h3>
-            <span className="bg-[#3DEBA6]/10 text-[#3DEBA6] text-[10px] font-black px-2.5 py-1 rounded-full uppercase tracking-wider">
+            <span className="bg-[#3DEBA6]/10 border border-[#3DEBA6]/30 text-[#3DEBA6] text-[11px] font-black px-3 py-1.5 rounded-full uppercase tracking-wider shadow-[0_0_10px_rgba(61,235,166,0.15)]">
               {completedCount}/{checklistItems.length} complete
             </span>
           </div>
 
-          <div className="space-y-3">
+          <div className="space-y-4">
             {checklistItems.map((item) => (
               <div
                 key={item.id}
                 onClick={() => toggleCheck(item.id)}
-                className={`flex items-start gap-4 p-5 rounded-2xl border transition-all cursor-pointer ${checkedItems[item.id]
-                  ? 'bg-[#3DEBA6]/5 border-[#3DEBA6]/20 opacity-60'
-                  : 'bg-white/[0.01] border-white/[0.03] hover:border-white/10'
+                className={`flex items-start gap-4 p-5 rounded-2xl border transition-all duration-300 cursor-pointer ${checkedItems[item.id]
+                  ? 'bg-[#3DEBA6]/5 border-[#3DEBA6]/20 opacity-60 scale-[0.99]'
+                  : 'bg-[#0A0A0F]/50 border-white/[0.06] hover:border-white/20 hover:bg-white/[0.02] shadow-sm'
                   }`}
               >
-                <div className={`mt-0.5 w-5 h-5 rounded flex items-center justify-center border-2 transition-all ${checkedItems[item.id]
-                  ? 'bg-[#3DEBA6] border-[#3DEBA6]'
-                  : 'border-gray-600'
+                <div className={`mt-0.5 w-6 h-6 rounded flex items-center justify-center border-2 transition-all duration-300 ${checkedItems[item.id]
+                  ? 'bg-[#3DEBA6] border-[#3DEBA6] shadow-[0_0_10px_rgba(61,235,166,0.4)]'
+                  : 'border-[#6B6B7E]'
                   }`}>
-                  {checkedItems[item.id] && <Check size={14} className="text-black font-bold" />}
+                  {checkedItems[item.id] && <Check size={16} className="text-black font-black" />}
                 </div>
 
                 <div className="flex-1">
-                  <p className={`text-sm font-bold transition-all ${checkedItems[item.id] ? 'line-through text-gray-500' : 'text-gray-200'
+                  <p className={`text-sm font-bold transition-all ${checkedItems[item.id] ? 'line-through text-[#6B6B7E]' : 'text-[#EEEEF0]'
                     } ${item.isSuccess ? 'text-[#3DEBA6]' : ''}`}>
                     {item.text}
                   </p>
                   {item.subtitle && (
-                    <p className="text-[11px] text-gray-500 mt-1 font-mono uppercase tracking-tight">
+                    <p className="text-[11px] text-[#6B6B7E] mt-1.5 font-mono uppercase tracking-tight font-bold">
                       {item.subtitle}
                     </p>
                   )}
@@ -371,20 +373,20 @@ export default function ScanResultPage() {
         </div>
 
         {/* Magic AI Generation Sandbox Playground */}
-        <div className="bg-[#13131A] border border-[#a25bef]/30 p-8 rounded-[32px] relative overflow-hidden">
-          <div className="absolute -right-20 -top-20 w-64 h-64 bg-[#a25bef]/10 blur-[100px] rounded-full pointer-events-none"></div>
+        <div className="bg-[#13131A]/80 backdrop-blur-xl border border-[#a25bef]/40 p-8 rounded-[32px] relative overflow-hidden shadow-[0_0_30px_rgba(162,91,239,0.1)]">
+          <div className="absolute -right-20 -top-20 w-80 h-80 bg-[#a25bef]/15 blur-[120px] rounded-full pointer-events-none"></div>
           <div className="relative z-10">
-            <h3 className="text-lg font-black mb-2 flex items-center gap-2 text-white">
-              <Sparkles size={20} className="text-[#a25bef]" />
+            <h3 className="text-xl font-black mb-3 flex items-center gap-2 text-white">
+              <Sparkles size={22} className="text-[#a25bef]" />
               AI Bullet Point Rewriter
             </h3>
-            <p className="text-sm text-gray-400 mb-6">
-              Paste a weak bullet point from your resume below. Our AI will instantly rewrite it to include strong action verbs tailored specifically for the <strong className="text-white">{scan.jobId?.jobTitle || 'Targeted'}</strong> role.
+            <p className="text-sm text-[#6B6B7E] mb-8 font-medium">
+              Paste a weak bullet point from your resume below. Our AI will instantly rewrite it to include strong action verbs tailored specifically for the <strong className="text-white bg-white/10 px-2 py-0.5 rounded ml-1">{scan.jobId?.jobTitle || 'Targeted'}</strong> role.
             </p>
 
-            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-end gap-3 mb-3">
-              <label className="text-xs font-bold text-gray-500 uppercase tracking-widest">
-                Draft Bullet Point
+            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-end gap-3 mb-4">
+              <label className="text-[11px] font-black text-[#6B6B7E] uppercase tracking-widest flex items-center gap-2">
+                <div className="w-2 h-2 rounded-full bg-[#a25bef] animate-pulse"></div> Draft Bullet Point
               </label>
               <MagicRewriteButton
                 currentText={rewriteText}
@@ -393,12 +395,15 @@ export default function ScanResultPage() {
               />
             </div>
 
-            <textarea
-              value={rewriteText}
-              onChange={(e) => setRewriteText(e.target.value)}
-              placeholder='e.g., "I made the website faster and fixed bugs."'
-              className="w-full bg-white/[0.02] border border-white/10 rounded-2xl p-5 text-sm text-gray-200 focus:outline-none focus:border-[#a25bef]/50 transition-colors placeholder:text-gray-600 resize-y min-h-[120px]"
-            />
+            <div className="relative group">
+              <div className="absolute -inset-0.5 bg-gradient-to-r from-[#a25bef]/20 to-[#5B5FEF]/20 rounded-[20px] blur opacity-50 group-focus-within:opacity-100 transition duration-500"></div>
+              <textarea
+                value={rewriteText}
+                onChange={(e) => setRewriteText(e.target.value)}
+                placeholder='e.g., "I made the website faster and fixed bugs."'
+                className="w-full relative bg-[#0A0A0F]/90 border border-white/10 rounded-[18px] p-6 text-sm text-white focus:outline-none focus:ring-1 focus:ring-[#a25bef]/50 focus:border-[#a25bef]/50 transition-all placeholder:text-[#6B6B7E] resize-y min-h-[140px] font-mono leading-relaxed"
+              />
+            </div>
           </div>
         </div>
 
