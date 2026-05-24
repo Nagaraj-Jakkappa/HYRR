@@ -5,6 +5,8 @@ const { Server } = require('socket.io');
 const cors = require('cors');
 const helmet = require('helmet');
 const morgan = require('morgan');
+const mongoSanitize = require('express-mongo-sanitize');
+const xss = require('xss-clean');
 const mongoose = require('mongoose'); // Imported explicitly to handle the connection event hooks
 
 const connectDB = require('./config/db');
@@ -62,6 +64,12 @@ app.options('*', cors(corsOptions));
 
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
+
+// Data sanitization against NoSQL query injection
+app.use(mongoSanitize());
+
+// Data sanitization against XSS
+app.use(xss());
 
 if (process.env.NODE_ENV !== 'test') {
   app.use(morgan('dev'));
