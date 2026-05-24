@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
     Sparkles, ScanSearch, LayoutTemplate, FileText,
@@ -12,6 +12,29 @@ export default function DemoPage() {
     const [atsScore, setAtsScore] = useState(68);
     const [isOptimizing, setIsOptimizing] = useState(false);
     const [bulletText, setBulletText] = useState("Responsible for frontend dashboard components.");
+    
+    // --- DEMO RESTRICTION LOGIC ---
+    const DEMO_TIME_LIMIT = 60; // 60 seconds demo
+    const [timeLeft, setTimeLeft] = useState(DEMO_TIME_LIMIT);
+    const [timeExpired, setTimeExpired] = useState(false);
+
+    useEffect(() => {
+        if (timeLeft <= 0) {
+            setTimeExpired(true);
+            return;
+        }
+        const timer = setInterval(() => {
+            setTimeLeft(prev => prev - 1);
+        }, 1000);
+        return () => clearInterval(timer);
+    }, [timeLeft]);
+
+    // Format time left (MM:SS)
+    const formatTime = (seconds: number) => {
+        const m = Math.floor(seconds / 60);
+        const s = seconds % 60;
+        return `${m}:${s.toString().padStart(2, '0')}`;
+    };
 
     const runDemoOptimization = () => {
         if (isOptimizing) return;
@@ -40,12 +63,21 @@ export default function DemoPage() {
                     <h1 className="text-xl font-black tracking-tight">Interactive Sandbox Simulation</h1>
                     <p className="text-xs text-gray-500 mt-0.5">Test-driving hyper-targeted candidate matching profiles in real time.</p>
                 </div>
-                <button
-                    onClick={() => navigate('/register')}
-                    className="bg-[#5B5FEF] hover:bg-[#4A4EDF] text-white text-xs font-black uppercase tracking-widest px-6 py-3 rounded-xl transition-all shadow-lg shadow-[#5B5FEF]/15"
-                >
-                    Deploy Your Own Instance
-                </button>
+                <div className="flex items-center gap-4">
+                    {/* Countdown Timer Display */}
+                    <div className="flex items-center gap-2 bg-[#5B5FEF]/10 border border-[#5B5FEF]/20 px-4 py-2 rounded-xl">
+                        <span className="w-2 h-2 rounded-full bg-[#5B5FEF] animate-pulse" />
+                        <span className="text-xs font-mono font-bold text-[#5B5FEF]">
+                            Demo expires in: {formatTime(timeLeft)}
+                        </span>
+                    </div>
+                    <button
+                        onClick={() => navigate('/register')}
+                        className="bg-[#5B5FEF] hover:bg-[#4A4EDF] text-white text-xs font-black uppercase tracking-widest px-6 py-3 rounded-xl transition-all shadow-lg shadow-[#5B5FEF]/15"
+                    >
+                        Deploy Your Own Instance
+                    </button>
+                </div>
             </div>
 
             {/* Sandbox Matrix Workspace Grid */}
@@ -122,6 +154,35 @@ export default function DemoPage() {
 
             </div>
             <Footer />
+
+            {/* TIME EXPIRED OVERLAY MODAL */}
+            {timeExpired && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
+                    <div className="bg-[#13131A] border border-white/10 rounded-2xl p-8 max-w-md w-full text-center shadow-[0_20px_60px_rgba(0,0,0,0.8)] transform transition-all">
+                        <div className="w-16 h-16 bg-[#5B5FEF]/20 border border-[#5B5FEF]/30 rounded-full flex items-center justify-center mx-auto mb-6">
+                            <Sparkles className="text-[#5B5FEF]" size={28} />
+                        </div>
+                        <h2 className="text-2xl font-black text-white mb-3">Demo Time Expired</h2>
+                        <p className="text-gray-400 text-sm mb-8 leading-relaxed">
+                            Your 60-second interactive preview has concluded. Sign up for a free account to unlock unlimited access, save your progress, and export your optimized resume.
+                        </p>
+                        <div className="flex flex-col gap-3">
+                            <button
+                                onClick={() => navigate('/register')}
+                                className="w-full bg-[#5B5FEF] hover:bg-[#4A4EDF] text-white font-bold py-4 rounded-xl transition-all shadow-[0_8px_32px_rgba(91,95,239,0.25)]"
+                            >
+                                Create Free Account
+                            </button>
+                            <button
+                                onClick={() => navigate('/')}
+                                className="w-full bg-white/5 hover:bg-white/10 text-white font-bold py-4 rounded-xl transition-all"
+                            >
+                                Return to Home
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }

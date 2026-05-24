@@ -61,6 +61,7 @@ const App = () => (
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/report/:id" element={<ReportPage />} />
+        <Route path="/demo" element={<DemoPage />} />
 
         {/* --- PROTECTED ROUTES --- */}
         <Route element={<Protected><Layout /></Protected>}>
@@ -69,7 +70,6 @@ const App = () => (
           <Route path="/builder" element={<ResumeBuilderPage />} />
           <Route path="/history" element={<HistoryPage />} />
           <Route path="/compare" element={<ComparePage />} />
-          <Route path="/demo" element={<DemoPage />} />
 
           {/* Feature 2: Optimization Scan Flow Routes */}
           <Route path="/scan" element={<ScanPage />} />
