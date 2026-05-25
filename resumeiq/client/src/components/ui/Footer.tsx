@@ -66,7 +66,7 @@ export default function Footer() {
           <div>
             <h4 className="text-white font-semibold text-[17px] mb-5 tracking-wide">Resume</h4>
             <div className="space-y-1">
-              <FooterLink to="/templates">Resume Templates</FooterLink>
+              <FooterLink to="/#templates">Resume Templates</FooterLink>
               <FooterLink to="/builder">AI Resume Builder</FooterLink>
               <FooterLink to="/scan">ATS Resume Scanner</FooterLink>
             </div>
@@ -74,7 +74,7 @@ export default function Footer() {
           <div>
             <h4 className="text-white font-semibold text-[17px] mb-5 tracking-wide">Cover Letter</h4>
             <div className="space-y-1">
-              <FooterLink to="/cover-letter-builder">Cover Letter Builder</FooterLink>
+              <FooterLink to="/builder">Cover Letter Builder</FooterLink>
               <FooterLink to="/cover-letter-templates">Cover Letter Templates</FooterLink>
             </div>
           </div>

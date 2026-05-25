@@ -27,6 +27,12 @@ import TermsPage from './pages/TermsPage';
 import PrivacyPage from './pages/PrivacyPage';
 import PricingPage from './pages/PricingPage';
 import ScrollToTopButton from './components/ui/ScrollToTopButton';
+import ContactPage from './pages/ContactPage';
+import SupportPage from './pages/SupportPage';
+import CoverLetterTemplatesPage from './pages/CoverLetterTemplatesPage';
+import CookiePolicyPage from './pages/CookiePolicyPage';
+import RefundPolicyPage from './pages/RefundPolicyPage';
+import VulnerabilityDisclosurePage from './pages/VulnerabilityDisclosurePage';
 
 const Protected = ({ children, adminOnly = false }: { children: any; adminOnly?: boolean }) => {
   const { user, loading } = useAuth();
@@ -86,6 +92,12 @@ const App = () => {
         <Route path="/demo" element={<DemoPage />} />
         <Route path="/terms" element={<TermsPage />} />
         <Route path="/privacy" element={<PrivacyPage />} />
+        <Route path="/contact" element={<ContactPage />} />
+        <Route path="/support" element={<SupportPage />} />
+        <Route path="/cover-letter-templates" element={<CoverLetterTemplatesPage />} />
+        <Route path="/cookie-policy" element={<CookiePolicyPage />} />
+        <Route path="/refund-policy" element={<RefundPolicyPage />} />
+        <Route path="/vulnerability-disclosure" element={<VulnerabilityDisclosurePage />} />
 
         {/* --- PROTECTED ROUTES --- */}
         <Route element={<Protected><Layout /></Protected>}>
