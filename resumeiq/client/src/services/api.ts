@@ -78,6 +78,8 @@ export const authAPI = {
     return api.post('/auth/logout', { refreshToken });
   },
   getMe: () => api.get('/auth/me'),
+  forgotPassword: (data: { email: string }) => api.post('/auth/forgot-password', data),
+  resetPassword: (token: string, data: { password: string }) => api.put(`/auth/reset-password/${token}`, data),
 };
 
 export const resumeAPI = {

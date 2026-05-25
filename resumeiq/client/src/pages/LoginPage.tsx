@@ -169,9 +169,14 @@ export default function LoginPage() {
 
                 {/* Password field */}
                 <div>
-                  <label className="block text-[10px] font-mono font-black text-gray-400 uppercase tracking-[0.2em] mb-2.5">
-                    Password
-                  </label>
+                  <div className="flex justify-between items-center mb-2.5">
+                    <label className="block text-[10px] font-mono font-black text-gray-400 uppercase tracking-[0.2em]">
+                      Password
+                    </label>
+                    <Link to="/forgot-password" className="text-[11px] text-[#5B5FEF] hover:text-[#8E91FF] transition-colors font-mono font-bold" tabIndex={-1}>
+                      Forgot password?
+                    </Link>
+                  </div>
                   <div className="relative group">
                     <div className="absolute -inset-0.5 bg-gradient-to-r from-[#5B5FEF]/20 to-[#8E5BEF]/20 rounded-xl blur opacity-0 group-focus-within:opacity-100 transition duration-500 pointer-events-none"></div>
                     <input

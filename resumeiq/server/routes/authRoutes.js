@@ -8,7 +8,9 @@ const {
     getMe,
     changePassword,
     updateProfile,
-    deleteAccount
+    deleteAccount,
+    forgotPassword,
+    resetPassword
 } = require('../controllers/authController');
 const { protect } = require('../middleware/auth');
 const { authLimiter, apiLimiter } = require('../middleware/rateLimiter');
@@ -19,6 +21,8 @@ const { authLimiter, apiLimiter } = require('../middleware/rateLimiter');
  */
 router.post('/register', authLimiter, register);
 router.post('/login', authLimiter, login);
+router.post('/forgot-password', authLimiter, forgotPassword);
+router.put('/reset-password/:token', authLimiter, resetPassword);
 
 /**
  * Token Management

@@ -5,6 +5,8 @@ import { AuthProvider, useAuth } from './context/AuthContext';
 // Pages
 import LandingPage from './pages/LandingPage';
 import LoginPage from './pages/LoginPage';
+import ForgotPasswordPage from './pages/ForgotPasswordPage';
+import ResetPasswordPage from './pages/ResetPasswordPage';
 import RegisterPage from './pages/RegisterPage';
 import DashboardPage from './pages/DashboardPage';
 import ResumesPage from './pages/ResumesPage';
@@ -73,6 +75,8 @@ const App = () => {
         {/* --- PUBLIC ROUTES --- */}
         <Route path="/" element={<LandingPage />} />
         <Route path="/login" element={<LoginPage />} />
+        <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+        <Route path="/reset-password/:token" element={<ResetPasswordPage />} />
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/report/:id" element={<ReportPage />} />
         <Route path="/demo" element={<DemoPage />} />

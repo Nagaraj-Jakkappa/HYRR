@@ -1,3 +1,4 @@
+const crypto = require('crypto');
 const User = require('../models/User');
 const Scan = require('../models/Scan');
 const Resume = require('../models/Resume');
@@ -241,6 +242,76 @@ exports.deleteAccount = async (req, res, next) => {
     await User.findByIdAndDelete(user._id);
 
     res.json({ success: true, message: 'Account deleted permanently' });
+  } catch (err) {
+    next(err);
+  }
+};
+
+/**
+ * Forgot Password (Request Reset Link)
+ */
+exports.forgotPassword = async (req, res, next) => {
+  try {
+    const { email } = req.body;
+    if (!email) {
+      return res.status(400).json({ success: false, message: 'Please provide an email' });
+    }
+
+    const user = await User.findOne({ email: email.trim().toLowerCase() });
+    if (!user) {
+      // Return 200 even if user not found to prevent email enumeration attacks
+      return res.status(200).json({ success: true, message: 'If an account exists, an email was sent' });
+    }
+
+    // Generate token
+    const resetToken = user.createPasswordResetToken();
+    await user.save({ validateBeforeSave: false });
+
+    // Mock sending email
+    const frontendUrl = process.env.CLIENT_URL || 'http://localhost:5173';
+    const resetUrl = `${frontendUrl}/reset-password/${resetToken}`;
+    
+    // In production, use SendGrid/Nodemailer here instead of console.log
+    console.log(`\n\n=== MOCK EMAIL ===\nTo: ${user.email}\nSubject: Password Reset Request\nReset Link: ${resetUrl}\n==================\n\n`);
+
+    res.status(200).json({ success: true, message: 'If an account exists, an email was sent' });
+  } catch (err) {
+    next(err);
+  }
+};
+
+/**
+ * Reset Password (Validate Token & Set New Password)
+ */
+exports.resetPassword = async (req, res, next) => {
+  try {
+    const { password } = req.body;
+    const { token } = req.params;
+
+    if (!password || password.length < 6) {
+      return res.status(400).json({ success: false, message: 'Password must be at least 6 characters' });
+    }
+
+    // Hash the incoming token to match it in DB
+    const hashedToken = crypto.createHash('sha256').update(token).digest('hex');
+
+    const user = await User.findOne({
+      resetPasswordToken: hashedToken,
+      resetPasswordExpire: { $gt: Date.now() }
+    });
+
+    if (!user) {
+      return res.status(400).json({ success: false, message: 'Invalid or expired reset token' });
+    }
+
+    // Set new password (triggers pre-save hook)
+    user.passwordHash = password;
+    user.resetPasswordToken = undefined;
+    user.resetPasswordExpire = undefined;
+    
+    await user.save();
+
+    res.status(200).json({ success: true, message: 'Password has been reset successfully' });
   } catch (err) {
     next(err);
   }

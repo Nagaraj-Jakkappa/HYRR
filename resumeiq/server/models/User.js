@@ -12,6 +12,8 @@ const userSchema = new mongoose.Schema({
   refreshToken: { type: String, default: null },
   isActive: { type: Boolean, default: true },
   lastLogin: { type: Date },
+  resetPasswordToken: String,
+  resetPasswordExpire: Date,
 }, { timestamps: true });
 
 // Pre-save middleware hook logic matrix
@@ -24,6 +26,20 @@ userSchema.pre('save', async function (next) {
 // Structural custom schema evaluation methods
 userSchema.methods.comparePassword = async function (password) {
   return bcrypt.compare(password, this.passwordHash);
+};
+
+// Generates a random reset token and hashes it for the database
+userSchema.methods.createPasswordResetToken = function () {
+  const crypto = require('crypto');
+  const resetToken = crypto.randomBytes(32).toString('hex');
+
+  // Hash the token and set to resetPasswordToken field
+  this.resetPasswordToken = crypto.createHash('sha256').update(resetToken).digest('hex');
+
+  // Set expire time to 10 minutes
+  this.resetPasswordExpire = Date.now() + 10 * 60 * 1000;
+
+  return resetToken;
 };
 
 userSchema.methods.toJSON = function () {
