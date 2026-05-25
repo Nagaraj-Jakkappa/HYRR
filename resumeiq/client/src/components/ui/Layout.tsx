@@ -167,7 +167,7 @@ export default function Layout() {
             )}
         </div>
 
-        <div className="px-8 pb-8 max-w-7xl w-full mx-auto flex-1 flex flex-col min-h-[calc(100vh-140px)]">
+        <div className="px-8 pb-8 max-w-7xl w-full mx-auto grow shrink-0 flex flex-col">
           <Outlet />
         </div>
         <div className="w-full flex-shrink-0">
