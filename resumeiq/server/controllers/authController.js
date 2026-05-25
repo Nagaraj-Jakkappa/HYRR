@@ -30,7 +30,9 @@ exports.register = async (req, res, next) => {
     }
 
     // Creating user instance initializes the schema pre-save hook perfectly exactly once
-    const plan = 'free';
+    const validPlans = ['free', 'pro', 'career+'];
+    const requestedPlan = req.body.plan?.toLowerCase() || 'free';
+    const plan = validPlans.includes(requestedPlan) ? requestedPlan : 'free';
     const scansLimit = getScansLimitForPlan(plan);
     const user = await User.create({ name, email: email.trim().toLowerCase(), passwordHash: password, plan, scansLimit });
 

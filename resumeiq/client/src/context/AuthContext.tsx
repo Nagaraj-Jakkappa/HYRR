@@ -3,7 +3,7 @@ import { authAPI } from '../services/api'
 import { connectSocket, disconnectSocket } from '../services/socket'
 
 interface User { _id: string; name: string; email: string; role: string; createdAt: string; plan: string; scansUsed: number; scansLimit: number }
-interface AuthCtx { user: User | null; loading: boolean; login: (e: string, p: string) => Promise<void>; register: (n: string, e: string, p: string) => Promise<void>; logout: () => void; isAdmin: boolean }
+interface AuthCtx { user: User | null; loading: boolean; login: (e: string, p: string) => Promise<void>; register: (n: string, e: string, p: string, plan?: string, utr?: string) => Promise<void>; logout: () => void; isAdmin: boolean }
 
 const AuthContext = createContext<AuthCtx>({} as AuthCtx)
 
@@ -29,8 +29,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     connectSocket(data.data.accessToken)
   }
 
-  const register = async (name: string, email: string, password: string) => {
-    const { data } = await authAPI.register({ name, email, password })
+  const register = async (name: string, email: string, password: string, plan?: string, utr?: string) => {
+    const { data } = await authAPI.register({ name, email, password, plan, utr })
     localStorage.setItem('accessToken', data.data.accessToken)
     localStorage.setItem('refreshToken', data.data.refreshToken)
     setUser(data.data.user)

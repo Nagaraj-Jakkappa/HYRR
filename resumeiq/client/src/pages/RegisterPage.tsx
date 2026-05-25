@@ -1,5 +1,5 @@
 import { useState, FormEvent } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { Eye, EyeOff, ArrowRight, Check, Zap, ScanSearch, Sparkles, FileText } from 'lucide-react'
 import toast from 'react-hot-toast'
@@ -8,6 +8,7 @@ import Footer from '../components/ui/Footer'
 export default function RegisterPage() {
   const { register } = useAuth()
   const navigate = useNavigate()
+  const [searchParams] = useSearchParams()
   const [form, setForm] = useState({ name: '', email: '', password: '' })
   const [show, setShow] = useState(false)
   const [loading, setLoading] = useState(false)
@@ -17,7 +18,9 @@ export default function RegisterPage() {
     if (form.password.length < 6) return toast.error('Password must be 6+ characters')
     setLoading(true)
     try {
-      await register(form.name, form.email, form.password)
+      const plan = searchParams.get('plan') || undefined;
+      const utr = searchParams.get('utr') || undefined;
+      await register(form.name, form.email, form.password, plan, utr)
       navigate('/dashboard')
       toast.success('Account created!')
     } catch (err: any) {
