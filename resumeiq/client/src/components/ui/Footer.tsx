@@ -55,7 +55,7 @@ export default function Footer() {
           <div>
             <h4 className="text-white font-semibold text-[17px] mb-5 tracking-wide">Top</h4>
             <div className="space-y-1">
-              <FooterLink to="/about">About</FooterLink>
+              <FooterLink to="/#how-it-works">How it works</FooterLink>
               <FooterLink to="/contact">Contact</FooterLink>
               <FooterLink to="/support">Support</FooterLink>
               <FooterLink to="/#features">Features</FooterLink>
@@ -69,7 +69,6 @@ export default function Footer() {
               <FooterLink to="/templates">Resume Templates</FooterLink>
               <FooterLink to="/builder">AI Resume Builder</FooterLink>
               <FooterLink to="/scan">ATS Resume Scanner</FooterLink>
-              <FooterLink to="/#jd-match">Resume Job Description Match</FooterLink>
             </div>
           </div>
           <div>
@@ -77,61 +76,6 @@ export default function Footer() {
             <div className="space-y-1">
               <FooterLink to="/cover-letter-builder">Cover Letter Builder</FooterLink>
               <FooterLink to="/cover-letter-templates">Cover Letter Templates</FooterLink>
-            </div>
-          </div>
-          <div>
-            <h4 className="text-white font-semibold text-[17px] mb-5 tracking-wide">Free Tools</h4>
-            <div className="space-y-1">
-              <FooterLink to="/templates">Free Resume Templates</FooterLink>
-              <FooterLink to="/scan">Free Resume Checker</FooterLink>
-              <FooterLink to="/jd-keyword-finder">Free JD Keyword Finder</FooterLink>
-            </div>
-          </div>
-        </div>
-
-        {/* ROW 2 */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-x-8 gap-y-12 py-12 border-t border-white/5">
-          <div>
-            <h4 className="text-white font-semibold text-[17px] mb-5 tracking-wide">Resume Services</h4>
-            <div className="space-y-1">
-              <FooterLink to="/services/resume-writing">Resume Writing Service</FooterLink>
-              <FooterLink to="/services/linkedin">LinkedIn Profile Services</FooterLink>
-              <FooterLink to="/services/cover-letter">Cover Letter Writing</FooterLink>
-              <FooterLink to="/services/international">International Resume Services</FooterLink>
-              <FooterLink to="/services/review">Resume Review</FooterLink>
-            </div>
-          </div>
-          <div>
-            <h4 className="text-white font-semibold text-[17px] mb-5 tracking-wide">Packages & Samples</h4>
-            <div className="space-y-1">
-              <FooterLink to="/pricing">Service Plans & Pricing</FooterLink>
-              <FooterLink to="/success-stories">Success Stories</FooterLink>
-              <FooterLink to="/samples">Resume Samples</FooterLink>
-              <FooterLink to="/writers">Our Resume Writers</FooterLink>
-            </div>
-          </div>
-          <div>
-            <h4 className="text-white font-semibold text-[17px] mb-5 tracking-wide">Resume Writing Services by Location</h4>
-            <div className="space-y-1">
-              <span className="text-[#EEEEF0] font-medium block mb-2 text-[15px]">India</span>
-              <FooterLink to="/location/delhi">Resume Writing Services in Delhi</FooterLink>
-              <FooterLink to="/location/mumbai">Resume Writing Services in Mumbai</FooterLink>
-              <FooterLink to="/location/bangalore">Resume Writing Services in Bangalore</FooterLink>
-              <FooterLink to="/location/chennai">Resume Writing Services in Chennai</FooterLink>
-              <FooterLink to="/location/hyderabad">Resume Writing Services in Hyderabad</FooterLink>
-            </div>
-          </div>
-        </div>
-
-        {/* ROW 3 */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-x-8 gap-y-12 py-12 border-t border-white/5">
-          <div>
-            <h4 className="text-white font-semibold text-[17px] mb-5 tracking-wide">Resources</h4>
-            <div className="space-y-1">
-              <FooterLink to="/guide/freshers">Freshers Resume Guide</FooterLink>
-              <FooterLink to="/guide/experienced">Experienced Resume Guide</FooterLink>
-              <FooterLink to="/guide/linkedin">LinkedIn Profile Guide</FooterLink>
-              <FooterLink to="/blog">Blog</FooterLink>
             </div>
           </div>
           <div>
@@ -144,8 +88,10 @@ export default function Footer() {
               <FooterLink to="/vulnerability-disclosure">Vulnerability Disclosure</FooterLink>
             </div>
           </div>
-          <div className="flex items-end justify-start md:justify-end gap-3 h-full pb-4">
-             {/* Security Badges */}
+        </div>
+
+        {/* SECURITY BADGES */}
+        <div className="flex items-center justify-start md:justify-end gap-3 pb-8">
              <div className="bg-white px-3 py-1.5 rounded-md flex items-center gap-2 shadow-sm">
                 <ShieldCheck className="text-[#0eb563]" size={20} />
                 <div className="text-left leading-[1.1]">
@@ -160,7 +106,6 @@ export default function Footer() {
                   <div className="text-[7px] text-gray-500 font-bold tracking-tight">PAYMENT</div>
                 </div>
              </div>
-          </div>
         </div>
       </div>
 
