@@ -26,6 +26,7 @@ import DemoPage from './pages/DemoPage';
 import TermsPage from './pages/TermsPage';
 import PrivacyPage from './pages/PrivacyPage';
 import PricingPage from './pages/PricingPage';
+import ScrollToTopButton from './components/ui/ScrollToTopButton';
 
 const Protected = ({ children, adminOnly = false }: { children: any; adminOnly?: boolean }) => {
   const { user, loading } = useAuth();
@@ -72,6 +73,7 @@ const App = () => {
           }
         }}
       />
+      <ScrollToTopButton />
       <Routes>
         {/* --- PUBLIC ROUTES --- */}
         <Route path="/" element={<LandingPage />} />

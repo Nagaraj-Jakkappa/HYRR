@@ -153,7 +153,7 @@ export default function Layout() {
       </aside>
 
       {/* Main Content Area */}
-      <main className="flex-1 overflow-y-auto relative flex flex-col">
+      <main id="dashboard-scroll-container" className="flex-1 overflow-y-auto relative flex flex-col">
         <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-[#5B5FEF]/5 blur-[120px] -z-10 pointer-events-none" />
         
         {/* Top Navigation / Upgrade Pill */}
