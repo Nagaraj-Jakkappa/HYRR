@@ -25,6 +25,7 @@ import Layout from './components/ui/Layout';
 import DemoPage from './pages/DemoPage';
 import TermsPage from './pages/TermsPage';
 import PrivacyPage from './pages/PrivacyPage';
+import PricingPage from './pages/PricingPage';
 
 const Protected = ({ children, adminOnly = false }: { children: any; adminOnly?: boolean }) => {
   const { user, loading } = useAuth();
@@ -78,6 +79,7 @@ const App = () => {
         <Route path="/forgot-password" element={<ForgotPasswordPage />} />
         <Route path="/reset-password/:token" element={<ResetPasswordPage />} />
         <Route path="/register" element={<RegisterPage />} />
+        <Route path="/pricing" element={<PricingPage />} />
         <Route path="/report/:id" element={<ReportPage />} />
         <Route path="/demo" element={<DemoPage />} />
         <Route path="/terms" element={<TermsPage />} />
