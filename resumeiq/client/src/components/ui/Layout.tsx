@@ -159,7 +159,7 @@ export default function Layout() {
         {/* Top Navigation / Upgrade Pill */}
         <div className="max-w-7xl w-full mx-auto px-8 pt-6 flex justify-end h-14 items-center">
             {user?.plan?.toLowerCase() === 'free' && (
-                <Link to="/" className="bg-[#1A1A24] hover:bg-[#252530] text-gray-300 text-[13px] font-medium px-4 py-2 rounded-full transition-colors flex items-center gap-1 border border-white/[0.05]">
+                <Link to="/pricing" className="bg-[#1A1A24] hover:bg-[#252530] text-gray-300 text-[13px] font-medium px-4 py-2 rounded-full transition-colors flex items-center gap-1 border border-white/[0.05]">
                     <span className="capitalize">{user?.plan} plan</span>
                     <span className="text-gray-500 mx-1">·</span>
                     <span className="text-[#EEEEF0]">Upgrade</span>

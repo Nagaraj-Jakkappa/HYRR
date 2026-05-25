@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from "../context/AuthContext";
 import { authAPI } from '../services/api';
 import { 
@@ -17,6 +18,7 @@ import toast from 'react-hot-toast';
 
 const SettingsPage: React.FC = () => {
     const { user, logout } = useAuth();
+    const navigate = useNavigate();
     
     const [tab, setTab] = useState<'general' | 'security' | 'billing' | 'danger'>('general');
     
@@ -245,7 +247,7 @@ const SettingsPage: React.FC = () => {
                                     <p className="text-sm text-[#6B6B7E] mb-8 font-medium">Optimal for getting started with AI resume optimization.</p>
                                     
                                     <button 
-                                        onClick={() => window.location.href = '/#pricing'}
+                                        onClick={() => navigate('/pricing')}
                                         className="w-full bg-[#5B5FEF]/10 hover:bg-[#5B5FEF]/20 text-[#5B5FEF] border border-[#5B5FEF]/30 font-black uppercase tracking-wider text-xs py-4 rounded-xl transition-all shadow-[inset_0_0_15px_rgba(91,95,239,0.1)]">
                                         Upgrade Plan
                                     </button>
