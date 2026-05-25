@@ -76,7 +76,7 @@ export default function ResumesPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#0A0A0F] text-[#EEEEF0] p-6 lg:p-12 font-sans">
+    <div className="flex-1 bg-[#0A0A0F] text-[#EEEEF0] p-6 lg:p-12 font-sans">
       <div className="max-w-6xl mx-auto">
         
         <header className="mb-10">

@@ -252,7 +252,7 @@ export default function ResumeBuilderPage() {
     };
 
     return (
-        <div className="min-h-screen bg-[#0A0A0F] text-[#EEEEF0] p-6 font-sans">
+        <div className="flex-1 bg-[#0A0A0F] text-[#EEEEF0] p-6 font-sans">
 
             {/* Top Controller Header Banner Panel */}
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-[#13131A] border border-white/5 p-6 rounded-2xl mb-6 shadow-lg shadow-black/20">

@@ -63,7 +63,7 @@ const ComparePage: React.FC = () => {
     const scoreDiff = Math.abs((scans[0]?.atsScore || 0) - (scans[1]?.atsScore || 0));
 
     return (
-        <div className="p-6 lg:p-12 max-w-7xl mx-auto min-h-screen bg-[#0A0A0F] text-[#EEEEF0]">
+        <div className="p-6 lg:p-12 max-w-7xl mx-auto flex-1 bg-[#0A0A0F] text-[#EEEEF0]">
             <Link to="/history" className="flex items-center gap-2 text-gray-500 hover:text-white transition-colors mb-8">
                 <ArrowLeft size={16} /> <span className="text-xs font-mono uppercase">Back to History</span>
             </Link>

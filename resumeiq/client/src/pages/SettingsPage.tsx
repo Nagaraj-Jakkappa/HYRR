@@ -92,7 +92,7 @@ const SettingsPage: React.FC = () => {
     };
 
     return (
-        <div className="min-h-screen flex font-sans bg-[#0A0A0F] text-[#EEEEF0] selection:bg-[#5B5FEF]/30">
+        <div className="flex-1 flex font-sans bg-[#0A0A0F] text-[#EEEEF0] selection:bg-[#5B5FEF]/30">
             
             {/* Sidebar Navigation */}
             <aside className="w-64 border-r p-6 hidden md:flex flex-col bg-[#0D0D14] border-white/5">

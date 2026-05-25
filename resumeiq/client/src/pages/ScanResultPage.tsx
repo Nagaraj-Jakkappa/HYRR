@@ -180,19 +180,19 @@ export default function ScanResultPage() {
   };
 
   if (loading) return (
-    <div className="min-h-screen bg-[#0A0A0F] flex items-center justify-center">
+    <div className="flex-1 bg-[#0A0A0F] flex items-center justify-center">
       <Loader2 className="w-10 h-10 text-[#5B5FEF] animate-spin" />
     </div>
   );
 
   if (!scan) return (
-    <div className="min-h-screen bg-[#0A0A0F] flex items-center justify-center text-gray-500">
+    <div className="flex-1 bg-[#0A0A0F] flex items-center justify-center text-gray-500">
       Scan result data profile is missing.
     </div>
   );
 
   return (
-    <div className="min-h-screen bg-[#0A0A0F] text-[#EEEEF0] p-6 lg:p-12 font-sans">
+    <div className="flex-1 bg-[#0A0A0F] text-[#EEEEF0] p-6 lg:p-12 font-sans">
       <div className="max-w-4xl mx-auto">
         <Link to="/dashboard" className="inline-flex items-center text-gray-500 hover:text-white mb-8 transition-colors group text-sm font-bold">
           <ChevronLeft className="mr-1 group-hover:-translate-x-1 transition-transform" size={18} />

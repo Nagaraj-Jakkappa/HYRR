@@ -184,7 +184,7 @@ export default function DashboardPage() {
   const limitReached = stats.scansUsed >= stats.scansLimit;
 
   return (
-    <div className="min-h-screen bg-[#0A0A0F] text-[#EEEEF0] p-6 lg:p-12 font-sans">
+    <div className="bg-[#0A0A0F] text-[#EEEEF0] p-6 lg:p-12 font-sans flex-1">
       <div className="max-w-7xl mx-auto">
 
         {limitReached && (

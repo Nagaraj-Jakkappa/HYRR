@@ -167,10 +167,10 @@ export default function Layout() {
             )}
         </div>
 
-        <div className="px-8 pb-8 max-w-7xl w-full mx-auto min-h-[calc(100vh-140px)]">
+        <div className="px-8 pb-8 max-w-7xl w-full mx-auto flex-1 flex flex-col min-h-[calc(100vh-140px)]">
           <Outlet />
         </div>
-        <div className="mt-auto">
+        <div className="w-full flex-shrink-0">
           <Footer />
         </div>
       </main>
