@@ -26,9 +26,6 @@ import {
 
 export default function LandingPage() {
     const navigate = useNavigate();
-    const navigate = useNavigate();
-
-
 
     return (
         <div className="min-h-screen bg-[#0A0A0F] text-[#EEEEF0] overflow-x-hidden selection:bg-[#5B5FEF]/30">
