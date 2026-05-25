@@ -442,7 +442,61 @@ export default function LandingPage() {
                 </div>
             </section>
 
+            {/* ═══════════════════════════════ PRICING ═══════════════════════════════ */}
+            <section
+                id="pricing"
+                className="max-w-7xl mx-auto px-6 py-28 border-t border-white/[0.04]"
+            >
+                <div className="text-center mb-20">
+                    <h2 className="text-5xl font-black mb-5">Simple, Transparent Pricing</h2>
+                    <p className="text-gray-500 text-lg max-w-2xl mx-auto">
+                        Start free. Upgrade when you need unlimited scans and AI features.
+                    </p>
+                </div>
 
+                <div className="grid lg:grid-cols-3 gap-8">
+                    <PricingCard
+                        title="Free"
+                        price="₹0"
+                        desc="Get started, no credit card required."
+                        items={[
+                            '3 ATS scans per month',
+                            'Basic AI Magic Rewrite',
+                            '1 resume template',
+                            'PDF export',
+                            'Shareable scan reports',
+                        ]}
+                    />
+                    <PricingCard
+                        featured
+                        title="Pro"
+                        price="₹1499"
+                        desc="For active job seekers."
+                        items={[
+                            'Unlimited ATS scans',
+                            'Unlimited AI rewrites',
+                            'AI cover letter generator',
+                            'All 10 resume templates',
+                            'LinkedIn PDF import',
+                            'PDF & DOCX export',
+                            'Scan comparison',
+                            'Priority AI inference',
+                        ]}
+                    />
+                    <PricingCard
+                        title="Career+"
+                        price="₹2999"
+                        desc="For power users & career coaches."
+                        items={[
+                            'Everything in Pro',
+                            'Dashboard analytics',
+                            'Version history tracking',
+                            'Optimized resume downloads',
+                            'Priority support',
+                        ]}
+                    />
+                </div>
+            </section>
 
             {/* ═══════════════════════════════ FAQ ═══════════════════════════════ */}
             <section
@@ -598,6 +652,63 @@ function TestimonialCard({ quote, name, role }: { quote: string; name: string; r
                 <p className="font-bold text-white text-sm">{name}</p>
                 <p className="text-xs text-gray-500 mt-1">{role}</p>
             </div>
+        </div>
+    );
+}
+
+function PricingCard({
+    title,
+    price,
+    desc,
+    items,
+    featured = false,
+}: {
+    title: string;
+    price: string;
+    desc: string;
+    items: string[];
+    featured?: boolean;
+}) {
+    return (
+        <div
+            className={`rounded-[40px] p-10 border transition-all ${featured
+                ? 'bg-[#13131A] border-[#5B5FEF]/40 ring-1 ring-[#5B5FEF]/20 shadow-[0_20px_80px_rgba(91,95,239,0.15)]'
+                : 'bg-[#13131A] border-white/[0.05]'
+                }`}
+        >
+            <div className="flex items-center justify-between mb-8">
+                <div>
+                    <h3 className="text-2xl font-black mb-2">{title}</h3>
+                    <p className="text-gray-500">{desc}</p>
+                </div>
+                {featured && <Zap className="text-[#5B5FEF]" />}
+            </div>
+
+            <div className="text-6xl font-black tracking-tight mb-10">
+                {price}
+                <span className="text-xl text-gray-600 font-medium">/mo</span>
+            </div>
+
+            <ul className="space-y-5 mb-10">
+                {items.map((item) => (
+                    <li key={item} className="flex items-center gap-3 text-gray-400 font-medium">
+                        <div className="w-5 h-5 rounded-full bg-[#5B5FEF]/10 flex items-center justify-center flex-shrink-0">
+                            <Check size={12} className="text-[#5B5FEF]" />
+                        </div>
+                        {item}
+                    </li>
+                ))}
+            </ul>
+
+            <Link
+                to="/pricing"
+                className={`w-full block text-center py-4 rounded-2xl font-bold transition-all ${featured
+                    ? 'bg-gradient-to-r from-[#5B5FEF] to-[#8E5BEF] hover:from-[#6c70fc] hover:to-[#9f6dfc] shadow-[0_0_20px_rgba(91,95,239,0.3)] hover:shadow-[0_0_30px_rgba(91,95,239,0.5)] active:scale-[0.98]'
+                    : 'bg-white/[0.04] hover:bg-white/[0.08]'
+                    }`}
+            >
+                Get Started
+            </Link>
         </div>
     );
 }
