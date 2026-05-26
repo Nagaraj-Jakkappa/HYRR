@@ -25,11 +25,36 @@ export default function CookiePolicyPage() {
                 <div className="bg-[#13131A]/80 backdrop-blur-xl p-8 md:p-12 rounded-[32px] border border-white/5 shadow-2xl space-y-8 text-gray-400 leading-relaxed text-sm">
                     <section>
                         <h2 className="text-lg font-bold text-white mb-2">1. What are cookies?</h2>
-                        <p>Cookies are small text files that are placed on your computer or mobile device when you visit a website. They are widely used to make websites work more efficiently and provide a better user experience.</p>
+                        <p>Cookies are small text files placed on your device when you visit our platform. They allow us to recognize your device, maintain your session securely, and remember your preferences for a seamless experience.</p>
                     </section>
+                    
                     <section>
-                        <h2 className="text-lg font-bold text-white mb-2">2. How we use cookies</h2>
-                        <p>We use cookies to maintain your session (keeping you logged in), remember your preferences, and understand how you interact with our platform to improve our services.</p>
+                        <h2 className="text-lg font-bold text-white mb-2">2. Strictly Necessary Cookies</h2>
+                        <p className="mb-4">We only use strictly necessary cookies that are essential for the core operation and security of the Hyrr platform. Because these cookies are essential, they cannot be disabled in our systems.</p>
+                        
+                        <div className="space-y-4">
+                            <div className="p-4 bg-white/[0.02] border border-white/[0.05] rounded-2xl">
+                                <h3 className="text-white font-medium mb-1">Authentication & Security</h3>
+                                <p className="mb-2">We use highly secure, encrypted cookies to manage your login session. We do not expose these cookies to client-side scripts, protecting your account from common web vulnerabilities.</p>
+                                <ul className="list-disc pl-5 space-y-1 text-gray-500">
+                                    <li><strong>accessToken:</strong> An HttpOnly, Secure cookie that verifies your identity for active requests (lasts 15 minutes).</li>
+                                    <li><strong>refreshToken:</strong> An HttpOnly, Secure cookie that allows you to stay logged in without repeatedly entering your password (lasts 7 days).</li>
+                                </ul>
+                            </div>
+
+                            <div className="p-4 bg-white/[0.02] border border-white/[0.05] rounded-2xl">
+                                <h3 className="text-white font-medium mb-1">User Interface Preferences</h3>
+                                <p>We use local storage (similar to cookies) to remember your UI choices across visits.</p>
+                                <ul className="list-disc pl-5 mt-2 space-y-1 text-gray-500">
+                                    <li><strong>hyrr_theme:</strong> Remembers your preferred color theme.</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </section>
+
+                    <section>
+                        <h2 className="text-lg font-bold text-white mb-2">3. Third-Party and Tracking Cookies</h2>
+                        <p>Hyrr respects your privacy. We <strong>do not</strong> use third-party advertising cookies, cross-site trackers, or marketing pixels on our platform.</p>
                     </section>
                 </div>
             </main>
