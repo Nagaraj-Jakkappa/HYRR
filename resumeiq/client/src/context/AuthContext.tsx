@@ -11,35 +11,36 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null)
   const [loading, setLoading] = useState(true)
 
+  // On mount, verify auth by calling /me — cookie is sent automatically
   useEffect(() => {
-    const token = localStorage.getItem('accessToken')
-    if (token) {
-      authAPI.getMe().then(({ data }) => {
+    authAPI.getMe()
+      .then(({ data }) => {
         setUser(data.data.user)
-        connectSocket(token)
-      }).catch(() => localStorage.clear()).finally(() => setLoading(false))
-    } else setLoading(false)
+        connectSocket()
+      })
+      .catch(() => {
+        setUser(null)
+      })
+      .finally(() => setLoading(false))
   }, [])
 
   const login = async (email: string, password: string) => {
     const { data } = await authAPI.login({ email, password })
-    localStorage.setItem('accessToken', data.data.accessToken)
-    localStorage.setItem('refreshToken', data.data.refreshToken)
+    // Cookie is set by the backend automatically — we only store user in state
     setUser(data.data.user)
-    connectSocket(data.data.accessToken)
+    connectSocket()
   }
 
   const register = async (name: string, email: string, password: string, plan?: string, utr?: string) => {
     const { data } = await authAPI.register({ name, email, password, plan, utr })
-    localStorage.setItem('accessToken', data.data.accessToken)
-    localStorage.setItem('refreshToken', data.data.refreshToken)
+    // Cookie is set by the backend automatically — we only store user in state
     setUser(data.data.user)
-    connectSocket(data.data.accessToken)
+    connectSocket()
   }
 
   const logout = async () => {
     try { await authAPI.logout() } catch {}
-    localStorage.clear()
+    // Cookie is cleared by the backend — we only clear React state
     disconnectSocket()
     setUser(null)
   }

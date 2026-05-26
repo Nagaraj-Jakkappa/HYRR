@@ -1,23 +1,13 @@
 import axios from 'axios';
 
 // --- AXIOS INITIALIZATION ---
+// withCredentials: true ensures cookies are sent/received with every request
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL || 'http://localhost:5000/api',
+  withCredentials: true,
 });
 
-// Request Interceptor for Auth
-api.interceptors.request.use((config) => {
-  const token = localStorage.getItem('accessToken');
-  if (token) {
-    // Ensures the "Bearer " prefix is sent for every request
-    config.headers.Authorization = `Bearer ${token}`;
-  }
-  return config;
-}, (error) => {
-  return Promise.reject(error);
-});
-
-// Response Interceptor for Token Refresh
+// Response Interceptor for Token Refresh (cookie-based, no localStorage)
 api.interceptors.response.use(
   (res) => res,
   async (err) => {
@@ -25,30 +15,30 @@ api.interceptors.response.use(
 
     if (!err.response) return Promise.reject(err);
 
-    // If unauthorized and we haven't tried to refresh yet
+    // Skip refresh logic for auth endpoints — let the caller handle these 401s directly
+    const url = originalRequest.url || '';
+    const isAuthEndpoint = url.includes('/auth/me') || url.includes('/auth/refresh')
+      || url.includes('/auth/login') || url.includes('/auth/register');
+
+    if (isAuthEndpoint) {
+      return Promise.reject(err);
+    }
+
+    // If unauthorized on a protected endpoint and we haven't tried to refresh yet
     if (err.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
 
       try {
-        const refreshToken = localStorage.getItem('refreshToken');
-        if (!refreshToken) throw new Error('No refresh token available');
-
-        // Call refresh endpoint
-        const response = await axios.post(`${api.defaults.baseURL}/auth/refresh`, { refreshToken });
-
-        // Handle different possible backend response structures
-        const newAccessToken = response.data?.data?.accessToken || response.data?.accessToken;
-
-        if (newAccessToken) {
-          localStorage.setItem('accessToken', newAccessToken);
-          // Update the original request with the new token
-          originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
-          return api(originalRequest);
-        }
+        // Call refresh endpoint — refresh token cookie is sent automatically
+        await axios.post(
+          `${api.defaults.baseURL}/auth/refresh`,
+          {},
+          { withCredentials: true }
+        );
+        // Retry the original request with the new access token cookie
+        return api(originalRequest);
       } catch (refreshError) {
-        // If refresh fails, clear everything and kick to login
-        localStorage.removeItem('accessToken');
-        localStorage.removeItem('refreshToken');
+        // If refresh fails, redirect to login
         window.location.href = '/login';
         return Promise.reject(refreshError);
       }
@@ -73,10 +63,7 @@ export const authAPI = {
   changePassword: (data: any) => api.post('/auth/change-password', data),
   updateProfile: (data: any) => api.put('/auth/profile', data),
   deleteAccount: () => api.delete('/auth/account'),
-  logout: () => {
-    const refreshToken = localStorage.getItem('refreshToken');
-    return api.post('/auth/logout', { refreshToken });
-  },
+  logout: () => api.post('/auth/logout'),
   getMe: () => api.get('/auth/me'),
   forgotPassword: (data: { email: string }) => api.post('/auth/forgot-password', data),
   resetPassword: (token: string, data: { password: string }) => api.put(`/auth/reset-password/${token}`, data),
@@ -96,9 +83,13 @@ export const resumeAPI = {
       headers: { 'Content-Type': 'multipart/form-data' }
     }),
 
-  // --- NEW: Cover Letter Generation Pipeline ---
+  // --- Cover Letter Generation Pipeline ---
   generateCoverLetter: (data: { resumeData: any; companyName: string; jobTitle: string }) =>
-    api.post('/resumes/cover-letter', data)
+    api.post('/resumes/cover-letter', data),
+
+  // --- View resume file (blob for new-tab viewing) ---
+  viewFile: (id: string) =>
+    api.get(`/resumes/${id}/view`, { responseType: 'blob' }),
 };
 
 // --- Magic Rewrite AI Call ---

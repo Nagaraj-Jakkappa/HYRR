@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { resumeAPI } from '../services/api';
+import api from '../services/api';
 import { useNavigate, Link } from 'react-router-dom';
 import {
   Upload,
@@ -67,6 +68,16 @@ export default function ResumesPage() {
       setResumes(r => r.filter(x => x._id !== id));
     } catch {
       toast.error('Delete failed');
+    }
+  };
+
+  const handleViewFile = async (resumeId: string) => {
+    try {
+      const { data } = await api.get(`/resumes/${resumeId}/view`, { responseType: 'blob' });
+      const url = window.URL.createObjectURL(data);
+      window.open(url, '_blank');
+    } catch {
+      toast.error('Failed to open file');
     }
   };
 
@@ -191,22 +202,12 @@ export default function ResumesPage() {
                       {/* Dropdown Menu */}
                       {activeMenuId === resume._id && (
                         <div className="absolute right-0 top-full mt-2 w-36 bg-[#1a1a24] border border-white/10 rounded-xl shadow-2xl py-1 z-10 animate-in fade-in zoom-in-95 duration-150">
-                          <a 
-                            href={`${import.meta.env.VITE_API_URL || 'http://localhost:5000/api'}/resumes/${resume._id}/view`} 
-                            target="_blank" 
-                            rel="noopener noreferrer" 
-                            onClick={(e) => {
-                              // Attach auth token as a query param since this opens in a new tab
-                              const token = localStorage.getItem('accessToken');
-                              if (token) {
-                                e.preventDefault();
-                                window.open(`${import.meta.env.VITE_API_URL || 'http://localhost:5000/api'}/resumes/${resume._id}/view?token=${token}`, '_blank');
-                              }
-                            }}
+                          <button 
+                            onClick={() => handleViewFile(resume._id)}
                             className="w-full text-left px-4 py-2 text-sm text-gray-300 hover:bg-white/5 hover:text-white flex items-center gap-2"
                           >
                             <ExternalLink size={14} /> View File
-                          </a>
+                          </button>
                           <button 
                             onClick={() => handleDelete(resume._id, resume.originalName)} 
                             className="w-full text-left px-4 py-2 text-sm text-red-400 hover:bg-red-500/10 flex items-center gap-2"

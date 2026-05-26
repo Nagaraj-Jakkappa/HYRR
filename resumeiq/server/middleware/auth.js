@@ -8,14 +8,14 @@ exports.protect = async (req, res, next) => {
   try {
     let token;
 
-    // 1. Check for token in headers
-    if (req.headers.authorization?.startsWith('Bearer ')) {
-      token = req.headers.authorization.split(' ')[1];
+    // 1. Primary: Read from HttpOnly cookie
+    if (req.cookies?.accessToken) {
+      token = req.cookies.accessToken;
     }
 
-    // 1b. Fallback: check query string (used for new-tab file viewing)
-    if (!token && req.query.token) {
-      token = req.query.token;
+    // 2. Fallback: Bearer header (for API clients like Postman)
+    else if (req.headers.authorization?.startsWith('Bearer ')) {
+      token = req.headers.authorization.split(' ')[1];
     }
 
     if (!token) {

@@ -2,22 +2,17 @@ import { io, Socket } from 'socket.io-client'
 
 let socket: Socket | null = null
 
-export const connectSocket = (token?: string): Socket => {
+export const connectSocket = (): Socket => {
   // If socket is already connected, don't create a new one
   if (socket?.connected) return socket
-
-  // 1. Priority: Use the token passed as an argument. 
-  // 2. Fallback: Look specifically for 'accessToken' as seen in your browser storage.
-  const authToken = token || localStorage.getItem('accessToken')
 
   // Get the base URL from your env and strip the /api suffix for the websocket handshake
   const apiURL = import.meta.env.VITE_API_URL || 'http://localhost:5000'
   const socketURL = apiURL.replace('/api', '')
 
+  // withCredentials: true sends cookies during the WebSocket HTTP handshake
+  // No need to pass auth.token — the server reads it from the cookie
   socket = io(socketURL, {
-    auth: {
-      token: authToken
-    },
     transports: ['websocket', 'polling'],
     reconnectionAttempts: 5,
     withCredentials: true
@@ -28,7 +23,7 @@ export const connectSocket = (token?: string): Socket => {
   })
 
   socket.on('connect_error', (error) => {
-    // If you see 'Authentication error', it means the token was sent but rejected by the server
+    // If you see 'Authentication error', it means the cookie was missing or rejected by the server
     console.error('❌ Socket connection error:', error.message)
   })
 

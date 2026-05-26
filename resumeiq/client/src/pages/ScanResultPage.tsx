@@ -151,18 +151,8 @@ export default function ScanResultPage() {
   const handleDownload = async (format: 'pdf' | 'docx') => {
     setIsGenerating(format);
     try {
-      const token = localStorage.getItem('accessToken');
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/scans/${id}/download`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify({ format })
-      });
-
-      if (!response.ok) throw new Error('Download request failed');
-      const blob = await response.blob();
+      const response = await api.post(`/scans/${id}/download`, { format }, { responseType: 'blob' });
+      const blob = response.data;
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;

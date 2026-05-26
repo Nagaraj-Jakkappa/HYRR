@@ -9,6 +9,30 @@ const {
 } = require('../utils/tokenUtils');
 const { getScansLimitForPlan } = require('../middleware/planGate');
 
+// --- COOKIE CONFIGURATION ---
+const COOKIE_OPTIONS = {
+  httpOnly: true,
+  secure: process.env.NODE_ENV === 'production',
+  sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+};
+
+const setTokenCookies = (res, accessToken, refreshToken) => {
+  res.cookie('accessToken', accessToken, {
+    ...COOKIE_OPTIONS,
+    maxAge: 15 * 60 * 1000, // 15 minutes
+  });
+  res.cookie('refreshToken', refreshToken, {
+    ...COOKIE_OPTIONS,
+    maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+    path: '/api/auth',
+  });
+};
+
+const clearTokenCookies = (res) => {
+  res.clearCookie('accessToken', COOKIE_OPTIONS);
+  res.clearCookie('refreshToken', { ...COOKIE_OPTIONS, path: '/api/auth' });
+};
+
 /**
  * Account Registration
  */
@@ -46,14 +70,13 @@ exports.register = async (req, res, next) => {
       { $set: { refreshToken, lastLogin } }
     );
 
-    // Hydrate the instantiated document properties for client response payload
-    user.refreshToken = refreshToken;
-    user.lastLogin = lastLogin;
+    // Set HttpOnly cookies
+    setTokenCookies(res, accessToken, refreshToken);
 
     res.status(201).json({
       success: true,
       message: 'Account created successfully',
-      data: { user, accessToken, refreshToken },
+      data: { user },
     });
   } catch (err) {
     next(err);
@@ -92,12 +115,13 @@ exports.login = async (req, res, next) => {
       { $set: { refreshToken, lastLogin } }
     );
 
-    user.refreshToken = refreshToken;
-    user.lastLogin = lastLogin;
+    // Set HttpOnly cookies
+    setTokenCookies(res, accessToken, refreshToken);
 
     res.json({
       success: true,
-      data: { user, accessToken, refreshToken }
+      message: 'Login successful',
+      data: { user }
     });
   } catch (err) {
     next(err);
@@ -109,7 +133,8 @@ exports.login = async (req, res, next) => {
  */
 exports.refreshToken = async (req, res, next) => {
   try {
-    const { refreshToken } = req.body;
+    // Read refresh token from HttpOnly cookie
+    const refreshToken = req.cookies?.refreshToken;
 
     if (!refreshToken) {
       return res.status(401).json({ success: false, message: 'Refresh token required' });
@@ -130,9 +155,12 @@ exports.refreshToken = async (req, res, next) => {
       { $set: { refreshToken: newRefreshToken } }
     );
 
+    // Set new HttpOnly cookies
+    setTokenCookies(res, newAccessToken, newRefreshToken);
+
     res.json({
       success: true,
-      data: { accessToken: newAccessToken, refreshToken: newRefreshToken }
+      message: 'Tokens refreshed'
     });
   } catch (err) {
     if (err.name === 'TokenExpiredError') {
@@ -197,6 +225,10 @@ exports.logout = async (req, res, next) => {
       { _id: req.user.id },
       { $set: { refreshToken: null } }
     );
+
+    // Clear HttpOnly cookies
+    clearTokenCookies(res);
+
     res.json({ success: true, message: 'Logged out successfully' });
   } catch (err) {
     next(err);

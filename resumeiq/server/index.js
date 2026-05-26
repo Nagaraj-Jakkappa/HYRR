@@ -3,6 +3,7 @@ const express = require('express');
 const http = require('http');
 const { Server } = require('socket.io');
 const cors = require('cors');
+const cookieParser = require('cookie-parser');
 const helmet = require('helmet');
 const morgan = require('morgan');
 const mongoSanitize = require('express-mongo-sanitize');
@@ -61,6 +62,7 @@ app.use(helmet({ contentSecurityPolicy: false }));
 app.use(cors(corsOptions));
 // Handle Preflight requests explicitly for all routes
 app.options('*', cors(corsOptions));
+app.use(cookieParser());
 
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
@@ -84,7 +86,10 @@ app.set('io', io);
 
 // Socket.io auth middleware
 io.use((socket, next) => {
-  const token = socket.handshake.auth?.token;
+  // Read token from cookie sent during WebSocket HTTP handshake, fallback to auth token
+  const cookieModule = require('cookie');
+  const cookies = cookieModule.parse(socket.request.headers.cookie || '');
+  const token = cookies.accessToken || socket.handshake.auth?.token;
   if (!token) return next(new Error('Authentication error'));
   try {
     const jwt = require('jsonwebtoken');

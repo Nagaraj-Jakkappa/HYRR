@@ -1,10 +1,11 @@
 import { Link } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
 import Footer from '../components/ui/Footer';
+import { useAuth } from '../context/AuthContext';
 
 export default function NotFoundPage() {
-  // Determine session authorization state locally
-  const isAuthenticated = !!localStorage.getItem('accessToken');
+  const { user } = useAuth();
+  const isAuthenticated = !!user;
 
   return (
     <div className="min-h-screen bg-[#0A0A0F] text-[#EEEEF0] flex flex-col font-sans">
