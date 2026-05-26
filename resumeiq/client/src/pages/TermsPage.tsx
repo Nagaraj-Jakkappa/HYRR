@@ -21,27 +21,51 @@ export default function TermsPage() {
             </nav>
 
             <main className="flex-1 max-w-4xl mx-auto px-6 py-16 w-full">
-                <h1 className="text-4xl font-black mb-8">Terms of Service</h1>
-                <div className="bg-[#13131A]/80 backdrop-blur-xl p-8 md:p-12 rounded-[32px] border border-white/5 shadow-2xl space-y-8 text-gray-400 leading-relaxed text-sm">
+                <div className="text-center mb-12">
+                    <h1 className="text-4xl font-black mb-4">Terms of Use</h1>
+                    <p className="text-gray-400 max-w-2xl mx-auto text-sm">
+                        By using this website, you agree to be bound by these terms of use. If you do not agree to these terms, you are not authorized to use this website.
+                    </p>
+                </div>
+                
+                <div className="bg-[#13131A]/80 backdrop-blur-xl p-8 md:p-12 rounded-[32px] border border-white/5 shadow-2xl space-y-10 text-gray-400 leading-relaxed text-sm">
                     <section>
-                        <h2 className="text-lg font-bold text-white mb-2">1. Acceptance of Terms</h2>
-                        <p>By accessing and using hyrr, you accept and agree to be bound by the terms and provision of this agreement.</p>
+                        <h2 className="text-xl font-bold text-white mb-3">Eligibility</h2>
+                        <p>This website is intended for use by individuals who are 18 years of age or older. If you are under the age of 18, you must have the consent of a parent or guardian to use this website.</p>
                     </section>
+
                     <section>
-                        <h2 className="text-lg font-bold text-white mb-2">2. Use License</h2>
-                        <p>Permission is granted to temporarily download one copy of the materials (information or software) on hyrr's website for personal, non-commercial transitory viewing only.</p>
+                        <h2 className="text-xl font-bold text-white mb-3">Fair & Intended Use</h2>
+                        <p className="mb-3">Hyrr is designed primarily for individual job seekers to create and optimize their own resumes. While we welcome a wide range of users, our current subscription plans are not intended for commercial use (e.g., by resume writing agencies, consultants, or businesses creating resumes on behalf of others).</p>
+                        <p className="mb-3">If you represent a business or plan to use the platform for commercial purposes, please reach out to us at contact@hyrr.ai to explore appropriate options.</p>
+                        <p>We reserve the right to review usage patterns and take appropriate action in case of suspected misuse or violation of this intent.</p>
                     </section>
+
                     <section>
-                        <h2 className="text-lg font-bold text-white mb-2">3. User Accounts</h2>
-                        <p>If you create an account on the Website, you are responsible for maintaining the security of your account and you are fully responsible for all activities that occur under the account.</p>
+                        <h2 className="text-xl font-bold text-white mb-3">Content</h2>
+                        <p>The content on this website is owned by or licensed to hyrr.ai. You may not copy, distribute, modify, or create derivative works from the content without the express written permission of the website owner.</p>
                     </section>
+
                     <section>
-                        <h2 className="text-lg font-bold text-white mb-2">4. Disclaimer</h2>
-                        <p>The materials on hyrr's website are provided on an 'as is' basis. hyrr makes no warranties, expressed or implied, and hereby disclaims and negates all other warranties including, without limitation, implied warranties or conditions of merchantability, fitness for a particular purpose, or non-infringement of intellectual property or other violation of rights.</p>
+                        <h2 className="text-xl font-bold text-white mb-3">Privacy</h2>
+                        <p className="mb-4">We respect your privacy and will not collect any personal information about you without your consent. The website owner will not sell or share your personal information with third parties.</p>
+                        <h3 className="text-white font-semibold mb-1">Account Termination</h3>
+                        <p>Free account deletion requests are governed by our Free Account Deletion Policy as described in the <Link to="/privacy" className="text-[#5B5FEF] hover:underline">Privacy Policy</Link>.</p>
                     </section>
+
                     <section>
-                        <h2 className="text-lg font-bold text-white mb-2">5. Limitations</h2>
-                        <p>In no event shall hyrr or its suppliers be liable for any damages (including, without limitation, damages for loss of data or profit, or due to business interruption) arising out of the use or inability to use the materials on hyrr's website.</p>
+                        <h2 className="text-xl font-bold text-white mb-3">Disclaimer</h2>
+                        <p>hyrr.ai makes no warranties or representations about the accuracy, completeness, or timeliness of the content on this website. The website owner is not liable for any damages arising from the use of this website.</p>
+                    </section>
+
+                    <section>
+                        <h2 className="text-xl font-bold text-white mb-3">Changes</h2>
+                        <p>The website owner reserves the right to change these terms of use at any time. You are responsible for reviewing these terms of use periodically to stay informed of changes.</p>
+                    </section>
+
+                    <section>
+                        <h2 className="text-xl font-bold text-white mb-3">Governing Law</h2>
+                        <p>These terms of use are governed by and construed in accordance with the laws of India. Any dispute arising out of these terms of use will be resolved in the courts of the State.</p>
                     </section>
                 </div>
             </main>
