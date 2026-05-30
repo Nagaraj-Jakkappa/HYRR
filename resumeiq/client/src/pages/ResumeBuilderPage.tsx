@@ -779,7 +779,7 @@ export default function ResumeBuilderPage() {
                         </div>
 
                         <div
-                            className="shadow-[0_20px_50px_rgba(0,0,0,0.5)] bg-white transform origin-top mx-auto min-w-[210mm] min-h-[297mm] h-max scale-[0.4] sm:scale-[0.6] md:scale-[0.8] lg:scale-[0.9] xl:scale-100 transition-transform duration-300 ring-1 ring-white/10 relative z-10"
+                            className="shadow-[0_20px_50px_rgba(0,0,0,0.5)] bg-white mx-auto min-w-[210mm] min-h-[297mm] h-max [zoom:0.45] sm:[zoom:0.6] md:[zoom:0.8] lg:[zoom:0.9] xl:[zoom:1] transition-all duration-300 ring-1 ring-white/10 relative z-10 origin-top"
                         >
                             <div ref={printAreaRef} className="w-full h-full bg-white text-black">
                                 {renderSelectedTemplate()}
