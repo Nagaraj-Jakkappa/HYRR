@@ -166,7 +166,10 @@ export default function ResumeBuilderPage() {
 
         try {
             const token = localStorage.getItem('token');
-            const response = await fetch('/api/resumes/cover-letter', {
+            const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+            const endpoint = apiUrl.replace(/\/api$/, '') + '/api/resumes/cover-letter';
+            
+            const response = await fetch(endpoint, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
