@@ -308,7 +308,14 @@ export default function AdminPage() {
                     <ResponsiveContainer>
                       <ComposedChart data={stats.planDistribution.sort((a,b) => b.count - a.count)} layout="vertical" margin={{ top: 0, right: 0, left: 20, bottom: 0 }}>
                         <XAxis type="number" axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: '#4b5563' }} />
-                        <YAxis type="category" dataKey="_id" axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: '#fff', textTransform: 'uppercase' }} />
+                        <YAxis 
+                          type="category" 
+                          dataKey="_id" 
+                          axisLine={false} 
+                          tickLine={false} 
+                          tick={{ fontSize: 10, fill: '#fff' }} 
+                          tickFormatter={(value) => String(value).toUpperCase()}
+                        />
                         <Tooltip cursor={{ fill: 'rgba(255,255,255,0.02)' }} contentStyle={{ backgroundColor: '#0D0D14', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px' }} />
                         <Bar dataKey="count" fill="#F0C060" radius={[0, 4, 4, 0]} barSize={24} />
                       </ComposedChart>
