@@ -42,6 +42,7 @@ interface User {
   role: string;
   plan: string;
   isActive: boolean;
+  tokensUsed: number;
 }
 
 interface Scan {
@@ -59,6 +60,9 @@ interface AdminStats {
   chartData: { _id: string; scans: number; avgScore: number }[];
   dailySignups: { _id: string; signups: number }[];
   topKeywords: KeywordStat[];
+  totalTokensUsed: number;
+  planDistribution: { _id: string; count: number }[];
+  systemHealth: { mongodb: string; redis: string; backend: string };
 }
 
 interface SettingsConfig {
@@ -136,6 +140,35 @@ export default function AdminPage() {
     } catch (e) { toast.error('Failed to delete user'); }
   };
 
+  const exportScansToCSV = () => {
+    if (scans.length === 0) return toast.error('No scans available to export');
+    
+    // Create CSV header
+    const headers = ['User Email', 'Job Title', 'Company Name', 'ATS Score', 'Date'];
+    
+    // Create CSV rows
+    const csvRows = scans.map(s => {
+      // Escape strings to prevent CSV injection and handle commas
+      const email = `"${(s.userId?.email || 'Unknown').replace(/"/g, '""')}"`;
+      const title = `"${(s.jobId?.jobTitle || 'N/A').replace(/"/g, '""')}"`;
+      const company = `"${(s.jobId?.companyName || 'N/A').replace(/"/g, '""')}"`;
+      const score = s.atsScore;
+      const date = `"${new Date(s.createdAt).toLocaleDateString()}"`;
+      return [email, title, company, score, date].join(',');
+    });
+    
+    const csvContent = [headers.join(','), ...csvRows].join('\n');
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.setAttribute('download', `hyrr_scans_export_${new Date().toISOString().split('T')[0]}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    toast.success('CSV Export downloaded successfully');
+  };
+
   // Settings Actions
   const handleSettingsSave = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -194,18 +227,36 @@ export default function AdminPage() {
         <header className="mb-10 flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-black tracking-tight mb-1">Infrastructure Control</h1>
-            <p className="text-gray-500 text-sm font-mono uppercase tracking-widest">
-              System Health: {settings?.maintenanceMode ? <span className="text-red-400">Maintenance</span> : <span className="text-[#3DEBA6]">Optimal</span>}
-            </p>
+            {stats?.systemHealth ? (
+              <div className="flex items-center gap-4 mt-2">
+                <div className="flex items-center gap-1.5 text-xs font-mono uppercase">
+                  <div className={`w-2 h-2 rounded-full ${stats.systemHealth.mongodb === 'connected' ? 'bg-[#3DEBA6]' : 'bg-red-500 animate-pulse'}`} />
+                  <span className="text-gray-400">MongoDB</span>
+                </div>
+                <div className="flex items-center gap-1.5 text-xs font-mono uppercase">
+                  <div className={`w-2 h-2 rounded-full ${stats.systemHealth.redis === 'connected' ? 'bg-[#3DEBA6]' : 'bg-red-500 animate-pulse'}`} />
+                  <span className="text-gray-400">Redis</span>
+                </div>
+                <div className="flex items-center gap-1.5 text-xs font-mono uppercase">
+                  <div className="w-2 h-2 rounded-full bg-[#3DEBA6]" />
+                  <span className="text-gray-400">API</span>
+                </div>
+              </div>
+            ) : (
+              <p className="text-gray-500 text-sm font-mono uppercase tracking-widest mt-2">
+                System Health: {settings?.maintenanceMode ? <span className="text-red-400">Maintenance</span> : <span className="text-[#3DEBA6]">Optimal</span>}
+              </p>
+            )}
           </div>
         </header>
 
         {tab === 'stats' && stats && (
           <div className="space-y-8 animate-in fade-in duration-500">
             {/* Stat Cards Row */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
               <StatCard title="Total Users" value={stats.totalUsers} color="text-blue-400" icon={<Users size={20} />} />
               <StatCard title="Global Scans" value={stats.totalScans} color="text-violet-400" icon={<BarChart3 size={20} />} />
+              <StatCard title="Total AI Tokens" value={(stats.totalTokensUsed / 1000).toFixed(1) + 'k'} color="text-[#5B5FEF]" icon={<Activity size={20} />} />
               <StatCard title="Monthly Revenue" value={`₹${stats.revenue || 0}`} color="text-[#3DEBA6]" icon={<IndianRupee size={20} />} />
             </div>
 
@@ -241,27 +292,25 @@ export default function AdminPage() {
                 </div>
               </div>
 
-              {/* DAILY SIGNUPS CHART */}
+              {/* PLAN DISTRIBUTION CHART */}
               <div className="bg-[#13131A]/80 backdrop-blur-xl p-8 rounded-[32px] border border-white/5 shadow-xl">
                 <p className="text-xs font-mono text-gray-500 uppercase tracking-widest mb-8 flex items-center justify-between">
                   <span className="flex items-center gap-2">
-                    <Users size={14} className="text-[#3DEBA6]" /> Daily Signups (7 Days)
+                    <ShieldAlert size={14} className="text-[#F0C060]" /> Tier Distribution
                   </span>
                 </p>
                 <div style={{ height: 280, width: '100%' }}>
-                  {!stats.dailySignups || stats.dailySignups.length === 0 ? (
+                  {!stats.planDistribution || stats.planDistribution.length === 0 ? (
                     <div className="h-full flex flex-col items-center justify-center border border-dashed border-white/10 rounded-2xl bg-white/[0.02]">
-                      <Users size={24} className="text-gray-700 mb-2 opacity-50" />
-                      <span className="text-gray-600 text-xs font-mono uppercase">No Signup Data Found</span>
+                      <span className="text-gray-600 text-xs font-mono uppercase">No Plan Data</span>
                     </div>
                   ) : (
                     <ResponsiveContainer>
-                      <ComposedChart data={stats.dailySignups}>
-                        <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.03)" vertical={false} />
-                        <XAxis dataKey="_id" axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: '#4b5563' }} />
-                        <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: '#4b5563' }} />
+                      <ComposedChart data={stats.planDistribution.sort((a,b) => b.count - a.count)} layout="vertical" margin={{ top: 0, right: 0, left: 20, bottom: 0 }}>
+                        <XAxis type="number" axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: '#4b5563' }} />
+                        <YAxis type="category" dataKey="_id" axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: '#fff', textTransform: 'uppercase' }} />
                         <Tooltip cursor={{ fill: 'rgba(255,255,255,0.02)' }} contentStyle={{ backgroundColor: '#0D0D14', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px' }} />
-                        <Bar dataKey="signups" fill="#3DEBA6" name="New Users" radius={[4, 4, 0, 0]} barSize={24} />
+                        <Bar dataKey="count" fill="#F0C060" radius={[0, 4, 4, 0]} barSize={24} />
                       </ComposedChart>
                     </ResponsiveContainer>
                   )}
@@ -311,6 +360,7 @@ export default function AdminPage() {
                     <th className="px-6 py-4 text-left text-[10px] font-mono text-gray-500 uppercase tracking-wider">User</th>
                     <th className="px-6 py-4 text-left text-[10px] font-mono text-gray-500 uppercase tracking-wider">Role</th>
                     <th className="px-6 py-4 text-left text-[10px] font-mono text-gray-500 uppercase tracking-wider">Plan</th>
+                    <th className="px-6 py-4 text-left text-[10px] font-mono text-gray-500 uppercase tracking-wider">AI Tokens</th>
                     <th className="px-6 py-4 text-left text-[10px] font-mono text-gray-500 uppercase tracking-wider">Status</th>
                     <th className="px-6 py-4 text-right text-[10px] font-mono text-gray-500 uppercase tracking-wider">Actions</th>
                   </tr>
@@ -350,6 +400,9 @@ export default function AdminPage() {
                           <option value="career+">Career+</option>
                         </select>
                       </td>
+                      <td className="px-6 py-4 text-xs font-mono text-gray-400">
+                        {u.tokensUsed || 0}
+                      </td>
                       <td className="px-6 py-4">
                         <button 
                           onClick={() => handleToggleStatus(u._id)}
@@ -381,9 +434,17 @@ export default function AdminPage() {
         {/* Global Scans Tab */}
         {tab === 'scans' && (
           <div className="bg-[#13131A]/80 backdrop-blur-xl border border-white/5 shadow-xl rounded-[32px] overflow-hidden animate-in slide-in-from-bottom-4 duration-500">
-            <div className="p-6 border-b border-white/5 bg-white/[0.01]">
-              <h2 className="text-lg font-bold">Global Scans Record</h2>
-              <p className="text-xs text-gray-500">View all resume scans performed across the platform.</p>
+            <div className="p-6 border-b border-white/5 bg-white/[0.01] flex items-center justify-between">
+              <div>
+                <h2 className="text-lg font-bold">Global Scans Record</h2>
+                <p className="text-xs text-gray-500">View all resume scans performed across the platform.</p>
+              </div>
+              <button 
+                onClick={exportScansToCSV}
+                className="flex items-center gap-2 px-4 py-2 bg-white/5 hover:bg-white/10 text-white rounded-xl text-xs font-bold font-mono tracking-widest uppercase transition-colors border border-white/10"
+              >
+                <Save size={14} /> Export CSV
+              </button>
             </div>
             <div className="divide-y divide-white/[0.04] overflow-x-auto">
               <table className="w-full min-w-[800px]">

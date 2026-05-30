@@ -24,3 +24,11 @@ exports.apiLimiter = rateLimit({
   standardHeaders: true,
   legacyHeaders: false,
 });
+
+exports.adminLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 mins
+  max: 50, // Strict limit for admin dashboard to prevent brute force scraping
+  message: { success: false, message: 'Too many admin requests, please slow down' },
+  standardHeaders: true,
+  legacyHeaders: false,
+});

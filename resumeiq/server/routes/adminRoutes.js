@@ -14,8 +14,8 @@ const {
 } = require('../controllers/adminController');
 
 // Import authentication middleware
-// Using 'auth' to match your actual filename: server/middleware/auth.js
 const { protect, admin } = require('../middleware/auth');
+const { adminLimiter } = require('../middleware/rateLimiter');
 
 /**
  * Admin Access Control
@@ -23,7 +23,7 @@ const { protect, admin } = require('../middleware/auth');
  * 1. The user is logged in (protect)
  * 2. The user has the 'admin' role (admin)
  */
-router.use(protect, admin);
+router.use(protect, admin, adminLimiter);
 
 /**
  * Dashboard Routes

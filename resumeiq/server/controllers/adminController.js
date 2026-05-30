@@ -3,6 +3,8 @@ const Scan = require('../models/Scan');
 const Resume = require('../models/Resume');
 const Settings = require('../models/Settings');
 const { getScansLimitForPlan } = require('../middleware/planGate');
+const mongoose = require('mongoose');
+const { getRedis } = require('../config/redis');
 
 /**
  * 1. GET ADMIN STATS
@@ -20,7 +22,9 @@ exports.getAdminStats = async (req, res, next) => {
       userPerformance,
       dailySignups,
       totalUsers,
-      totalScans
+      totalScans,
+      totalTokensUsedResult,
+      planDistribution
     ] = await Promise.all([
 
       // A. Scan Volume & Avg Score (Last 7 days)
@@ -111,7 +115,24 @@ exports.getAdminStats = async (req, res, next) => {
 
       User.countDocuments(),
       Scan.countDocuments({ status: 'done' }),
+
+      // Total AI Tokens Used
+      User.aggregate([
+        { $group: { _id: null, totalTokens: { $sum: '$tokensUsed' } } }
+      ]),
+
+      // Plan Distribution
+      User.aggregate([
+        { $group: { _id: '$plan', count: { $sum: 1 } } }
+      ])
     ]);
+
+    const redisClient = getRedis();
+    const systemHealth = {
+      mongodb: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected',
+      redis: redisClient?.status === 'ready' ? 'connected' : 'disconnected',
+      backend: 'connected'
+    };
 
     res.json({
       success: true,
@@ -122,7 +143,10 @@ exports.getAdminStats = async (req, res, next) => {
         userPerformance,
         dailySignups,
         totalUsers,
-        totalScans
+        totalScans,
+        totalTokensUsed: totalTokensUsedResult[0]?.totalTokens || 0,
+        planDistribution,
+        systemHealth
       }
     });
   } catch (err) { next(err); }
