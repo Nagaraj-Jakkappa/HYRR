@@ -49,6 +49,9 @@ exports.processBackgroundScan = async (scanId, userId, resumeRawText, jobDescrip
     });
 
     await userRepository.incrementScansUsed(userId);
+    if (analysis.tokensUsed) {
+      await userRepository.incrementTokensUsed(userId, analysis.tokensUsed);
+    }
 
     emitter('scan:done', { scanId: scan._id, atsScore: scan.atsScore });
     console.log(`[Scan Background] Scan completed successfully: ${scan._id}`);

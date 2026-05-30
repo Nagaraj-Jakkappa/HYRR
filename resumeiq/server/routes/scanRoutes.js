@@ -4,7 +4,7 @@ const scanController = require('../controllers/scanController');
 const validate = require('../middleware/validate');
 const { scanResumeSchema } = require('../validators/zodSchemas');
 const { protect } = require('../middleware/auth');
-const { requirePlan } = require('../middleware/planGate');
+const { requirePlan, checkTokenBudget } = require('../middleware/planGate');
 const { scanLimiter } = require('../middleware/rateLimiter');
 
 /**
@@ -27,7 +27,7 @@ router.use(protect);
  * @desc    Start a new AI resume scan
  * @access  Private
  */
-router.post('/', scanLimiter, validate(scanResumeSchema), scanController.createScan);
+router.post('/', scanLimiter, checkTokenBudget, validate(scanResumeSchema), scanController.createScan);
 
 /**
  * @route   GET /api/scans
@@ -55,6 +55,6 @@ router.get('/:id', scanController.getScan);
  * @desc    Generate and download an AI-optimized PDF or DOCX resume
  * @access  Private
  */
-router.post('/:id/download', requirePlan('pro', 'career+'), scanController.downloadResume);
+router.post('/:id/download', requirePlan('pro', 'career+'), checkTokenBudget, scanController.downloadResume);
 
 module.exports = router;

@@ -54,7 +54,11 @@ exports.downloadResume = async (req, res, next) => {
 
     const missingKeywordsStr = scan.missingKeywords.join(', ');
 
-    const optimizedText = await rewriteResumeWithKeywords(scan.resumeId.rawText, scan.jobId.jobDescription, missingKeywordsStr);
+    const { result: optimizedText, tokensUsed } = await rewriteResumeWithKeywords(scan.resumeId.rawText, scan.jobId.jobDescription, missingKeywordsStr);
+
+    if (tokensUsed > 0) {
+      await userRepository.incrementTokensUsed(req.user._id, tokensUsed);
+    }
 
     if (format === 'pdf') {
       documentService.generateOptimizedPDF(res, optimizedText, scan.resumeId.rawText, scan.resumeId.originalName, scan.jobId);

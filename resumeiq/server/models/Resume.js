@@ -12,4 +12,7 @@ const resumeSchema = new mongoose.Schema({
   isActive: { type: Boolean, default: true },
 }, { timestamps: true });
 
+// Dashboard recent lookups
+resumeSchema.index({ userId: 1, createdAt: -1 });
+
 module.exports = mongoose.model('Resume', resumeSchema);

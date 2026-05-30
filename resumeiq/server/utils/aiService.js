@@ -106,6 +106,10 @@ const analyzeResume = async (resumeText, jobDescription, keywords, socket, scanI
 
     const content = response.choices[0].message.content;
     const result = JSON.parse(content);
+    
+    // Inject actual token usage into the result
+    const tokensUsed = response.usage?.total_tokens || 0;
+    result.tokensUsed = tokensUsed;
 
     sendUpdate('scan:progress', { step: 'Finalizing Score', pct: 90 });
 
@@ -144,7 +148,14 @@ const rewriteTextWithAI = async (text, jobTitle) => {
     try {
       if (redis && typeof redis.get === 'function') {
         const cached = await redis.get(cacheKey);
-        if (cached) return cached;
+        if (cached) {
+          // Backward compatibility check if cached is raw string vs JSON
+          try {
+             return JSON.parse(cached);
+          } catch(e) {
+             return { result: cached, tokensUsed: 0 };
+          }
+        }
       }
     } catch (redisErr) {
       console.warn("Redis Cache Warning:", redisErr.message);
@@ -159,19 +170,41 @@ const rewriteTextWithAI = async (text, jobTitle) => {
     });
     
     const result = chatCompletion.choices[0].message.content.trim();
+    const tokensUsed = chatCompletion.usage?.total_tokens || 0;
 
     try {
       if (redis && typeof redis.set === 'function') {
-        await redis.set(cacheKey, result, { EX: 86400 * 30 }); // Cache for 30 days
+        // Cache the object to preserve both text and token count
+        await redis.set(cacheKey, JSON.stringify({ result, tokensUsed }), { EX: 86400 * 30 }); // Cache for 30 days
       }
     } catch (cacheErr) {
       console.error("Redis Set Error:", cacheErr.message);
     }
 
-    return result;
+    return { result, tokensUsed };
   } catch (error) {
     console.error('AI Rewrite Error:', error.message);
     throw new Error('Failed to rewrite text');
+  }
+};
+
+/**
+ * Streaming version of rewriteTextWithAI for SSE in Magic Rewrite
+ */
+const streamRewriteTextWithAI = async (text, jobTitle) => {
+  try {
+    const prompt = `Rewrite this bullet point to be impactful for a ${jobTitle || 'general'} role. Original: "${text}"`;
+    return await aiClient.chat.completions.create({
+      messages: [{ role: 'user', content: prompt }],
+      model: process.env.GROQ_MODEL || 'llama-3.3-70b-versatile',
+      temperature: 0.7,
+      max_tokens: 150,
+      stream: true,
+      stream_options: { include_usage: true }
+    });
+  } catch (error) {
+    console.error('AI Stream Rewrite Error:', error.message);
+    throw new Error('Failed to stream rewrite text');
   }
 };
 
@@ -294,10 +327,11 @@ const rewriteResumeWithKeywords = async (rawText, jobDescription, missingKeyword
     // Strip conversational filler from the top (e.g. "Here is the revised resume:")
     content = content.replace(/^(?:Here is the|Here's the|Sure|Certainly|Below is the).*?\n/gi, '');
 
-    return content.trim();
+    let tokensUsed = chatCompletion.usage?.total_tokens || 0;
+    return { result: content.trim(), tokensUsed };
   } catch (error) {
     console.error('Resume Rewrite Error:', error.message);
-    return rawText; // Fallback to raw text
+    return { result: rawText, tokensUsed: 0 }; // Fallback to raw text
   }
 };
 
@@ -305,7 +339,8 @@ module.exports = {
   analyzeResume,
   extractKeywordsFromJD,
   rewriteTextWithAI,
+  streamRewriteTextWithAI,
+  rewriteResumeWithKeywords,
   generateCoverLetterWithAI,
-  parseLinkedInResumeWithAI,
-  rewriteResumeWithKeywords
+  parseLinkedInResumeWithAI
 };

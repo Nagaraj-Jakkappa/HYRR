@@ -28,8 +28,11 @@ const MagicRewriteButton: React.FC<MagicRewriteButtonProps> = ({ currentText, jo
                 const cleanedText = data.improved.replace(/^[-•*]\s*/, '');
                 onRewrite(cleanedText);
             }
-        } catch (err) {
-            setError('Failed to rewrite. Try again.');
+        } catch (err: any) {
+            const backendMsg = err.response?.data?.errors?.[0]?.message 
+                               || err.response?.data?.message 
+                               || 'Failed to rewrite. Try again.';
+            setError(backendMsg);
             setTimeout(() => setError(null), 3000);
         } finally {
             setIsLoading(false);

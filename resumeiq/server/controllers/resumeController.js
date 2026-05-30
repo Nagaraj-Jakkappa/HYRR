@@ -124,13 +124,73 @@ exports.magicRewrite = async (req, res) => {
       return res.status(400).json({ message: 'Text is required for rewriting' });
     }
 
-    const improvedText = await rewriteTextWithAI(text, jobTitle);
+    const crypto = require('crypto');
+    const { streamRewriteTextWithAI } = require('../utils/aiService');
+    const redis = require('../config/redis');
+    const userRepository = require('../repositories/userRepository');
 
-    res.status(200).json({
-      success: true,
-      original: text,
-      improved: improvedText
-    });
+    // Attempt cache read
+    const hash = crypto.createHash('sha256').update(text + (jobTitle || '')).digest('hex');
+    const cacheKey = `rewrite:${hash}`;
+    if (redis && typeof redis.get === 'function') {
+      const cached = await redis.get(cacheKey);
+      if (cached) {
+        let parsed;
+        try { parsed = JSON.parse(cached); } catch(e) { parsed = { result: cached }; }
+        return res.status(200).json({ success: true, original: text, improved: parsed.result, cached: true });
+      }
+    }
+
+    // Since we stream now, tell the client they're getting an event stream
+    // Or if client still uses standard POST, we need to handle that. Wait!
+    // The client current POST expects JSON! If we change to text/event-stream, we break the frontend!
+    // If the frontend `magicRewriteAPI` expects JSON, we can't change it without breaking it. Let's send stream only if the client requests it via a query param `?stream=true`.
+    if (req.query.stream === 'true') {
+      const stream = await streamRewriteTextWithAI(text, jobTitle);
+
+      res.setHeader('Content-Type', 'text/event-stream');
+      res.setHeader('Cache-Control', 'no-cache');
+      res.setHeader('Connection', 'keep-alive');
+
+      let accumulatedText = '';
+      let totalTokensUsed = 0;
+
+      for await (const chunk of stream) {
+        if (chunk.choices && chunk.choices[0]?.delta?.content) {
+          const content = chunk.choices[0].delta.content;
+          accumulatedText += content;
+          res.write(`data: ${JSON.stringify({ content })}\n\n`);
+        }
+        if (chunk.usage) {
+          totalTokensUsed = chunk.usage.total_tokens || 0;
+        }
+      }
+
+      res.write('data: [DONE]\n\n');
+      res.end();
+
+      // Post-stream processing: cache and budget
+      if (totalTokensUsed > 0) {
+        await userRepository.incrementTokensUsed(req.user._id, totalTokensUsed).catch(console.error);
+      }
+      if (redis && typeof redis.set === 'function') {
+        redis.set(cacheKey, JSON.stringify({ result: accumulatedText.trim(), tokensUsed: totalTokensUsed }), { EX: 86400 * 30 }).catch(console.error);
+      }
+    } else {
+      // Fallback for non-streaming clients
+      const { rewriteTextWithAI } = require('../utils/aiService');
+      const { result: improvedText, tokensUsed } = await rewriteTextWithAI(text, jobTitle);
+
+      if (tokensUsed > 0) {
+        await userRepository.incrementTokensUsed(req.user._id, tokensUsed);
+      }
+
+      res.status(200).json({
+        success: true,
+        original: text,
+        improved: improvedText
+      });
+    }
   } catch (error) {
     res.status(500).json({ message: 'Error generating magic rewrite', error: error.message });
   }

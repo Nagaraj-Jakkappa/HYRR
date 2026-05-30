@@ -9,6 +9,7 @@ const userSchema = new mongoose.Schema({
   plan: { type: String, enum: ['free', 'pro', 'career+'], default: 'free' },
   scansUsed: { type: Number, default: 0 },
   scansLimit: { type: Number, default: 3 },
+  tokensUsed: { type: Number, default: 0 },
   refreshToken: { type: String, default: null },
   isActive: { type: Boolean, default: true },
   lastLogin: { type: Date },

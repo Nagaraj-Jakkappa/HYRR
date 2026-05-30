@@ -10,4 +10,7 @@ const jobSchema = new mongoose.Schema({
   status: { type: String, enum: ['active', 'applied', 'rejected', 'offer'], default: 'active' },
 }, { timestamps: true });
 
+// For rapid identical-JD checks during scan creation
+jobSchema.index({ userId: 1, jobDescHash: 1 });
+
 module.exports = mongoose.model('Job', jobSchema);

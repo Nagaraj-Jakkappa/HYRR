@@ -3,7 +3,7 @@ const validate = (schema) => (req, res, next) => {
   if (!result.success) {
     return res.status(400).json({
       success: false,
-      message: 'Invalid request payload data',
+      message: 'Validation failed',
       errors: result.error?.issues?.map(e => ({
         field: e.path?.[0] || 'unknown',
         message: e.message

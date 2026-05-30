@@ -94,7 +94,8 @@ export const resumeAPI = {
 
 // --- Magic Rewrite AI Call ---
 export const magicRewriteAPI = async (text: string, jobTitle?: string) => {
-  const response = await api.post('/resumes/rewrite', { text, jobTitle });
+  const validJobTitle = jobTitle && jobTitle.trim().length >= 2 ? jobTitle.trim() : "General Role";
+  const response = await api.post('/resumes/rewrite', { text, jobTitle: validJobTitle });
   return response.data;
 };
 
