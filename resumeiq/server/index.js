@@ -20,6 +20,7 @@ const authRoutes = require('./routes/authRoutes');
 const resumeRoutes = require('./routes/resumeRoutes');
 const scanRoutes = require('./routes/scanRoutes');
 const adminRoutes = require('./routes/adminRoutes');
+const coverLetterRoutes = require('./routes/coverLetterRoutes');
 
 const app = express();
 
@@ -121,6 +122,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/resumes', resumeRoutes);
 app.use('/api/scans', scanRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/cover-letters', coverLetterRoutes);
 
 app.get('/api/health', (req, res) => {
   res.json({

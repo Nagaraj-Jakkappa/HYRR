@@ -92,25 +92,23 @@ export default function LandingPage() {
                         </span>
                     </div>
 
-                    <h1 className="text-5xl md:text-7xl font-black tracking-tighter leading-[0.92] max-w-6xl mx-auto mb-8">
+                    <h1 className="text-5xl md:text-7xl font-black tracking-tighter leading-[1.05] max-w-5xl mx-auto mb-8">
                         Build Resumes That{' '}
-                        <span className="bg-gradient-to-r from-[#5B5FEF] to-[#8E91FF] text-transparent bg-clip-text">
+                        <span className="bg-gradient-to-r from-[#5B5FEF] to-[#3DEBA6] text-transparent bg-clip-text">
                             Beat the ATS
                         </span>
                         <br />
                         and Land Interviews.
                     </h1>
 
-                    <p className="max-w-3xl mx-auto text-lg md:text-xl text-gray-400 leading-relaxed mb-12">
-                        Upload your resume. Paste a job description. Get an instant AI-powered ATS
-                        score, keyword gap analysis, bullet-point rewrites, and a tailored cover
-                        letter — all generated in real time with Groq&rsquo;s Llama&nbsp;3.3 engine.
+                    <p className="max-w-2xl mx-auto text-lg md:text-xl text-gray-400 leading-relaxed mb-12">
+                        Compare your resume against any job description. Get real-time ATS scoring, keyword gap analysis, and AI-powered bullet rewrites to perfectly match the role.
                     </p>
 
-                    <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-20">
+                    <div className="flex flex-col sm:flex-row items-center justify-center gap-5 mb-20">
                         <Link
                             to="/register"
-                            className="inline-flex items-center justify-center bg-[#5B5FEF] hover:bg-[#4A4EDF] px-10 py-5 rounded-2xl font-bold text-lg transition-all shadow-[0_0_50px_rgba(91,95,239,0.35)] group"
+                            className="inline-flex items-center justify-center bg-[#5B5FEF] hover:bg-[#4A4EDF] px-10 py-4 rounded-2xl font-bold text-lg transition-all duration-300 shadow-[0_0_20px_rgba(91,95,239,0.3)] hover:shadow-[0_0_40px_rgba(91,95,239,0.5)] hover:-translate-y-1 active:translate-y-0 active:scale-95 group"
                         >
                             Start Building Free
                             <ArrowRight
@@ -121,7 +119,7 @@ export default function LandingPage() {
 
                         <button
                             onClick={() => navigate('/demo')}
-                            className="px-10 py-5 rounded-2xl border border-white/10 bg-white/[0.03] hover:bg-white/[0.06] font-bold text-lg transition-all"
+                            className="px-10 py-4 rounded-2xl border border-white/10 hover:border-white/20 bg-white/[0.03] hover:bg-white/[0.08] font-bold text-lg transition-all duration-300 hover:shadow-[0_0_20px_rgba(255,255,255,0.05)] hover:-translate-y-1 active:translate-y-0 active:scale-95"
                         >
                             Watch Demo
                         </button>
@@ -206,7 +204,7 @@ export default function LandingPage() {
                     {['FAANG', 'Product Startups', 'Big 4 Consulting', 'Fortune 500', 'Remote-First', 'Govt. & PSU'].map((item) => (
                         <div
                             key={item}
-                            className="px-6 py-3 rounded-2xl border border-white/[0.05] bg-white/[0.02] text-gray-400 font-bold text-sm"
+                            className="px-4 md:px-6 py-2 md:py-3 rounded-xl md:rounded-2xl border border-white/[0.06] hover:border-white/15 bg-white/[0.02] text-gray-400 font-bold text-xs md:text-sm transition-all"
                         >
                             {item}
                         </div>

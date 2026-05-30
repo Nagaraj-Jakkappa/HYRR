@@ -67,11 +67,21 @@ const magicRewriteSchema = z.object({
 });
 
 const generateCoverLetterSchema = z.object({
-  resumeData: resumeDataSchema,
-
+  resumeData: resumeDataSchema.optional(), // Make it optional for fallback if needed
   companyName: nonEmptyString('Company name', 2),
-
   jobTitle: nonEmptyString('Job title', 2),
+  jobDescription: optionalString,
+  template: z.enum(['Modern Professional', 'Startup Friendly', 'ATS Formal', 'Fresher / Internship']).optional(),
+});
+
+const saveCoverLetterSchema = generateCoverLetterSchema.extend({
+  content: nonEmptyString('Content', 10),
+});
+
+const updateCoverLetterSchema = z.object({
+  companyName: optionalString,
+  jobTitle: optionalString,
+  content: optionalString,
 });
 
 /**
@@ -93,5 +103,7 @@ const scanResumeSchema = z.object({
 module.exports = {
   magicRewriteSchema,
   generateCoverLetterSchema,
+  saveCoverLetterSchema,
+  updateCoverLetterSchema,
   scanResumeSchema,
 };

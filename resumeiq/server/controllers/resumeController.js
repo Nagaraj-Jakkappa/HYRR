@@ -1,7 +1,8 @@
 const resumeRepository = require('../repositories/resumeRepository');
 const resumeService = require('../services/resumeService');
 const pdfParse = require('pdf-parse');
-const { rewriteTextWithAI, generateCoverLetterWithAI, parseLinkedInResumeWithAI } = require('../utils/aiService');
+const { rewriteTextWithAI, parseLinkedInResumeWithAI } = require('../utils/aiService');
+const coverLetterService = require('../services/coverLetterService');
 
 
 exports.uploadResume = async (req, res, next) => {
@@ -231,7 +232,7 @@ exports.generateCoverLetter = async (req, res, next) => {
       return res.status(400).json({ success: false, message: 'Missing generation context arguments.' });
     }
 
-    const stream = await generateCoverLetterWithAI(resumeData, companyName, jobTitle);
+    const stream = await coverLetterService.generateStream(req.body);
 
     res.setHeader('Content-Type', 'text/event-stream');
     res.setHeader('Cache-Control', 'no-cache');

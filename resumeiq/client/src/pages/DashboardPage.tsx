@@ -314,8 +314,12 @@ export default function DashboardPage() {
                   </AreaChart>
                 </ResponsiveContainer>
               ) : (
-                <div className="h-full flex items-center justify-center text-gray-600 text-sm italic font-mono uppercase tracking-widest">
-                  Insufficient data for trend analysis
+                <div className="h-full flex flex-col items-center justify-center text-center">
+                  <div className="w-16 h-16 rounded-2xl bg-[#5B5FEF]/10 flex items-center justify-center text-[#5B5FEF] mb-4 shadow-[0_0_20px_rgba(91,95,239,0.2)]">
+                    <TrendingUp size={28} />
+                  </div>
+                  <p className="text-gray-300 font-bold mb-2">Insufficient data for trend analysis</p>
+                  <p className="text-sm text-gray-500 max-w-[280px]">Run multiple ATS scans against different job profiles to unlock AI growth insights.</p>
                 </div>
               )}
             </div>
@@ -362,7 +366,15 @@ export default function DashboardPage() {
 
             <div className="p-4 space-y-3">
               {!stats.recentScans?.length ? (
-                <div className="p-12 text-center text-gray-500 text-sm">No scan history found.</div>
+                <div className="p-12 flex flex-col items-center justify-center text-center">
+                  <div className="w-16 h-16 rounded-2xl bg-white/5 flex items-center justify-center text-gray-500 mb-4 group-hover:scale-110 transition-transform">
+                    <FileSearch size={28} />
+                  </div>
+                  <p className="text-gray-400 font-medium mb-6">No scan history found.</p>
+                  <Link to="/scan" className="btn-primary py-2 px-6 text-sm">
+                    Run First Scan
+                  </Link>
+                </div>
               ) : (
                 stats.recentScans.map((scan) => (
                   <div
@@ -404,7 +416,15 @@ export default function DashboardPage() {
 
             <div className="p-4 space-y-3">
               {!stats.recentResumes?.length ? (
-                <div className="p-12 text-center text-gray-500 text-sm">No resumes uploaded yet.</div>
+                <div className="p-12 flex flex-col items-center justify-center text-center">
+                  <div className="w-16 h-16 rounded-2xl bg-white/5 flex items-center justify-center text-gray-500 mb-4 group-hover:scale-110 transition-transform">
+                    <FileText size={28} />
+                  </div>
+                  <p className="text-gray-400 font-medium mb-6">No resumes uploaded yet.</p>
+                  <Link to="/resumes" className="btn-primary py-2 px-6 text-sm">
+                    Upload Resume
+                  </Link>
+                </div>
               ) : (
                 stats.recentResumes.map((resume) => (
                   <div
@@ -449,17 +469,17 @@ export default function DashboardPage() {
 
 function StatCard({ label, value, icon: Icon, color, sub, isStatic }: any) {
   return (
-    <div className="bg-[#13131A]/80 backdrop-blur-xl p-8 rounded-[32px] border border-white/5 shadow-xl group transition-all">
+    <div className="bg-[#13131A]/80 backdrop-blur-xl p-8 rounded-[32px] border border-white/[0.06] shadow-xl group transition-all duration-300 hover:border-white/15 hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.05),_0_20px_40px_rgba(0,0,0,0.4)] hover:-translate-y-1">
       <div className="flex justify-between items-start mb-6">
-        <span className="text-[10px] font-mono font-black text-gray-500 uppercase tracking-[0.2em]">{label}</span>
-        <div className="p-2 rounded-lg bg-white/5 group-hover:bg-white/10 transition-colors">
-          <Icon size={16} className={color} />
+        <span className="text-xs md:text-sm font-bold text-gray-400 tracking-wide">{label}</span>
+        <div className="p-2.5 rounded-xl bg-white/5 group-hover:bg-white/10 group-hover:scale-110 transition-all duration-300">
+          <Icon size={18} className={color} />
         </div>
       </div>
-      <div className={`text-4xl font-black mb-1 tracking-tighter ${color}`}>
+      <div className={`text-4xl md:text-5xl font-black mb-2 tracking-tighter ${color}`}>
         {value}{!isStatic && typeof value === 'number' ? '%' : ''}
       </div>
-      <p className="text-[10px] text-gray-600 font-mono uppercase tracking-widest">{sub}</p>
+      <p className="text-xs text-gray-500 font-medium">{sub}</p>
     </div>
   );
 }

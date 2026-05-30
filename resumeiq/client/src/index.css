@@ -6,6 +6,7 @@
   body {
     /* Main layout background configuration matching your landing page colors */
     @apply bg-[#0A0A0F] text-[#EEEEF0] font-sans antialiased;
+    font-family: 'Inter', system-ui, sans-serif;
   }
 
   /* Modern global minimal scrollbar */
@@ -31,22 +32,22 @@
 
   /* Updated card layout surface styling definitions */
   .card {
-    @apply bg-[#13131A] border border-white/[0.05] rounded-2xl transition-all duration-300 hover:border-[#5B5FEF]/30;
+    @apply bg-[#13131A] border border-white/[0.06] rounded-2xl transition-all duration-300 hover:border-white/15 hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.05)];
   }
 
   /* Primary button featuring the signature 'Hyrr' interactive tech glow */
   .btn-primary {
-    @apply bg-[#5B5FEF] hover:bg-[#4A4EDF] text-white font-bold px-6 py-3 rounded-xl transition-all duration-200 flex items-center justify-center gap-2 shadow-lg shadow-[#5B5FEF]/20 active:scale-95;
+    @apply bg-[#5B5FEF] hover:bg-[#4A4EDF] text-white font-bold px-6 py-3 rounded-xl transition-all duration-300 flex items-center justify-center gap-2 shadow-[0_0_15px_rgba(91,95,239,0.25)] hover:shadow-[0_0_25px_rgba(91,95,239,0.4)] hover:-translate-y-0.5 active:translate-y-0 active:scale-95;
   }
 
   /* Ghost button for standard nested secondary dashboard actions */
   .btn-ghost {
-    @apply bg-white/5 hover:bg-white/10 border border-white/5 text-gray-300 hover:text-white font-medium px-6 py-3 rounded-xl transition-all duration-200 flex items-center justify-center gap-2;
+    @apply bg-white/5 hover:bg-white/10 border border-white/5 hover:border-white/15 text-gray-300 hover:text-white font-medium px-6 py-3 rounded-xl transition-all duration-300 flex items-center justify-center gap-2;
   }
 
   /* High-fidelity dark mode form fields input configuration */
   .input {
-    @apply bg-[#13131A] border border-white/10 rounded-xl px-4 py-3 text-sm text-[#EEEEF0] placeholder-gray-600 focus:outline-none focus:border-[#5B5FEF] focus:ring-1 focus:ring-[#5B5FEF]/30 transition-all w-full;
+    @apply bg-[#13131A] border border-white/10 rounded-xl px-4 py-3 text-sm text-[#EEEEF0] placeholder-gray-600 focus:outline-none focus:border-[#5B5FEF] focus:ring-1 focus:ring-[#5B5FEF]/30 focus:shadow-[0_0_10px_rgba(91,95,239,0.2)] transition-all duration-300 w-full;
   }
 
   .label {

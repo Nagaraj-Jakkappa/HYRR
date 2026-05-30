@@ -74,7 +74,7 @@ router.post(
 router.post('/rewrite', checkTokenBudget, validate(magicRewriteSchema), magicRewrite);
 
 // --- AI Cover Letter Generator (Pro+ only) ---
-router.post('/cover-letter', requirePlan('pro', 'career+'), checkTokenBudget, validate(generateCoverLetterSchema), generateCoverLetter);
+router.post('/cover-letter', checkTokenBudget, validate(generateCoverLetterSchema), generateCoverLetter);
 
 // --- Proxy File Viewer (streams from Cloudinary through server) ---
 router.get('/:id/view', viewResumeFile);

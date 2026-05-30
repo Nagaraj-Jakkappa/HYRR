@@ -107,7 +107,11 @@ export default function ResumeBuilderPage() {
     // --- COVER LETTER SPECIFIC FORMS STATE ---
     const [targetCompany, setTargetCompany] = useState('GoComet');
     const [targetRole, setTargetRole] = useState('Frontend Engineer');
+    const [targetTemplate, setTargetTemplate] = useState('Modern Professional');
+    const [jobDescription, setJobDescription] = useState('');
     const [coverLetterContent, setCoverLetterContent] = useState('');
+    const [savingLetter, setSavingLetter] = useState(false);
+    const [currentCoverLetterId, setCurrentCoverLetterId] = useState<string | null>(null);
 
     const printAreaRef = useRef<HTMLDivElement>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
@@ -161,13 +165,14 @@ export default function ResumeBuilderPage() {
         if (!targetCompany || !targetRole) return toast.error('Please configure target enterprise context anchors.');
 
         setGeneratingLetter(true);
+        setCurrentCoverLetterId(null);
         const loadToast = toast.loading('Assembling custom tailored cover letter narrative loops via Groq...');
         setCoverLetterContent('');
 
         try {
             const token = localStorage.getItem('token');
             const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
-            const endpoint = apiUrl.replace(/\/api$/, '') + '/api/resumes/cover-letter';
+            const endpoint = apiUrl.replace(/\/api$/, '') + '/api/cover-letters/generate';
             
             const response = await fetch(endpoint, {
                 method: 'POST',
@@ -179,7 +184,9 @@ export default function ResumeBuilderPage() {
                 body: JSON.stringify({
                     resumeData,
                     companyName: targetCompany,
-                    jobTitle: targetRole
+                    jobTitle: targetRole,
+                    jobDescription,
+                    template: targetTemplate
                 })
             });
 
@@ -220,6 +227,58 @@ export default function ResumeBuilderPage() {
         } finally {
             setGeneratingLetter(false);
         }
+    };
+
+    const handleSaveCoverLetter = async () => {
+        if (!coverLetterContent) return;
+        setSavingLetter(true);
+        const toastId = toast.loading('Saving cover letter securely...');
+        try {
+            const token = localStorage.getItem('token');
+            const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+            
+            let url = `${apiUrl.replace(/\/api$/, '')}/api/cover-letters`;
+            let method = 'POST';
+            
+            if (currentCoverLetterId) {
+                url = `${url}/${currentCoverLetterId}`;
+                method = 'PATCH';
+            }
+
+            const res = await fetch(url, {
+                method,
+                credentials: 'include',
+                headers: {
+                    'Content-Type': 'application/json',
+                    ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+                },
+                body: JSON.stringify({
+                    companyName: targetCompany,
+                    jobTitle: targetRole,
+                    jobDescription,
+                    template: targetTemplate,
+                    content: coverLetterContent
+                })
+            });
+
+            const data = await res.json();
+            if (!res.ok) throw new Error(data.message || data.error || 'Failed to save');
+            
+            if (method === 'POST') {
+                setCurrentCoverLetterId(data.data._id);
+            }
+            toast.success('Cover letter saved successfully.', { id: toastId });
+        } catch (err: any) {
+            toast.error(err.message, { id: toastId });
+        } finally {
+            setSavingLetter(false);
+        }
+    };
+
+    const handleCopyCoverLetter = () => {
+        if (!coverLetterContent) return;
+        navigator.clipboard.writeText(coverLetterContent);
+        toast.success('Copied to clipboard!');
     };
 
     // --- LINKEDIN EXTRACTOR HANDLER ---
@@ -387,6 +446,28 @@ export default function ResumeBuilderPage() {
                                             placeholder="e.g., Senior Frontend Engineer" required
                                         />
                                     </div>
+                                    
+                                    <div>
+                                        <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1.5">Template Style</label>
+                                        <select
+                                            value={targetTemplate} onChange={e => setTargetTemplate(e.target.value)}
+                                            className="w-full bg-[#0A0A0F] border border-white/10 rounded-xl p-3 text-xs text-white focus:border-[#5B5FEF] focus:ring-1 focus:ring-[#5B5FEF]/50 outline-none transition-all"
+                                        >
+                                            <option value="Modern Professional">Modern Professional</option>
+                                            <option value="Startup Friendly">Startup Friendly</option>
+                                            <option value="ATS Formal">ATS Formal</option>
+                                            <option value="Fresher / Internship">Fresher / Internship</option>
+                                        </select>
+                                    </div>
+
+                                    <div>
+                                        <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1.5">Job Description Snippet (Optional)</label>
+                                        <textarea
+                                            value={jobDescription} onChange={e => setJobDescription(e.target.value)}
+                                            className="w-full bg-[#0A0A0F] border border-white/10 rounded-xl p-3 text-xs text-white min-h-[80px] focus:border-[#5B5FEF] focus:ring-1 focus:ring-[#5B5FEF]/50 outline-none transition-all resize-y"
+                                            placeholder="Paste a few key requirements here..."
+                                        />
+                                    </div>
 
                                     <button
                                         type="submit" disabled={generatingLetter}
@@ -399,12 +480,28 @@ export default function ResumeBuilderPage() {
                             </div>
 
                             {coverLetterContent && (
-                                <div className="mt-6 space-y-2">
+                                <div className="mt-6 space-y-3">
                                     <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-wider pl-1">Interactive Copy Sandbox</label>
                                     <textarea
                                         value={coverLetterContent} onChange={e => setCoverLetterContent(e.target.value)}
                                         className="w-full bg-[#0A0A0F] border border-white/10 rounded-2xl p-4 text-xs text-gray-300 min-h-[300px] font-sans resize-y leading-relaxed outline-none focus:border-[#5B5FEF] focus:ring-1 focus:ring-[#5B5FEF]/30 transition-all shadow-inner"
                                     />
+                                    <div className="flex items-center gap-3">
+                                        <button
+                                            type="button" onClick={handleSaveCoverLetter} disabled={savingLetter}
+                                            className="flex-1 flex items-center justify-center gap-2 bg-[#13131A] hover:bg-white/5 border border-white/10 text-white text-xs font-bold py-2.5 px-4 rounded-xl transition-all"
+                                        >
+                                            {savingLetter ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Check size={14} className="text-emerald-400" />}
+                                            {savingLetter ? 'Saving...' : 'Save to Profile'}
+                                        </button>
+                                        <button
+                                            type="button" onClick={handleCopyCoverLetter}
+                                            className="flex-1 flex items-center justify-center gap-2 bg-[#13131A] hover:bg-white/5 border border-white/10 text-white text-xs font-bold py-2.5 px-4 rounded-xl transition-all"
+                                        >
+                                            <FileText size={14} className="text-blue-400" />
+                                            Copy Text
+                                        </button>
+                                    </div>
                                 </div>
                             )}
                         </form>

@@ -211,7 +211,7 @@ const streamRewriteTextWithAI = async (text, jobTitle) => {
 /**
  * Generates a tailored 3-paragraph cover letter using Groq Llama 3.1 (8B Instant)
  */
-const generateCoverLetterWithAI = async (resumeData, companyName, jobTitle) => {
+const generateCoverLetterWithAI = async (resumeData, companyName, jobTitle, template = 'Modern Professional', jobDescription = '') => {
   try {
     const prompt = `
       You are an expert career consultant and copywriter. Draft a premium, high-impact cover letter based on the following professional applicant data.
@@ -219,9 +219,17 @@ const generateCoverLetterWithAI = async (resumeData, companyName, jobTitle) => {
       Target Context Parameters:
       - Company Name: ${companyName}
       - Target Role: ${jobTitle}
+      - Template Style: ${template}
+      ${jobDescription ? `- Job Description Snippet: ${jobDescription}` : ''}
       
       Applicant Resume Data:
-      ${JSON.stringify(resumeData)}
+      ${JSON.stringify(resumeData || {})}
+
+      STYLE GUIDANCE FOR '${template}':
+      ${template === 'Modern Professional' ? 'Professional, confident, and direct. Focus on measurable impact and leadership.' : ''}
+      ${template === 'Startup Friendly' ? 'Energetic, adaptable, and culturally aligned. Focus on taking initiative, fast-paced environments, and passion for the mission.' : ''}
+      ${template === 'ATS Formal' ? 'Highly formal and structured. Strictly mirror the keywords from the job description snippet if provided.' : ''}
+      ${template === 'Fresher / Internship' ? 'Eager, hungry to learn, and foundational. Emphasize academic projects, willingness to contribute, and fast learning ability.' : ''}
 
       STRICT RULES:
       1. Return exactly three paragraphs.
