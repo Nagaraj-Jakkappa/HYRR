@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import {
     MinimalistTemplate,
@@ -87,6 +87,15 @@ export default function ResumeBuilderPage() {
         skills: ['React', 'TypeScript', 'Node.js', 'Python', 'MERN Stack', 'Deep Learning', 'Redis']
     });
 
+    const [debouncedResumeData, setDebouncedResumeData] = useState<ResumeData>(resumeData);
+
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            setDebouncedResumeData(resumeData);
+        }, 500);
+        return () => clearTimeout(timer);
+    }, [resumeData]);
+
     const [activeTemplate, setActiveTemplate] = useState<TemplateKey>('modern');
     const [isTemplateModalOpen, setIsTemplateModalOpen] = useState(false);
     const [activeMode, setActiveMode] = useState<WorkspaceMode>('resume');
@@ -153,19 +162,57 @@ export default function ResumeBuilderPage() {
 
         setGeneratingLetter(true);
         const loadToast = toast.loading('Assembling custom tailored cover letter narrative loops via Groq...');
+        setCoverLetterContent('');
 
         try {
-            const { data } = await resumeAPI.generateCoverLetter({
-                resumeData,
-                companyName: targetCompany,
-                jobTitle: targetRole
+            const token = localStorage.getItem('token');
+            const response = await fetch('/api/resumes/cover-letter', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+                },
+                body: JSON.stringify({
+                    resumeData,
+                    companyName: targetCompany,
+                    jobTitle: targetRole
+                })
             });
-            if (data?.success && data?.data?.content) {
-                setCoverLetterContent(data.data.content);
-                toast.success('Tailored narrative structured successfully!', { id: loadToast });
+
+            if (!response.ok) {
+                throw new Error('AI generation pipeline was interrupted.');
+            }
+
+            const reader = response.body?.getReader();
+            const decoder = new TextDecoder('utf-8');
+            let content = '';
+
+            if (reader) {
+                toast.success('Receiving tailored narrative...', { id: loadToast });
+                while (true) {
+                    const { done, value } = await reader.read();
+                    if (done) break;
+
+                    const chunkStr = decoder.decode(value, { stream: true });
+                    const lines = chunkStr.split('\n');
+
+                    for (const line of lines) {
+                        if (line.startsWith('data: ') && line !== 'data: [DONE]') {
+                            try {
+                                const parsed = JSON.parse(line.replace('data: ', ''));
+                                if (parsed.content) {
+                                    content += parsed.content;
+                                    setCoverLetterContent(content);
+                                }
+                            } catch (e) {
+                                // Ignore parse errors for incomplete chunks
+                            }
+                        }
+                    }
+                }
             }
         } catch (err: any) {
-            toast.error(err?.response?.data?.message || 'AI generation pipeline was interrupted.', { id: loadToast });
+            toast.error(err.message || 'AI generation pipeline was interrupted.', { id: loadToast });
         } finally {
             setGeneratingLetter(false);
         }
@@ -228,7 +275,7 @@ export default function ResumeBuilderPage() {
         if (activeMode === 'coverLetter') {
             return (
                 <MatchingCoverLetterTemplate
-                    data={resumeData}
+                    data={debouncedResumeData}
                     companyName={targetCompany}
                     jobTitle={targetRole}
                     text={coverLetterContent || "Your customized AI cover letter copy variant will compile inside this canvas element block once triggered."}
@@ -237,17 +284,17 @@ export default function ResumeBuilderPage() {
         }
 
         switch (activeTemplate) {
-            case 'minimalist': return <MinimalistTemplate data={resumeData} />;
-            case 'modern': return <ModernTemplate data={resumeData} />;
-            case 'executive': return <ExecutiveTemplate data={resumeData} />;
-            case 'tech': return <TechMinimalTemplate data={resumeData} />;
-            case 'creative': return <CreativeTemplate data={resumeData} />;
-            case 'academic': return <AcademicTemplate data={resumeData} />;
-            case 'serif': return <SleekSerifTemplate data={resumeData} />;
-            case 'infographic': return <InfographicTemplate data={resumeData} />;
-            case 'european': return <EuropeanTemplate data={resumeData} />;
-            case 'metric': return <MetricEngineerTemplate data={resumeData} />;
-            default: return <MinimalistTemplate data={resumeData} />;
+            case 'minimalist': return <MinimalistTemplate data={debouncedResumeData} />;
+            case 'modern': return <ModernTemplate data={debouncedResumeData} />;
+            case 'executive': return <ExecutiveTemplate data={debouncedResumeData} />;
+            case 'tech': return <TechMinimalTemplate data={debouncedResumeData} />;
+            case 'creative': return <CreativeTemplate data={debouncedResumeData} />;
+            case 'academic': return <AcademicTemplate data={debouncedResumeData} />;
+            case 'serif': return <SleekSerifTemplate data={debouncedResumeData} />;
+            case 'infographic': return <InfographicTemplate data={debouncedResumeData} />;
+            case 'european': return <EuropeanTemplate data={debouncedResumeData} />;
+            case 'metric': return <MetricEngineerTemplate data={debouncedResumeData} />;
+            default: return <MinimalistTemplate data={debouncedResumeData} />;
         }
     };
 

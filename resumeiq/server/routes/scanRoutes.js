@@ -1,6 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const scanController = require('../controllers/scanController');
+const validate = require('../middleware/validate');
+const { scanResumeSchema } = require('../validators/zodSchemas');
 const { protect } = require('../middleware/auth');
 const { requirePlan } = require('../middleware/planGate');
 const { scanLimiter } = require('../middleware/rateLimiter');
@@ -25,7 +27,7 @@ router.use(protect);
  * @desc    Start a new AI resume scan
  * @access  Private
  */
-router.post('/', scanLimiter, scanController.createScan);
+router.post('/', scanLimiter, validate(scanResumeSchema), scanController.createScan);
 
 /**
  * @route   GET /api/scans

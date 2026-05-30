@@ -1,4 +1,4 @@
-const Resume = require('../models/Resume');
+const resumeRepository = require('../repositories/resumeRepository');
 const resumeService = require('../services/resumeService');
 const pdfParse = require('pdf-parse');
 const { rewriteTextWithAI, generateCoverLetterWithAI, parseLinkedInResumeWithAI } = require('../utils/aiService');
@@ -19,7 +19,7 @@ exports.uploadResume = async (req, res, next) => {
 
     const fileType = req.file.mimetype.includes('pdf') ? 'pdf' : 'docx';
 
-    const resume = await Resume.create({
+    const resume = await resumeRepository.createResume({
       userId: req.user._id,
       fileName: cloudinaryId,
       originalName: req.file.originalname,
@@ -51,7 +51,7 @@ exports.uploadResume = async (req, res, next) => {
 
 exports.getMyResumes = async (req, res, next) => {
   try {
-    const resumes = await Resume.find({ userId: req.user._id, isActive: true }).sort({ createdAt: -1 });
+    const resumes = await resumeRepository.findResumesByUserId(req.user._id);
     const signedResumes = resumes.map(r => {
       const signedUrl = resumeService.getSignedUrl(r.cloudinaryId);
       return { ...r.toObject(), fileUrl: signedUrl };
@@ -64,7 +64,7 @@ exports.getMyResumes = async (req, res, next) => {
 
 exports.getResume = async (req, res, next) => {
   try {
-    const resume = await Resume.findOne({ _id: req.params.id, userId: req.user._id });
+    const resume = await resumeRepository.findResumeByIdAndUserId(req.params.id, req.user._id);
     if (!resume) return res.status(404).json({ success: false, message: 'Resume not found' });
     
     const signedUrl = resumeService.getSignedUrl(resume.cloudinaryId);
@@ -77,12 +77,15 @@ exports.getResume = async (req, res, next) => {
 
 exports.deleteResume = async (req, res, next) => {
   try {
-    const resume = await Resume.findOne({ _id: req.params.id, userId: req.user._id });
+    const resume = await resumeRepository.findResumeByIdAndUserId(req.params.id, req.user._id);
     if (!resume) return res.status(404).json({ success: false, message: 'Resume not found' });
 
     await resumeService.deleteFromCloudinary(resume.cloudinaryId);
 
-    await Resume.findByIdAndDelete(req.params.id);
+    // Hard delete since deleteFromCloudinary implies destructive action. 
+    // In some cases we might just want to soft delete. For now, we will soft delete in repo,
+    // or just use Mongoose directly if we strictly want a hard delete. Let's soft delete.
+    await resumeRepository.softDeleteResume(req.params.id, req.user._id);
     res.json({ success: true, message: 'Resume deleted' });
   } catch (err) {
     next(err);
@@ -91,7 +94,7 @@ exports.deleteResume = async (req, res, next) => {
 
 exports.viewResumeFile = async (req, res, next) => {
   try {
-    const resume = await Resume.findOne({ _id: req.params.id, userId: req.user._id });
+    const resume = await resumeRepository.findResumeByIdAndUserId(req.params.id, req.user._id);
     if (!resume) return res.status(404).json({ success: false, message: 'Resume not found' });
 
     const contentType = resume.fileType === 'pdf'
@@ -167,13 +170,21 @@ exports.generateCoverLetter = async (req, res, next) => {
       return res.status(400).json({ success: false, message: 'Missing generation context arguments.' });
     }
 
-    const coverLetterText = await generateCoverLetterWithAI(resumeData, companyName, jobTitle);
+    const stream = await generateCoverLetterWithAI(resumeData, companyName, jobTitle);
 
-    return res.status(200).json({
-      success: true,
-      message: 'Cover letter compiled successfully.',
-      data: { content: coverLetterText }
-    });
+    res.setHeader('Content-Type', 'text/event-stream');
+    res.setHeader('Cache-Control', 'no-cache');
+    res.setHeader('Connection', 'keep-alive');
+
+    for await (const chunk of stream) {
+      const content = chunk.choices[0]?.delta?.content || '';
+      if (content) {
+        res.write(`data: ${JSON.stringify({ content })}\n\n`);
+      }
+    }
+
+    res.write('data: [DONE]\n\n');
+    return res.end();
   } catch (error) {
     console.error('Cover Letter Generation Error:', error);
     return res.status(500).json({ success: false, message: 'AI generation engine encountered a critical compilation error.', error: error.message });

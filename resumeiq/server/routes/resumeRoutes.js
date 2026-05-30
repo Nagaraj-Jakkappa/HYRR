@@ -1,6 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const multer = require('multer');
+const validate = require('../middleware/validate');
+const { magicRewriteSchema, generateCoverLetterSchema } = require('../validators/zodSchemas');
 
 // Destructure all controllers safely from your controller profile definitions
 const {
@@ -33,10 +35,10 @@ router.get('/', getMyResumes);
 router.post('/import-linkedin', requirePlan('pro', 'career+'), memoryUpload.single('file'), importLinkedInPDF);
 
 // --- AI Magic Rewrite Sandbox Pipeline ---
-router.post('/rewrite', magicRewrite);
+router.post('/rewrite', validate(magicRewriteSchema), magicRewrite);
 
 // --- AI Cover Letter Generator (Pro+ only) ---
-router.post('/cover-letter', requirePlan('pro', 'career+'), generateCoverLetter);
+router.post('/cover-letter', requirePlan('pro', 'career+'), validate(generateCoverLetterSchema), generateCoverLetter);
 
 // --- Proxy File Viewer (streams from Cloudinary through server) ---
 router.get('/:id/view', viewResumeFile);

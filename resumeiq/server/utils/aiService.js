@@ -67,6 +67,22 @@ const analyzeResume = async (resumeText, jobDescription, keywords, socket, scanI
   };
 
   try {
+    const hash = crypto.createHash('sha256').update(resumeText + jobDescription + keywords.join(',')).digest('hex');
+    const cacheKey = `scan:${hash}`;
+
+    try {
+      if (redis && typeof redis.get === 'function') {
+        const cached = await redis.get(cacheKey);
+        if (cached) {
+          console.log("Returning cached AI analysis");
+          sendUpdate('scan:progress', { step: 'Finalizing Score', pct: 90 });
+          return JSON.parse(cached);
+        }
+      }
+    } catch (redisErr) {
+      console.warn("Redis Cache Warning:", redisErr.message);
+    }
+
     sendUpdate('scan:progress', { step: 'Analyzing Structure', pct: 40 });
 
     console.log("Calling Groq for Resume Analysis...");
@@ -102,6 +118,14 @@ const analyzeResume = async (resumeText, jobDescription, keywords, socket, scanI
       result.suggestions = [{ text: "Consider adding industry-specific keywords.", type: "info" }];
     }
 
+    try {
+      if (redis && typeof redis.set === 'function') {
+        await redis.set(cacheKey, JSON.stringify(result), { EX: 86400 * 7 }); // Cache for 7 days
+      }
+    } catch (cacheErr) {
+      console.error("Redis Set Error:", cacheErr.message);
+    }
+
     return result;
   } catch (error) {
     console.error("CRITICAL AI Analysis Error:", error);
@@ -114,6 +138,18 @@ const analyzeResume = async (resumeText, jobDescription, keywords, socket, scanI
  */
 const rewriteTextWithAI = async (text, jobTitle) => {
   try {
+    const hash = crypto.createHash('sha256').update(text + jobTitle).digest('hex');
+    const cacheKey = `rewrite:${hash}`;
+
+    try {
+      if (redis && typeof redis.get === 'function') {
+        const cached = await redis.get(cacheKey);
+        if (cached) return cached;
+      }
+    } catch (redisErr) {
+      console.warn("Redis Cache Warning:", redisErr.message);
+    }
+
     const prompt = `Rewrite this bullet point to be impactful for a ${jobTitle} role. Original: "${text}"`;
     const chatCompletion = await aiClient.chat.completions.create({
       messages: [{ role: 'user', content: prompt }],
@@ -121,7 +157,18 @@ const rewriteTextWithAI = async (text, jobTitle) => {
       temperature: 0.7,
       max_tokens: 150,
     });
-    return chatCompletion.choices[0].message.content.trim();
+    
+    const result = chatCompletion.choices[0].message.content.trim();
+
+    try {
+      if (redis && typeof redis.set === 'function') {
+        await redis.set(cacheKey, result, { EX: 86400 * 30 }); // Cache for 30 days
+      }
+    } catch (cacheErr) {
+      console.error("Redis Set Error:", cacheErr.message);
+    }
+
+    return result;
   } catch (error) {
     console.error('AI Rewrite Error:', error.message);
     throw new Error('Failed to rewrite text');
@@ -153,13 +200,14 @@ const generateCoverLetterWithAI = async (resumeData, companyName, jobTitle) => {
     `;
 
     // Re-uses the globally configured aiClient instance securely
-    const completion = await aiClient.chat.completions.create({
+    const stream = await aiClient.chat.completions.create({
       messages: [{ role: 'user', content: prompt }],
-      model: 'llama-3.1-8b-instant', // <-- Updated to active model identifier
-      temperature: 0.6
+      model: 'llama-3.1-8b-instant',
+      temperature: 0.6,
+      stream: true
     });
 
-    return completion.choices[0].message.content.trim();
+    return stream;
   } catch (error) {
     console.error('AI Cover Letter Generation Error:', error.message);
     throw new Error('Failed to generate customized cover letter text.');

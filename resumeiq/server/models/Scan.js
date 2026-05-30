@@ -32,12 +32,14 @@ const scanSchema = new mongoose.Schema({
   resumeId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Resume',
-    required: true
+    required: true,
+    index: true
   },
   jobId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Job',
-    required: true
+    required: true,
+    index: true
   },
   atsScore: {
     type: Number,
@@ -86,5 +88,8 @@ scanSchema.index({ createdAt: -1 });
 
 // 2. For User Dashboard & Historical Lookups
 scanSchema.index({ userId: 1, createdAt: -1 });
+
+// 3. Compound index for fast duplicate checks
+scanSchema.index({ resumeId: 1, jobId: 1 });
 
 module.exports = mongoose.model('Scan', scanSchema);

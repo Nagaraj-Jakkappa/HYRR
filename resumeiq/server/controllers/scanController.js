@@ -1,6 +1,6 @@
-const Scan = require('../models/Scan');
-const Resume = require('../models/Resume');
-const Job = require('../models/Job');
+const scanRepository = require('../repositories/scanRepository');
+const resumeRepository = require('../repositories/resumeRepository');
+const jobRepository = require('../repositories/jobRepository');
 const User = require('../models/User');
 const { hashString } = require('../utils/hashUtils');
 const documentService = require('../services/documentService');
@@ -9,9 +9,7 @@ const { rewriteResumeWithKeywords } = require('../utils/aiService');
 
 exports.getPublicReport = async (req, res, next) => {
   try {
-    const scan = await Scan.findById(req.params.id)
-      .populate('jobId', 'companyName jobTitle')
-      .populate('resumeId', 'originalName');
+    const scan = await scanRepository.findPublicScanById(req.params.id);
 
     if (!scan) {
       return res.status(404).json({ success: false, message: 'Report not found' });
@@ -44,9 +42,7 @@ exports.downloadResume = async (req, res, next) => {
     const { id } = req.params;
     const { format } = req.body;
 
-    const scan = await Scan.findById(id)
-      .populate('resumeId')
-      .populate('jobId');
+    const scan = await scanRepository.findScanByIdAndUserId(id, req.user._id);
 
     if (!scan) {
       return res.status(404).json({ success: false, message: 'Scan not found' });
@@ -90,16 +86,16 @@ exports.createScan = async (req, res, next) => {
       });
     }
 
-    const resume = await Resume.findOne({ _id: resumeId, userId: user._id });
+    const resume = await resumeRepository.findResumeByIdAndUserId(resumeId, user._id);
     if (!resume) return res.status(404).json({ success: false, message: 'Resume not found' });
 
     const jobDescHash = hashString(jobDescription);
-    let job = await Job.findOne({ userId: user._id, jobDescHash });
+    let job = await jobRepository.findJobByHashAndUser(jobDescHash, user._id);
     if (!job) {
-      job = await Job.create({ userId: user._id, companyName, jobTitle, jobDescription, jobDescHash });
+      job = await jobRepository.createJob({ userId: user._id, companyName, jobTitle, jobDescription, jobDescHash });
     }
 
-    const scan = await Scan.create({
+    const scan = await scanRepository.createScan({
       userId: user._id,
       resumeId: resume._id,
       jobId: job._id,
@@ -119,23 +115,15 @@ exports.createScan = async (req, res, next) => {
 exports.getMyScans = async (req, res, next) => {
   try {
     const { page = 1, limit = 10 } = req.query;
-    const scans = await Scan.find({ userId: req.user._id })
-      .populate('resumeId', 'originalName fileType')
-      .populate('jobId', 'companyName jobTitle')
-      .sort({ createdAt: -1 })
-      .limit(limit * 1)
-      .skip((page - 1) * limit);
-
-    const total = await Scan.countDocuments({ userId: req.user._id });
+    const scans = await scanRepository.findScansByUserIdWithPagination(req.user._id, (page - 1) * limit, limit * 1);
+    const total = await scanRepository.countScansByUserId(req.user._id);
     res.json({ success: true, data: { scans, total, page: +page, pages: Math.ceil(total / limit) } });
   } catch (err) { next(err); }
 };
 
 exports.getScan = async (req, res, next) => {
   try {
-    const scan = await Scan.findOne({ _id: req.params.id, userId: req.user._id })
-      .populate('resumeId', 'originalName fileType fileUrl')
-      .populate('jobId', 'companyName jobTitle jobDescription extractedKeywords');
+    const scan = await scanRepository.findDetailedScanByIdAndUserId(req.params.id, req.user._id);
     if (!scan) return res.status(404).json({ success: false, message: 'Scan not found' });
     res.json({ success: true, data: { scan } });
   } catch (err) { next(err); }
@@ -146,41 +134,17 @@ exports.getDashboardStats = async (req, res, next) => {
     const userId = req.user._id;
     
     // 1. User specific stats
-    const stats = await Scan.aggregate([
-      { $match: { userId, status: 'done' } },
-      {
-        $group: {
-          _id: null,
-          avgATS: { $avg: '$atsScore' },
-          bestScore: { $max: '$atsScore' },
-          totalScans: { $sum: 1 },
-          allMissingKeywords: { $push: '$missingKeywords' },
-        }
-      }
-    ]);
+    const stats = await scanRepository.aggregateUserStats(userId);
 
     // 2. Global Average stats
-    const globalStats = await Scan.aggregate([
-      { $match: { status: 'done' } },
-      {
-        $group: {
-          _id: null,
-          avgATS: { $avg: '$atsScore' }
-        }
-      }
-    ]);
+    const globalStats = await scanRepository.aggregateGlobalStats();
     const globalAvgATS = Math.round(globalStats[0]?.avgATS || 0);
 
     // 3. Recent Scans
-    const recentScans = await Scan.find({ userId, status: 'done' })
-      .populate('resumeId', 'originalName')
-      .populate('jobId', 'companyName jobTitle')
-      .sort({ createdAt: -1 }).limit(5);
+    const recentScans = await scanRepository.findRecentScans(userId, 5);
       
     // 4. Recent Resumes
-    const recentResumes = await Resume.find({ userId })
-      .select('originalName fileType createdAt')
-      .sort({ createdAt: -1 }).limit(4);
+    const recentResumes = await resumeRepository.findRecentResumes(userId, 4);
 
     // 5. Contextual Top Recommendation
     let topMissingKeyword = null;
