@@ -166,9 +166,98 @@ const generateCoverLetterWithAI = async (resumeData, companyName, jobTitle) => {
   }
 };
 
+const parseLinkedInResumeWithAI = async (rawText) => {
+  try {
+    const prompt = `
+      You are an expert resume parsing engine. Analyze the following raw text extracted from a LinkedIn "Save to PDF" profile document.
+      Extract the personal metrics, professional summaries, work timelines, and academic instances.
+      
+      CRITICAL: You must return ONLY a clean JSON object conforming EXACTLY to the structure specified below. Do not add markdown blocks like \`\`\`json, do not write header descriptions or introductory texts.
+      
+      Target Structure Blueprint:
+      {
+        "personalInfo": {
+          "fullName": "Extract string or fallback to empty string",
+          "email": "Extract valid email or empty string",
+          "phone": "Extract number or empty string",
+          "location": "Extract city/state or empty string",
+          "linkedin": "Extract profile url handle or empty string"
+        },
+        "summary": "Synthesize a professional overview text block based on their headline and summary section",
+        "experience": [
+          {
+            "company": "Company Name",
+            "position": "Job Title",
+            "startDate": "YYYY-MM or string format",
+            "endDate": "YYYY-MM or string format",
+            "current": true/false based on timeline details,
+            "description": "Construct comprehensive structural summary lines of achievements or metadata"
+          }
+        ],
+        "education": [
+          {
+            "institution": "School or University Name",
+            "degree": "BCA, B.E., etc.",
+            "fieldOfStudy": "Computer Applications, etc.",
+            "startDate": "Year string",
+            "endDate": "Year string"
+          }
+        ],
+        "skills": ["Array", "of", "skill", "strings"]
+      }
+
+      Raw LinkedIn Profile Content Stream:
+      ${rawText}
+    `;
+
+    const chatCompletion = await aiClient.chat.completions.create({
+      messages: [{ role: 'user', content: prompt }],
+      model: 'llama-3.1-8b-instant',
+      temperature: 0.1,
+      response_format: { type: "json_object" }
+    });
+
+    return JSON.parse(chatCompletion.choices[0].message.content);
+  } catch (error) {
+    console.error('LinkedIn Parsing Error:', error.message);
+    throw new Error('Failed to parse LinkedIn PDF.');
+  }
+};
+
+const rewriteResumeWithKeywords = async (rawText, jobDescription, missingKeywordsStr) => {
+  try {
+    const prompt = `You are a professional resume writer. Rewrite the resume to better match the job description by naturally incorporating specific missing keywords. 
+          Return ONLY the improved resume text. DO NOT include any conversational filler, explanations, preambles, or concluding notes. Your output must start exactly with the resume content and end exactly with the resume content.`;
+
+    const chatCompletion = await aiClient.chat.completions.create({
+      model: process.env.GROQ_MODEL || "llama-3.3-70b-versatile",
+      messages: [
+        { role: "system", content: prompt },
+        { role: "user", content: `RESUME TEXT: ${rawText}\n\nTARGET JOB: ${jobDescription}\n\nMISSING KEYWORDS TO INCLUDE: ${missingKeywordsStr}` }
+      ],
+      temperature: 0.2,
+      max_tokens: 2048,
+    });
+
+    let content = chatCompletion.choices[0]?.message?.content || rawText;
+
+    // Strip conversational filler from the bottom (e.g. "Note: I've incorporated...")
+    content = content.replace(/(?:\n|^)(?:Note:|Here is the|Here's the|Please note|Additionally,|I have incorporated).*[\s\S]*$/gi, '');
+    // Strip conversational filler from the top (e.g. "Here is the revised resume:")
+    content = content.replace(/^(?:Here is the|Here's the|Sure|Certainly|Below is the).*?\n/gi, '');
+
+    return content.trim();
+  } catch (error) {
+    console.error('Resume Rewrite Error:', error.message);
+    return rawText; // Fallback to raw text
+  }
+};
+
 module.exports = {
   analyzeResume,
   extractKeywordsFromJD,
   rewriteTextWithAI,
-  generateCoverLetterWithAI
+  generateCoverLetterWithAI,
+  parseLinkedInResumeWithAI,
+  rewriteResumeWithKeywords
 };

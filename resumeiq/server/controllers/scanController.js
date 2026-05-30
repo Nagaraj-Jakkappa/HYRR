@@ -2,20 +2,10 @@ const Scan = require('../models/Scan');
 const Resume = require('../models/Resume');
 const Job = require('../models/Job');
 const User = require('../models/User');
-const Groq = require('groq-sdk');
-const PDFDocument = require('pdfkit');
-const { Document, Packer, Paragraph, TextRun, HeadingLevel, AlignmentType } = require('docx');
-const { analyzeResume, extractKeywordsFromJD } = require('../utils/aiService');
 const { hashString } = require('../utils/hashUtils');
-
-const groq = new Groq({
-  apiKey: process.env.GROQ_API_KEY,
-});
-
-const getCandidateName = (text, filename) => {
-  const firstLine = text.split('\n')[0].trim();
-  return firstLine.length > 2 && firstLine.length < 50 ? firstLine : filename.split('.')[0];
-};
+const documentService = require('../services/documentService');
+const scanService = require('../services/scanService');
+const { rewriteResumeWithKeywords } = require('../utils/aiService');
 
 exports.getPublicReport = async (req, res, next) => {
   try {
@@ -68,82 +58,14 @@ exports.downloadResume = async (req, res, next) => {
 
     const missingKeywordsStr = scan.missingKeywords.join(', ');
 
-    const completion = await groq.chat.completions.create({
-      model: process.env.GROQ_MODEL || "llama-3.3-70b-versatile",
-      messages: [
-        {
-          role: "system",
-          content: `You are a professional resume writer. Rewrite the resume to better match the job description by naturally incorporating specific missing keywords. 
-          Return ONLY the improved resume text, no explanation.`
-        },
-        {
-          role: "user",
-          content: `RESUME TEXT: ${scan.resumeId.rawText}\n\nTARGET JOB: ${scan.jobId.jobDescription}\n\nMISSING KEYWORDS TO INCLUDE: ${missingKeywordsStr}`
-        }
-      ],
-      temperature: 0.3,
-      max_tokens: 2048,
-    });
-
-    const optimizedText = completion.choices[0]?.message?.content || scan.resumeId.rawText;
-    const candidateName = getCandidateName(scan.resumeId.rawText, scan.resumeId.originalName);
-    const safeFileName = `${candidateName.replace(/\s+/g, '_')}_Optimized`;
+    const optimizedText = await rewriteResumeWithKeywords(scan.resumeId.rawText, scan.jobId.jobDescription, missingKeywordsStr);
 
     if (format === 'pdf') {
-      const doc = new PDFDocument({ margin: 50 });
-      res.setHeader('Content-Type', 'application/pdf');
-      res.setHeader('Content-Disposition', `attachment; filename="${safeFileName}.pdf"`);
-      doc.pipe(res);
-
-      doc.fillColor('#000000').fontSize(22).font('Helvetica-Bold').text(candidateName.toUpperCase(), { align: 'center' });
-      doc.moveDown(1);
-
-      const lines = optimizedText.split('\n');
-      lines.forEach(line => {
-        const trimmed = line.trim();
-        if (!trimmed) {
-          doc.moveDown(0.5);
-        } else if (trimmed === trimmed.toUpperCase() && trimmed.length > 3) {
-          doc.moveDown(1);
-          doc.fontSize(12).font('Helvetica-Bold').fillColor('#000000').text(trimmed);
-          doc.moveTo(50, doc.y).lineTo(550, doc.y).strokeColor('#E5E7EB').stroke();
-          doc.moveDown(0.5);
-        } else {
-          doc.fontSize(11).font('Helvetica').fillColor('#374151').text(trimmed, { align: 'justify', lineGap: 2 });
-        }
-      });
-
-      doc.fontSize(9).fillColor('#9CA3AF').text(`Optimized for ${scan.jobId.jobTitle} at ${scan.jobId.companyName} by Hyrr`, 50, 750, { align: 'center' });
-      doc.end();
-
+      documentService.generateOptimizedPDF(res, optimizedText, scan.resumeId.rawText, scan.resumeId.originalName, scan.jobId);
     } else if (format === 'docx') {
-      const lines = optimizedText.split('\n');
-      const doc = new Document({
-        sections: [{
-          children: [
-            new Paragraph({ text: candidateName, heading: HeadingLevel.HEADING_1, alignment: AlignmentType.CENTER }),
-            ...lines.map(line => {
-              const trimmed = line.trim();
-              const isHeader = trimmed === trimmed.toUpperCase() && trimmed.length > 3;
-              return new Paragraph({
-                text: trimmed,
-                heading: isHeader ? HeadingLevel.HEADING_2 : undefined,
-                spacing: { before: isHeader ? 300 : 120, after: 120 },
-                children: [new TextRun({ text: "", break: trimmed === "" ? 1 : 0 })]
-              });
-            }),
-            new Paragraph({
-              spacing: { before: 400 },
-              children: [new TextRun({ text: `Optimized by Hyrr`, color: "9CA3AF", size: 18, italics: true })]
-            })
-          ],
-        }],
-      });
-
-      const buffer = await Packer.toBuffer(doc);
-      res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document');
-      res.setHeader('Content-Disposition', `attachment; filename="${safeFileName}.docx"`);
-      res.send(buffer);
+      await documentService.generateOptimizedDocx(res, optimizedText, scan.resumeId.rawText, scan.resumeId.originalName);
+    } else {
+      res.status(400).json({ success: false, message: 'Invalid format requested' });
     }
   } catch (error) {
     console.error("Download Error:", error);
@@ -184,63 +106,13 @@ exports.createScan = async (req, res, next) => {
       status: 'pending',
     });
 
-    const io = req.app.get('io');
-    const userIdStr = user._id.toString();
-
-    const emitter = (event, data) => {
-      console.log(`[Socket Emit] Event: ${event}`, data);
-      if (io) io.to(userIdStr).emit(event, data);
-    };
-
     res.status(202).json({ success: true, message: 'Scan started', data: { scanId: scan._id } });
 
-    (async () => {
-      try {
-        console.log(`[Scan Background] Starting scan: ${scan._id}`);
+    const io = req.app.get('io');
+    
+    // Delegate to the scanService background orchestration
+    scanService.processBackgroundScan(scan._id, user._id, resume.rawText, jobDescription, io).catch(console.error);
 
-        scan.status = 'processing';
-        await scan.save();
-
-        emitter('scan:progress', { scanId: scan._id, step: 'Extracting keywords...', pct: 20 });
-        const keywords = await extractKeywordsFromJD(jobDescription);
-        console.log(`[Scan Background] Keywords extracted: ${keywords.length}`);
-
-        job.extractedKeywords = keywords;
-        await job.save();
-
-        emitter('scan:progress', { scanId: scan._id, step: 'Running AI analysis...', pct: 40 });
-        console.log(`[Scan Background] Calling analyzeResume...`);
-
-        // --- UPDATED: Added scan._id into positional parameters ---
-        const analysis = await analyzeResume(resume.rawText, jobDescription, keywords, emitter, scan._id);
-
-        if (!analysis) throw new Error("AI Analysis returned no data.");
-        console.log(`[Scan Background] AI Analysis success, score: ${analysis.atsScore}`);
-
-        Object.assign(scan, {
-          atsScore: analysis.atsScore || 0,
-          keywordMatchPct: analysis.keywordMatchPct || 0,
-          formattingScore: analysis.formattingScore || 0,
-          matchedKeywords: analysis.matchedKeywords || [],
-          missingKeywords: analysis.missingKeywords || [],
-          suggestions: analysis.suggestions || [],
-          status: 'done',
-          tokensUsed: analysis.tokensUsed || 0,
-          aiModel: process.env.GROQ_MODEL || 'llama-3.3-70b-versatile',
-        });
-
-        await scan.save();
-        await User.findByIdAndUpdate(user._id, { $inc: { scansUsed: 1 } });
-
-        emitter('scan:done', { scanId: scan._id, atsScore: scan.atsScore });
-        console.log(`[Scan Background] Scan completed successfully: ${scan._id}`);
-      } catch (err) {
-        console.error("[Scan Background CRITICAL ERROR]", err);
-        scan.status = 'failed';
-        await scan.save();
-        emitter('scan:failed', { scanId: scan._id, message: err.message });
-      }
-    })();
   } catch (err) { next(err); }
 };
 
