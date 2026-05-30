@@ -34,7 +34,8 @@ import {
     FileText,
     LayoutTemplate,
     X,
-    Check
+    Check,
+    Copy
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 
@@ -429,79 +430,110 @@ export default function ResumeBuilderPage() {
                                     <Sparkles size={16} className="text-[#5B5FEF]" /> AI Cover Letter Studio
                                 </h3>
 
-                                <div className="space-y-4 relative z-10">
+                                <div className="space-y-6 relative z-10">
                                     <div>
-                                        <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1.5">Target Enterprise Company</label>
-                                        <input
-                                            type="text" value={targetCompany} onChange={e => setTargetCompany(e.target.value)}
-                                            className="w-full bg-[#0A0A0F] border border-white/10 rounded-xl p-3 text-xs text-white focus:border-[#5B5FEF] focus:ring-1 focus:ring-[#5B5FEF]/50 outline-none transition-all"
-                                            placeholder="e.g., Google, Amazon, Startup Inc." required
-                                        />
-                                    </div>
-                                    <div>
-                                        <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1.5">Target Designation Role</label>
-                                        <input
-                                            type="text" value={targetRole} onChange={e => setTargetRole(e.target.value)}
-                                            className="w-full bg-[#0A0A0F] border border-white/10 rounded-xl p-3 text-xs text-white focus:border-[#5B5FEF] focus:ring-1 focus:ring-[#5B5FEF]/50 outline-none transition-all"
-                                            placeholder="e.g., Senior Frontend Engineer" required
-                                        />
-                                    </div>
-                                    
-                                    <div>
-                                        <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1.5">Template Style</label>
-                                        <select
-                                            value={targetTemplate} onChange={e => setTargetTemplate(e.target.value)}
-                                            className="w-full bg-[#0A0A0F] border border-white/10 rounded-xl p-3 text-xs text-white focus:border-[#5B5FEF] focus:ring-1 focus:ring-[#5B5FEF]/50 outline-none transition-all"
-                                        >
-                                            <option value="Modern Professional">Modern Professional</option>
-                                            <option value="Startup Friendly">Startup Friendly</option>
-                                            <option value="ATS Formal">ATS Formal</option>
-                                            <option value="Fresher / Internship">Fresher / Internship</option>
-                                        </select>
+                                        <label className="block text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-3">1. Select Template</label>
+                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                            {[
+                                                { id: 'Modern Professional', desc: 'Clean, structured, and standard' },
+                                                { id: 'Startup Friendly', desc: 'Bold, enthusiastic, and direct' },
+                                                { id: 'ATS Formal', desc: 'Strictly professional and rigid' },
+                                                { id: 'Fresher / Internship', desc: 'Focuses on potential and learning' }
+                                            ].map(t => (
+                                                <div 
+                                                    key={t.id} 
+                                                    onClick={() => setTargetTemplate(t.id)}
+                                                    className={`cursor-pointer border rounded-xl p-3 sm:p-4 transition-all ${targetTemplate === t.id ? 'bg-[#5B5FEF]/10 border-[#5B5FEF] shadow-[inset_0_0_20px_rgba(91,95,239,0.15)]' : 'bg-[#0A0A0F]/40 border-white/5 hover:border-white/20 hover:bg-[#0A0A0F]/60'}`}
+                                                >
+                                                    <h4 className={`text-[13px] font-bold mb-1 tracking-wide ${targetTemplate === t.id ? 'text-white' : 'text-gray-300'}`}>{t.id}</h4>
+                                                    <p className={`text-[11px] font-medium leading-snug ${targetTemplate === t.id ? 'text-[#a25bef]' : 'text-gray-500'}`}>{t.desc}</p>
+                                                </div>
+                                            ))}
+                                        </div>
                                     </div>
 
-                                    <div>
-                                        <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1.5">Job Description Snippet (Optional)</label>
-                                        <textarea
-                                            value={jobDescription} onChange={e => setJobDescription(e.target.value)}
-                                            className="w-full bg-[#0A0A0F] border border-white/10 rounded-xl p-3 text-xs text-white min-h-[80px] focus:border-[#5B5FEF] focus:ring-1 focus:ring-[#5B5FEF]/50 outline-none transition-all resize-y"
-                                            placeholder="Paste a few key requirements here..."
-                                        />
+                                    <div className="pt-2 border-t border-white/5">
+                                        <label className="block text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-4 mt-2">2. Target Role Details</label>
+                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+                                            <div>
+                                                <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1.5 flex items-center gap-1">Company Name <span className="text-[#ef4444]">*</span></label>
+                                                <input
+                                                    type="text" value={targetCompany} onChange={e => setTargetCompany(e.target.value)}
+                                                    className="w-full bg-[#0A0A0F]/50 border border-white/10 rounded-xl p-3.5 text-xs text-white focus:border-[#5B5FEF] focus:ring-1 focus:ring-[#5B5FEF]/50 outline-none transition-all hover:border-white/20"
+                                                    placeholder="e.g., Acme Corp" required
+                                                />
+                                            </div>
+                                            <div>
+                                                <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1.5 flex items-center gap-1">Job Title <span className="text-[#ef4444]">*</span></label>
+                                                <input
+                                                    type="text" value={targetRole} onChange={e => setTargetRole(e.target.value)}
+                                                    className="w-full bg-[#0A0A0F]/50 border border-white/10 rounded-xl p-3.5 text-xs text-white focus:border-[#5B5FEF] focus:ring-1 focus:ring-[#5B5FEF]/50 outline-none transition-all hover:border-white/20"
+                                                    placeholder="e.g., Product Manager" required
+                                                />
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1.5">Job Description <span className="text-gray-600 font-medium lowercase tracking-normal">(optional but recommended)</span></label>
+                                            <textarea
+                                                value={jobDescription} onChange={e => setJobDescription(e.target.value)}
+                                                className="w-full bg-[#0A0A0F]/50 border border-white/10 rounded-xl p-4 text-xs text-white min-h-[100px] focus:border-[#5B5FEF] focus:ring-1 focus:ring-[#5B5FEF]/50 outline-none transition-all resize-y hover:border-white/20 leading-relaxed font-sans"
+                                                placeholder="Paste key responsibilities or requirements here so the AI can perfectly match your skills..."
+                                            />
+                                        </div>
                                     </div>
 
                                     <button
-                                        type="submit" disabled={generatingLetter}
-                                        className="w-full flex items-center justify-center gap-2 bg-[#5B5FEF] hover:bg-[#4A4EDF] disabled:bg-slate-800 text-white text-xs font-bold py-3.5 px-4 rounded-xl transition-all shadow-[0_0_15px_rgba(91,95,239,0.4)]"
+                                        type="submit" disabled={generatingLetter || !targetCompany || !targetRole}
+                                        className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-[#5B5FEF] to-[#8E5BEF] hover:from-[#6c70fc] hover:to-[#9f6dfc] disabled:from-[#13131A] disabled:to-[#13131A] disabled:text-gray-500 disabled:border disabled:border-white/5 disabled:shadow-none text-white text-sm font-bold py-4 px-4 rounded-xl transition-all shadow-[0_0_15px_rgba(91,95,239,0.3)] hover:shadow-[0_0_25px_rgba(91,95,239,0.5)] active:scale-[0.99] mt-4 tracking-wide"
                                     >
-                                        {generatingLetter ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles size={14} />}
-                                        {generatingLetter ? 'Assembling Narrative Elements...' : 'Compile Tailored Cover Letter'}
+                                        {generatingLetter ? <Loader2 className="w-5 h-5 animate-spin" /> : <Sparkles size={18} />}
+                                        {generatingLetter ? 'Generating Cover Letter...' : 'Generate Cover Letter'}
                                     </button>
                                 </div>
                             </div>
 
-                            {coverLetterContent && (
-                                <div className="mt-6 space-y-3">
-                                    <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-wider pl-1">Interactive Copy Sandbox</label>
+                            {coverLetterContent ? (
+                                <div className="mt-8 space-y-4 bg-[#13131A] p-5 sm:p-6 rounded-3xl border border-white/5 shadow-2xl relative">
+                                    <div className="flex items-center justify-between mb-2">
+                                        <label className="text-[11px] font-black text-gray-300 uppercase tracking-widest flex items-center gap-2">
+                                            <FileText size={16} className="text-[#3DEBA6]" /> 
+                                            Generated Content
+                                        </label>
+                                        {savingLetter ? (
+                                            <span className="text-[10px] font-bold text-gray-400 flex items-center gap-1.5 bg-white/5 px-3 py-1 rounded-full"><Loader2 size={12} className="animate-spin" /> Saving...</span>
+                                        ) : currentCoverLetterId ? (
+                                            <span className="text-[10px] font-bold text-[#3DEBA6] flex items-center gap-1.5 bg-[#3DEBA6]/10 px-3 py-1 rounded-full border border-[#3DEBA6]/20 shadow-[inset_0_0_10px_rgba(61,235,166,0.1)]"><Check size={12} /> Saved to Profile</span>
+                                        ) : null}
+                                    </div>
                                     <textarea
                                         value={coverLetterContent} onChange={e => setCoverLetterContent(e.target.value)}
-                                        className="w-full bg-[#0A0A0F] border border-white/10 rounded-2xl p-4 text-xs text-gray-300 min-h-[300px] font-sans resize-y leading-relaxed outline-none focus:border-[#5B5FEF] focus:ring-1 focus:ring-[#5B5FEF]/30 transition-all shadow-inner"
+                                        className="w-full bg-[#0A0A0F]/80 border border-white/10 rounded-2xl p-5 sm:p-6 text-sm text-gray-200 min-h-[400px] font-serif resize-y leading-relaxed outline-none focus:border-[#5B5FEF] focus:ring-1 focus:ring-[#5B5FEF]/30 transition-all shadow-inner hover:border-white/20 custom-scrollbar"
                                     />
-                                    <div className="flex items-center gap-3">
+                                    <div className="flex flex-col sm:flex-row items-center gap-3 pt-2">
                                         <button
-                                            type="button" onClick={handleSaveCoverLetter} disabled={savingLetter}
-                                            className="flex-1 flex items-center justify-center gap-2 bg-[#13131A] hover:bg-white/5 border border-white/10 text-white text-xs font-bold py-2.5 px-4 rounded-xl transition-all"
+                                            type="button" onClick={handleSaveCoverLetter} disabled={savingLetter || !coverLetterContent}
+                                            className="w-full sm:w-auto flex-1 flex items-center justify-center gap-2 bg-[#5B5FEF]/10 hover:bg-[#5B5FEF]/20 border border-[#5B5FEF]/30 text-[#5B5FEF] text-xs font-bold py-3.5 px-4 rounded-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed active:scale-[0.98]"
                                         >
-                                            {savingLetter ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Check size={14} className="text-emerald-400" />}
-                                            {savingLetter ? 'Saving...' : 'Save to Profile'}
+                                            {savingLetter ? <Loader2 className="w-4 h-4 animate-spin" /> : currentCoverLetterId ? <Check size={16} /> : <FileDown size={16} />}
+                                            {currentCoverLetterId ? 'Update Saved Profile' : 'Save to Profile'}
                                         </button>
                                         <button
-                                            type="button" onClick={handleCopyCoverLetter}
-                                            className="flex-1 flex items-center justify-center gap-2 bg-[#13131A] hover:bg-white/5 border border-white/10 text-white text-xs font-bold py-2.5 px-4 rounded-xl transition-all"
+                                            type="button" onClick={handleCopyCoverLetter} disabled={!coverLetterContent}
+                                            className="w-full sm:w-auto flex-1 flex items-center justify-center gap-2 bg-white/5 hover:bg-white/10 border border-white/10 text-white text-xs font-bold py-3.5 px-4 rounded-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed active:scale-[0.98]"
                                         >
-                                            <FileText size={14} className="text-blue-400" />
-                                            Copy Text
+                                            <Copy size={16} className="text-gray-400" />
+                                            Copy to Clipboard
                                         </button>
                                     </div>
+                                </div>
+                            ) : (
+                                <div className="mt-8 border border-white/5 border-dashed rounded-3xl p-10 flex flex-col items-center justify-center text-center bg-[#0A0A0F]/30 relative overflow-hidden group">
+                                    <div className="absolute inset-0 bg-gradient-to-br from-[#5B5FEF]/0 to-[#8E5BEF]/0 group-hover:from-[#5B5FEF]/5 group-hover:to-[#8E5BEF]/5 transition-all duration-500"></div>
+                                    <div className="w-16 h-16 bg-white/[0.03] border border-white/5 rounded-full flex items-center justify-center mb-5 relative z-10 shadow-lg">
+                                        <FileText className="text-gray-600" size={28} />
+                                    </div>
+                                    <h4 className="text-sm font-black text-gray-300 mb-2 relative z-10 tracking-wide">No Cover Letter Generated</h4>
+                                    <p className="text-xs text-gray-500 max-w-[280px] leading-relaxed relative z-10 font-medium">Fill out the target role details above and click Generate to create a highly tailored, beautifully written cover letter.</p>
                                 </div>
                             )}
                         </form>
@@ -543,27 +575,27 @@ export default function ResumeBuilderPage() {
                                     <ChevronDown size={16} className={`transform transition-transform duration-300 ${activeSection === 'personal' ? 'rotate-180 text-blue-400' : 'text-gray-500'}`} />
                                 </button>
                                 {activeSection === 'personal' && (
-                                    <div className="p-4 border-t border-white/5 bg-[#0A0A0F]/50">
+                                    <div className="p-4 sm:p-6 border-t border-white/5 bg-[#0A0A0F]/50 space-y-4">
                                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                             <div>
-                                                <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1.5">Full Name</label>
-                                                <input type="text" name="fullName" value={resumeData.personalInfo.fullName} onChange={handlePersonalInfoChange} className="w-full bg-[#13131A] border border-white/10 rounded-xl p-2.5 text-xs text-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500/30 outline-none transition-all" />
+                                                <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1.5 flex items-center gap-1">Full Name <span className="text-[#ef4444]">*</span></label>
+                                                <input type="text" name="fullName" value={resumeData.personalInfo.fullName} onChange={handlePersonalInfoChange} className="w-full bg-[#0A0A0F]/50 border border-white/10 rounded-xl p-3 text-xs text-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500/50 outline-none transition-all hover:border-white/20" placeholder="e.g., John Doe" />
                                             </div>
                                             <div>
-                                                <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1.5">Email Address</label>
-                                                <input type="email" name="email" value={resumeData.personalInfo.email} onChange={handlePersonalInfoChange} className="w-full bg-[#13131A] border border-white/10 rounded-xl p-2.5 text-xs text-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500/30 outline-none transition-all" />
+                                                <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1.5 flex items-center gap-1">Email Address <span className="text-[#ef4444]">*</span></label>
+                                                <input type="email" name="email" value={resumeData.personalInfo.email} onChange={handlePersonalInfoChange} className="w-full bg-[#0A0A0F]/50 border border-white/10 rounded-xl p-3 text-xs text-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500/50 outline-none transition-all hover:border-white/20" placeholder="e.g., john@example.com" />
                                             </div>
                                             <div>
-                                                <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1.5">Phone Number</label>
-                                                <input type="text" name="phone" value={resumeData.personalInfo.phone} onChange={handlePersonalInfoChange} className="w-full bg-[#13131A] border border-white/10 rounded-xl p-2.5 text-xs text-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500/30 outline-none transition-all" />
+                                                <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1.5 flex items-center gap-1">Phone Number <span className="text-[#ef4444]">*</span></label>
+                                                <input type="text" name="phone" value={resumeData.personalInfo.phone} onChange={handlePersonalInfoChange} className="w-full bg-[#0A0A0F]/50 border border-white/10 rounded-xl p-3 text-xs text-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500/50 outline-none transition-all hover:border-white/20" placeholder="e.g., +1 234 567 8900" />
                                             </div>
                                             <div>
-                                                <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1.5">Location</label>
-                                                <input type="text" name="location" value={resumeData.personalInfo.location || ''} onChange={handlePersonalInfoChange} className="w-full bg-[#13131A] border border-white/10 rounded-xl p-2.5 text-xs text-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500/30 outline-none transition-all" />
+                                                <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1.5 flex items-center gap-1">Location <span className="text-[#ef4444]">*</span></label>
+                                                <input type="text" name="location" value={resumeData.personalInfo.location || ''} onChange={handlePersonalInfoChange} className="w-full bg-[#0A0A0F]/50 border border-white/10 rounded-xl p-3 text-xs text-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500/50 outline-none transition-all hover:border-white/20" placeholder="e.g., San Francisco, CA" />
                                             </div>
                                             <div className="sm:col-span-2">
-                                                <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1.5">LinkedIn Profile</label>
-                                                <input type="text" name="linkedin" value={resumeData.personalInfo.linkedin} onChange={handlePersonalInfoChange} className="w-full bg-[#13131A] border border-white/10 rounded-xl p-2.5 text-xs text-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500/30 outline-none transition-all" />
+                                                <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1.5">LinkedIn Profile <span className="text-gray-600 font-medium lowercase tracking-normal">(optional)</span></label>
+                                                <input type="text" name="linkedin" value={resumeData.personalInfo.linkedin} onChange={handlePersonalInfoChange} className="w-full bg-[#0A0A0F]/50 border border-white/10 rounded-xl p-3 text-xs text-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500/50 outline-none transition-all hover:border-white/20" placeholder="e.g., linkedin.com/in/johndoe" />
                                             </div>
                                         </div>
                                     </div>
@@ -583,11 +615,16 @@ export default function ResumeBuilderPage() {
                                     <ChevronDown size={16} className={`transform transition-transform duration-300 ${activeSection === 'summary' ? 'rotate-180 text-purple-400' : 'text-gray-500'}`} />
                                 </button>
                                 {activeSection === 'summary' && (
-                                    <div className="p-4 border-t border-white/5 bg-[#0A0A0F]/50">
+                                    <div className="p-4 sm:p-6 border-t border-white/5 bg-[#0A0A0F]/50">
+                                        <div className="flex items-center justify-between mb-3">
+                                            <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-wider flex items-center gap-1">Summary Text <span className="text-[#ef4444]">*</span></label>
+                                            <MagicRewriteButton currentText={resumeData.summary} jobTitle={resumeData.experience[0]?.position || "Software Engineer"} onRewrite={newText => setResumeData({ ...resumeData, summary: newText })} />
+                                        </div>
                                         <textarea 
-                                            className="w-full bg-[#13131A] border border-white/10 rounded-xl p-3 text-xs text-white outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500/30 resize-y font-sans leading-relaxed min-h-[100px] transition-all" 
+                                            className="w-full bg-[#0A0A0F]/50 border border-white/10 rounded-xl p-4 text-xs text-white outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500/50 resize-y font-sans leading-relaxed min-h-[120px] transition-all hover:border-white/20" 
                                             value={resumeData.summary} 
                                             onChange={e => setResumeData({ ...resumeData, summary: e.target.value })} 
+                                            placeholder="Write a brief, high-impact summary of your career and goals..."
                                         />
                                     </div>
                                 )}
@@ -618,41 +655,42 @@ export default function ResumeBuilderPage() {
                                     </div>
                                 </button>
                                 {activeSection === 'experience' && (
-                                    <div className="p-4 border-t border-white/5 bg-[#0A0A0F]/50 space-y-4">
+                                    <div className="p-4 sm:p-6 border-t border-white/5 bg-[#0A0A0F]/50 space-y-5">
                                         {resumeData.experience.map((exp, idx) => (
-                                            <div key={idx} className="relative p-4 border border-white/5 bg-[#13131A] rounded-xl space-y-4 transition-all hover:border-white/10">
+                                            <div key={idx} className="relative p-5 border border-white/5 bg-[#13131A] rounded-2xl space-y-4 transition-all hover:border-white/10 shadow-lg">
                                                 {resumeData.experience.length > 1 && (
-                                                    <button onClick={() => removeExperience(idx)} className="absolute top-4 right-4 text-gray-500 hover:text-red-400 transition-colors bg-[#0A0A0F] p-1.5 rounded-lg border border-white/5">
-                                                        <Trash2 size={13} />
+                                                    <button onClick={() => removeExperience(idx)} className="absolute -top-3 -right-3 text-gray-500 hover:text-red-400 hover:bg-red-400/10 transition-colors bg-[#0A0A0F] p-2 rounded-full border border-white/10 shadow-md z-10 group">
+                                                        <Trash2 size={14} className="group-hover:scale-110 transition-transform" />
                                                     </button>
                                                 )}
-                                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pr-10">
+                                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pr-2">
                                                     <div>
-                                                        <label className="block text-[9px] font-bold text-gray-500 uppercase mb-1">Role Title</label>
-                                                        <input type="text" value={exp.position} onChange={e => handleExperienceChange(idx, 'position', e.target.value)} className="w-full bg-[#0A0A0F] border border-white/10 rounded-lg p-2.5 text-xs text-white focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500/30 outline-none transition-all" />
+                                                        <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1.5 flex items-center gap-1">Role Title <span className="text-[#ef4444]">*</span></label>
+                                                        <input type="text" value={exp.position} onChange={e => handleExperienceChange(idx, 'position', e.target.value)} className="w-full bg-[#0A0A0F]/50 border border-white/10 rounded-xl p-3 text-xs text-white focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500/50 outline-none transition-all hover:border-white/20" placeholder="e.g., Senior Frontend Engineer" />
                                                     </div>
                                                     <div>
-                                                        <label className="block text-[9px] font-bold text-gray-500 uppercase mb-1">Company</label>
-                                                        <input type="text" value={exp.company} onChange={e => handleExperienceChange(idx, 'company', e.target.value)} className="w-full bg-[#0A0A0F] border border-white/10 rounded-lg p-2.5 text-xs text-white focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500/30 outline-none transition-all" />
+                                                        <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1.5 flex items-center gap-1">Company <span className="text-[#ef4444]">*</span></label>
+                                                        <input type="text" value={exp.company} onChange={e => handleExperienceChange(idx, 'company', e.target.value)} className="w-full bg-[#0A0A0F]/50 border border-white/10 rounded-xl p-3 text-xs text-white focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500/50 outline-none transition-all hover:border-white/20" placeholder="e.g., Acme Corp" />
                                                     </div>
                                                     <div>
-                                                        <label className="block text-[9px] font-bold text-gray-500 uppercase mb-1">Start Date</label>
-                                                        <input type="text" value={exp.startDate} onChange={e => handleExperienceChange(idx, 'startDate', e.target.value)} className="w-full bg-[#0A0A0F] border border-white/10 rounded-lg p-2.5 text-xs text-white focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500/30 outline-none transition-all" />
+                                                        <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1.5 flex items-center gap-1">Start Date <span className="text-[#ef4444]">*</span></label>
+                                                        <input type="text" value={exp.startDate} onChange={e => handleExperienceChange(idx, 'startDate', e.target.value)} className="w-full bg-[#0A0A0F]/50 border border-white/10 rounded-xl p-3 text-xs text-white focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500/50 outline-none transition-all hover:border-white/20" placeholder="e.g., Jan 2020" />
                                                     </div>
                                                     <div>
-                                                        <label className="block text-[9px] font-bold text-gray-500 uppercase mb-1">End Date</label>
-                                                        <input type="text" value={exp.endDate} onChange={e => handleExperienceChange(idx, 'endDate', e.target.value)} className="w-full bg-[#0A0A0F] border border-white/10 rounded-lg p-2.5 text-xs text-white focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500/30 outline-none transition-all" />
+                                                        <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1.5 flex items-center gap-1">End Date <span className="text-gray-600 font-medium lowercase tracking-normal">(or "Present")</span></label>
+                                                        <input type="text" value={exp.endDate} onChange={e => handleExperienceChange(idx, 'endDate', e.target.value)} className="w-full bg-[#0A0A0F]/50 border border-white/10 rounded-xl p-3 text-xs text-white focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500/50 outline-none transition-all hover:border-white/20" placeholder="e.g., Present" />
                                                     </div>
                                                 </div>
-                                                <div className="space-y-2">
-                                                    <div className="flex justify-between items-center bg-[#0A0A0F] px-3 py-2 rounded-t-lg border border-white/10 border-b-0">
-                                                        <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Achievements & Details</label>
+                                                <div className="space-y-0 pt-2">
+                                                    <div className="flex justify-between items-center bg-[#0A0A0F]/50 px-4 py-3 rounded-t-xl border border-white/10 border-b-0">
+                                                        <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider flex items-center gap-1">Achievements & Details <span className="text-[#ef4444]">*</span></label>
                                                         <MagicRewriteButton currentText={exp.description} jobTitle={exp.position} onRewrite={newText => handleExperienceChange(idx, 'description', newText)} />
                                                     </div>
                                                     <textarea 
                                                         value={exp.description} 
                                                         onChange={e => handleExperienceChange(idx, 'description', e.target.value)} 
-                                                        className="w-full bg-[#0A0A0F] border border-white/10 rounded-b-lg p-3 text-xs text-white min-h-[120px] outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500/30 transition-all leading-relaxed" 
+                                                        className="w-full bg-[#0A0A0F]/50 border border-white/10 rounded-b-xl p-4 text-xs text-white min-h-[140px] outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500/50 transition-all leading-relaxed font-sans resize-y hover:border-white/20" 
+                                                        placeholder="Describe your impact, metrics, and technical accomplishments..."
                                                     />
                                                 </div>
                                             </div>
@@ -674,16 +712,16 @@ export default function ResumeBuilderPage() {
                                     <ChevronDown size={16} className={`transform transition-transform duration-300 ${activeSection === 'education' ? 'rotate-180 text-amber-400' : 'text-gray-500'}`} />
                                 </button>
                                 {activeSection === 'education' && (
-                                    <div className="p-4 border-t border-white/5 bg-[#0A0A0F]/50 space-y-3">
+                                    <div className="p-4 sm:p-6 border-t border-white/5 bg-[#0A0A0F]/50 space-y-4">
                                         {resumeData.education.map((edu, idx) => (
-                                            <div key={idx} className="grid grid-cols-1 sm:grid-cols-2 gap-3 bg-[#13131A] border border-white/5 p-4 rounded-xl">
+                                            <div key={idx} className="grid grid-cols-1 sm:grid-cols-2 gap-4 bg-[#13131A] border border-white/5 p-5 rounded-2xl relative shadow-lg">
                                                 <div>
-                                                    <label className="block text-[9px] font-bold text-gray-500 uppercase mb-1">Institution Name</label>
-                                                    <input type="text" value={edu.institution} onChange={e => handleEducationChange(idx, 'institution', e.target.value)} className="w-full bg-[#0A0A0F] border border-white/10 rounded-lg p-2.5 text-xs text-white focus:border-amber-500 focus:ring-1 focus:ring-amber-500/30 outline-none transition-all" />
+                                                    <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1.5 flex items-center gap-1">Institution Name <span className="text-[#ef4444]">*</span></label>
+                                                    <input type="text" value={edu.institution} onChange={e => handleEducationChange(idx, 'institution', e.target.value)} className="w-full bg-[#0A0A0F]/50 border border-white/10 rounded-xl p-3 text-xs text-white focus:border-amber-500 focus:ring-1 focus:ring-amber-500/50 outline-none transition-all hover:border-white/20" placeholder="e.g., University of Engineering" />
                                                 </div>
                                                 <div>
-                                                    <label className="block text-[9px] font-bold text-gray-500 uppercase mb-1">Degree Type</label>
-                                                    <input type="text" value={edu.degree} onChange={e => handleEducationChange(idx, 'degree', e.target.value)} className="w-full bg-[#0A0A0F] border border-white/10 rounded-lg p-2.5 text-xs text-white focus:border-amber-500 focus:ring-1 focus:ring-amber-500/30 outline-none transition-all" />
+                                                    <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1.5 flex items-center gap-1">Degree Type <span className="text-[#ef4444]">*</span></label>
+                                                    <input type="text" value={edu.degree} onChange={e => handleEducationChange(idx, 'degree', e.target.value)} className="w-full bg-[#0A0A0F]/50 border border-white/10 rounded-xl p-3 text-xs text-white focus:border-amber-500 focus:ring-1 focus:ring-amber-500/50 outline-none transition-all hover:border-white/20" placeholder="e.g., Bachelor of Science in Computer Science" />
                                                 </div>
                                             </div>
                                         ))}
@@ -704,12 +742,13 @@ export default function ResumeBuilderPage() {
                                     <ChevronDown size={16} className={`transform transition-transform duration-300 ${activeSection === 'skills' ? 'rotate-180 text-cyan-400' : 'text-gray-500'}`} />
                                 </button>
                                 {activeSection === 'skills' && (
-                                    <div className="p-4 border-t border-white/5 bg-[#0A0A0F]/50">
-                                        <input 
-                                            className="w-full bg-[#13131A] border border-white/10 rounded-xl p-3 text-xs text-white focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500/30 outline-none font-mono transition-all" 
+                                    <div className="p-4 sm:p-6 border-t border-white/5 bg-[#0A0A0F]/50">
+                                        <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2 flex items-center gap-1">Comma-separated skills <span className="text-gray-600 font-medium lowercase tracking-normal">(e.g. React, Python, AWS)</span></label>
+                                        <textarea 
+                                            className="w-full bg-[#0A0A0F]/50 border border-white/10 rounded-xl p-4 text-sm text-white focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500/50 outline-none font-mono transition-all hover:border-white/20 min-h-[100px] resize-y leading-relaxed shadow-inner" 
                                             value={resumeData.skills.join(', ')} 
                                             onChange={e => setResumeData({ ...resumeData, skills: e.target.value.split(',').map(s => s.trim()) })} 
-                                            placeholder="React, TypeScript, Node.js..."
+                                            placeholder="React, TypeScript, Node.js, Python, AWS, Docker..."
                                         />
                                     </div>
                                 )}
@@ -733,14 +772,14 @@ export default function ResumeBuilderPage() {
                         </div>
                     </div>
 
-                    <div className="flex-1 overflow-auto custom-scrollbar flex justify-center p-8 relative">
+                    <div className="flex-1 overflow-auto custom-scrollbar flex justify-center p-2 sm:p-6 md:p-8 relative">
                         {/* Blueprint Grid Background Pattern */}
                         <div className="absolute inset-0 pointer-events-none opacity-20" 
                             style={{ backgroundImage: 'radial-gradient(#ffffff 1px, transparent 1px)', backgroundSize: '24px 24px' }}>
                         </div>
 
                         <div
-                            className="shadow-[0_20px_50px_rgba(0,0,0,0.5)] bg-white transform origin-top mx-auto min-w-[210mm] min-h-[297mm] h-max scale-[0.6] sm:scale-[0.7] md:scale-[0.8] lg:scale-[0.9] xl:scale-100 transition-transform duration-300 ring-1 ring-white/10 relative z-10"
+                            className="shadow-[0_20px_50px_rgba(0,0,0,0.5)] bg-white transform origin-top mx-auto min-w-[210mm] min-h-[297mm] h-max scale-[0.4] sm:scale-[0.6] md:scale-[0.8] lg:scale-[0.9] xl:scale-100 transition-transform duration-300 ring-1 ring-white/10 relative z-10"
                         >
                             <div ref={printAreaRef} className="w-full h-full bg-white text-black">
                                 {renderSelectedTemplate()}

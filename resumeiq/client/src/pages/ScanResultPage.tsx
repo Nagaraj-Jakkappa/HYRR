@@ -193,12 +193,17 @@ export default function ScanResultPage() {
         <div className="bg-[#13131A]/80 backdrop-blur-xl border border-white/5 rounded-[40px] p-10 mb-8 relative overflow-hidden shadow-2xl">
           <div className="relative z-10 flex flex-col md:flex-row items-center gap-8">
             <div className="flex flex-col items-center">
-              <div className={`w-36 h-36 rounded-full border-[8px] flex items-center justify-center text-5xl font-black transition-all duration-1000 bg-[#0A0A0F]/50 ${
-                scan.atsScore >= 80 ? 'border-[#3DEBA6] text-[#3DEBA6] shadow-[0_0_50px_rgba(61,235,166,0.4),inset_0_0_20px_rgba(61,235,166,0.2)]' :
-                scan.atsScore >= 60 ? 'border-[#F0C060] text-[#F0C060] shadow-[0_0_50px_rgba(240,192,96,0.4),inset_0_0_20px_rgba(240,192,96,0.2)]' :
-                'border-[#ef4444] text-[#ef4444] shadow-[0_0_50px_rgba(239,68,68,0.4),inset_0_0_20px_rgba(239,68,68,0.2)]'
+              <div className={`w-36 h-36 sm:w-48 sm:h-48 rounded-full border-[8px] sm:border-[12px] flex flex-col items-center justify-center transition-all duration-1000 bg-[#0A0A0F]/80 backdrop-blur-sm shadow-2xl relative z-10 ${
+                scan.atsScore >= 80 ? 'border-[#3DEBA6] text-[#3DEBA6] shadow-[0_0_60px_rgba(61,235,166,0.3),inset_0_0_30px_rgba(61,235,166,0.1)]' :
+                scan.atsScore >= 60 ? 'border-[#F0C060] text-[#F0C060] shadow-[0_0_60px_rgba(240,192,96,0.3),inset_0_0_30px_rgba(240,192,96,0.1)]' :
+                'border-[#ef4444] text-[#ef4444] shadow-[0_0_60px_rgba(239,68,68,0.3),inset_0_0_30px_rgba(239,68,68,0.1)]'
               }`}>
-                {Math.round(scan.atsScore)}<span className="text-xl ml-0.5">%</span>
+                <span className="text-5xl sm:text-7xl font-black tracking-tighter flex items-start drop-shadow-md">
+                  {Math.round(scan.atsScore)}<span className="text-2xl sm:text-3xl mt-1 sm:mt-2 ml-0.5 opacity-80">%</span>
+                </span>
+                <span className="text-[10px] sm:text-[11px] font-black uppercase tracking-[0.2em] mt-1 sm:mt-2 opacity-80 drop-shadow-sm">
+                  {scan.atsScore >= 80 ? 'Excellent' : scan.atsScore >= 60 ? 'Good Match' : 'Needs Work'}
+                </span>
               </div>
               <WinRateBadge score={scan.atsScore} />
             </div>
@@ -267,14 +272,20 @@ export default function ScanResultPage() {
 
         {/* Keywords Metrics Distributions Panel */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-          <div className="bg-[#13131A]/80 backdrop-blur-xl p-8 rounded-[32px] border border-white/5 shadow-xl relative overflow-hidden">
-            <div className="absolute top-0 right-0 w-32 h-32 bg-[#3DEBA6]/5 blur-3xl rounded-full pointer-events-none"></div>
-            <h3 className="text-xs font-black uppercase tracking-widest text-[#3DEBA6] mb-6 flex items-center gap-2 relative z-10">
-              <CheckCircle size={16} /> Matched Keywords ({scan.matchedKeywords?.length || 0})
-            </h3>
+          <div className="bg-[#13131A]/80 backdrop-blur-xl p-6 sm:p-8 rounded-[32px] border border-white/5 shadow-xl relative overflow-hidden flex flex-col">
+            <div className="absolute top-0 right-0 w-32 h-32 bg-[#3DEBA6]/10 blur-3xl rounded-full pointer-events-none"></div>
+            <div className="flex items-center justify-between mb-4 relative z-10">
+              <h3 className="text-sm font-black uppercase tracking-widest text-[#3DEBA6] flex items-center gap-2">
+                <CheckCircle size={18} /> Matched Keywords
+              </h3>
+              <span className="bg-[#3DEBA6]/10 text-[#3DEBA6] text-xs font-bold px-3 py-1 rounded-full border border-[#3DEBA6]/20">
+                {scan.matchedKeywords?.length || 0}
+              </span>
+            </div>
+            <p className="text-gray-400 text-xs mb-6 relative z-10">Keywords found in both the job description and your resume.</p>
             <div className="flex flex-wrap gap-2.5 relative z-10">
               {scan.matchedKeywords?.map(k => (
-                <span key={k} className="px-3.5 py-1.5 bg-[#3DEBA6]/10 border border-[#3DEBA6]/30 text-[#3DEBA6] text-[11px] font-bold rounded-xl uppercase tracking-wide shadow-[inset_0_0_10px_rgba(61,235,166,0.1)]">{k}</span>
+                <span key={k} className="px-3.5 py-1.5 bg-[#3DEBA6]/10 border border-[#3DEBA6]/30 text-[#3DEBA6] text-xs font-bold rounded-xl shadow-[inset_0_0_10px_rgba(61,235,166,0.1)]">{k}</span>
               ))}
               {(!scan.matchedKeywords || scan.matchedKeywords.length === 0) && (
                 <p className="text-xs text-[#6B6B7E] italic font-medium">No explicit semantic criteria matches flagged.</p>
@@ -282,37 +293,48 @@ export default function ScanResultPage() {
             </div>
           </div>
 
-          <div className="bg-[#13131A]/80 backdrop-blur-xl p-8 rounded-[32px] border border-white/5 shadow-xl relative overflow-hidden">
-            <div className="absolute top-0 right-0 w-32 h-32 bg-[#ef4444]/5 blur-3xl rounded-full pointer-events-none"></div>
-            <h3 className="text-xs font-black uppercase tracking-widest text-[#ef4444] mb-6 flex items-center gap-2 relative z-10">
-              <AlertCircle size={16} /> Missing Keywords ({scan.missingKeywords?.length || 0})
-            </h3>
+          <div className="bg-[#13131A]/80 backdrop-blur-xl p-6 sm:p-8 rounded-[32px] border border-white/5 shadow-xl relative overflow-hidden flex flex-col">
+            <div className="absolute top-0 right-0 w-32 h-32 bg-[#ef4444]/10 blur-3xl rounded-full pointer-events-none"></div>
+            <div className="flex items-center justify-between mb-4 relative z-10">
+              <h3 className="text-sm font-black uppercase tracking-widest text-[#ef4444] flex items-center gap-2">
+                <AlertCircle size={18} /> Missing Keywords
+              </h3>
+              <span className="bg-[#ef4444]/10 text-[#ef4444] text-xs font-bold px-3 py-1 rounded-full border border-[#ef4444]/20">
+                {scan.missingKeywords?.length || 0}
+              </span>
+            </div>
+            <p className="text-gray-400 text-xs mb-6 relative z-10">Add these exact keywords to your resume to pass the ATS filter.</p>
             <div className="flex flex-wrap gap-2.5 relative z-10">
               {scan.missingKeywords?.map(k => (
-                <span key={k} className="px-3.5 py-1.5 bg-[#ef4444]/10 border border-[#ef4444]/30 text-[#ef4444] text-[11px] font-bold rounded-xl uppercase tracking-wide shadow-[inset_0_0_10px_rgba(239,68,68,0.1)]">{k}</span>
+                <span key={k} className="px-3.5 py-1.5 bg-[#ef4444]/10 border border-[#ef4444]/30 text-[#ef4444] text-xs font-bold rounded-xl shadow-[inset_0_0_10px_rgba(239,68,68,0.1)]">{k}</span>
               ))}
               {(!scan.missingKeywords || scan.missingKeywords.length === 0) && (
-                <span className="text-xs text-[#3DEBA6] font-bold font-mono">✓ 100% Core Matrix Intersection Coverage</span>
+                <div className="flex items-center gap-2 text-[#3DEBA6] bg-[#3DEBA6]/10 px-4 py-3 rounded-xl border border-[#3DEBA6]/20">
+                  <CheckCircle size={16} />
+                  <span className="text-sm font-bold">You hit all the core keywords!</span>
+                </div>
               )}
             </div>
           </div>
         </div>
 
         {/* Strategic System Suggestions Array Block */}
-        <div className="bg-[#13131A] p-8 rounded-[32px] border border-white/5 mb-8">
-          <h3 className="text-lg font-black mb-6 flex items-center gap-2">
-            <Target size={20} className="text-[#5B5FEF]" />
-            Strategic Suggestions
+        <div className="bg-[#13131A]/80 backdrop-blur-xl p-6 sm:p-8 rounded-[32px] border border-white/5 shadow-xl mb-8">
+          <h3 className="text-xl font-black mb-6 flex items-center gap-2 text-white">
+            <Target size={22} className="text-[#5B5FEF]" />
+            Actionable Insights
           </h3>
-          <div className="space-y-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {scan.suggestions?.map((s, i) => (
-              <div key={i} className="flex gap-4 p-5 bg-white/[0.01] border border-white/[0.03] rounded-2xl text-gray-400 text-sm">
-                <span className="text-[#5B5FEF] font-mono font-black">0{i + 1}</span>
-                <p>{typeof s === 'string' ? s : (s.text || s.message || "Refine template parameters alignment.")}</p>
+              <div key={i} className="flex gap-4 p-5 bg-[#0A0A0F]/50 border border-white/[0.06] hover:border-white/10 rounded-2xl transition-all h-full">
+                <div className="flex-shrink-0 w-8 h-8 rounded-full bg-[#5B5FEF]/10 flex items-center justify-center text-[#5B5FEF] font-black text-sm border border-[#5B5FEF]/20">
+                  {i + 1}
+                </div>
+                <p className="text-gray-300 text-sm leading-relaxed">{typeof s === 'string' ? s : (s.text || s.message || "Refine template parameters alignment.")}</p>
               </div>
             ))}
             {(!scan.suggestions || scan.suggestions.length === 0) && (
-              <p className="text-gray-500 italic text-sm">No structural optimization flags raised.</p>
+              <p className="text-gray-500 italic text-sm">No specific structural suggestions found.</p>
             )}
           </div>
         </div>
@@ -396,10 +418,16 @@ export default function ScanResultPage() {
             </div>
           </div>
         </div>
-
-        <div className="mt-12 flex justify-center">
-          <Link to="/scan" className="text-sm font-bold text-[#5B5FEF] hover:underline">
-            Scan another resume
+        {/* Bottom Action Grid */}
+        <div className="mt-12 flex flex-col sm:flex-row items-center justify-center gap-4 max-w-2xl mx-auto">
+          <Link to={`/builder`} className="flex-1 w-full sm:w-auto flex items-center justify-center gap-2 px-6 py-4 bg-gradient-to-r from-[#5B5FEF] to-[#8E5BEF] hover:from-[#6c70fc] hover:to-[#9f6dfc] text-white rounded-2xl font-bold transition-all shadow-[0_0_15px_rgba(91,95,239,0.3)] hover:shadow-[0_0_25px_rgba(91,95,239,0.5)] active:scale-[0.98]">
+            <FileText size={18} /> Edit Resume
+          </Link>
+          <Link to={`/builder`} className="flex-1 w-full sm:w-auto flex items-center justify-center gap-2 px-6 py-4 bg-[#0A0A0F]/50 hover:bg-white/5 border border-white/10 text-white rounded-2xl font-bold transition-all active:scale-[0.98]">
+            <Sparkles size={18} className="text-[#a25bef]" /> Cover Letter
+          </Link>
+          <Link to="/scan" className="flex-1 w-full sm:w-auto flex items-center justify-center gap-2 px-6 py-4 bg-[#0A0A0F]/50 hover:bg-white/5 border border-white/10 text-white rounded-2xl font-bold transition-all active:scale-[0.98]">
+            <Target size={18} className="text-[#3DEBA6]" /> New Scan
           </Link>
         </div>
       </div>

@@ -226,25 +226,25 @@ export default function AdminPage() {
       <main className="flex-1 p-8 lg:p-12 overflow-y-auto">
         <header className="mb-10 flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-black tracking-tight mb-1">Infrastructure Control</h1>
+            <h1 className="text-2xl sm:text-3xl font-black tracking-tight mb-1">Infrastructure Control</h1>
             {stats?.systemHealth ? (
-              <div className="flex items-center gap-4 mt-2">
-                <div className="flex items-center gap-1.5 text-xs font-mono uppercase">
-                  <div className={`w-2 h-2 rounded-full ${stats.systemHealth.mongodb === 'connected' ? 'bg-[#3DEBA6]' : 'bg-red-500 animate-pulse'}`} />
-                  <span className="text-gray-400">MongoDB</span>
+              <div className="flex flex-wrap items-center gap-3 mt-3">
+                <div className={`flex items-center gap-2 text-[10px] font-bold uppercase tracking-wider px-3 py-1.5 rounded-full border ${stats.systemHealth.mongodb === 'connected' ? 'bg-[#3DEBA6]/10 border-[#3DEBA6]/20 text-[#3DEBA6]' : 'bg-red-500/10 border-red-500/20 text-red-500'}`}>
+                  <div className={`w-1.5 h-1.5 rounded-full ${stats.systemHealth.mongodb === 'connected' ? 'bg-[#3DEBA6]' : 'bg-red-500 animate-pulse'}`} />
+                  MongoDB: {stats.systemHealth.mongodb === 'connected' ? 'Connected' : 'Offline'}
                 </div>
-                <div className="flex items-center gap-1.5 text-xs font-mono uppercase">
-                  <div className={`w-2 h-2 rounded-full ${stats.systemHealth.redis === 'connected' ? 'bg-[#3DEBA6]' : 'bg-red-500 animate-pulse'}`} />
-                  <span className="text-gray-400">Redis</span>
+                <div className={`flex items-center gap-2 text-[10px] font-bold uppercase tracking-wider px-3 py-1.5 rounded-full border ${stats.systemHealth.redis === 'connected' ? 'bg-[#3DEBA6]/10 border-[#3DEBA6]/20 text-[#3DEBA6]' : 'bg-red-500/10 border-red-500/20 text-red-500'}`}>
+                  <div className={`w-1.5 h-1.5 rounded-full ${stats.systemHealth.redis === 'connected' ? 'bg-[#3DEBA6]' : 'bg-red-500 animate-pulse'}`} />
+                  Redis: {stats.systemHealth.redis === 'connected' ? 'Connected' : 'Offline'}
                 </div>
-                <div className="flex items-center gap-1.5 text-xs font-mono uppercase">
-                  <div className="w-2 h-2 rounded-full bg-[#3DEBA6]" />
-                  <span className="text-gray-400">API</span>
+                <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-wider px-3 py-1.5 rounded-full border bg-[#3DEBA6]/10 border-[#3DEBA6]/20 text-[#3DEBA6]">
+                  <div className="w-1.5 h-1.5 rounded-full bg-[#3DEBA6]" />
+                  Backend: Online
                 </div>
               </div>
             ) : (
-              <p className="text-gray-500 text-sm font-mono uppercase tracking-widest mt-2">
-                System Health: {settings?.maintenanceMode ? <span className="text-red-400">Maintenance</span> : <span className="text-[#3DEBA6]">Optimal</span>}
+              <p className="text-gray-500 text-[10px] font-bold uppercase tracking-widest mt-2 px-3 py-1.5 bg-white/5 border border-white/10 rounded-full inline-block">
+                System Health: {settings?.maintenanceMode ? <span className="text-red-400 ml-1">Maintenance</span> : <span className="text-[#3DEBA6] ml-1">Optimal</span>}
               </p>
             )}
           </div>
@@ -254,36 +254,36 @@ export default function AdminPage() {
           <div className="space-y-8 animate-in fade-in duration-500">
             {/* Stat Cards Row */}
             <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-              <StatCard title="Total Users" value={stats.totalUsers} color="text-blue-400" icon={<Users size={20} />} />
-              <StatCard title="Global Scans" value={stats.totalScans} color="text-violet-400" icon={<BarChart3 size={20} />} />
-              <StatCard title="Total AI Tokens" value={(stats.totalTokensUsed / 1000).toFixed(1) + 'k'} color="text-[#5B5FEF]" icon={<Activity size={20} />} />
-              <StatCard title="Monthly Revenue" value={`₹${stats.revenue || 0}`} color="text-[#3DEBA6]" icon={<IndianRupee size={20} />} />
+              <StatCard title="Total Users" value={stats.totalUsers} color="text-blue-400" icon={<Users size={24} />} />
+              <StatCard title="Global Scans" value={stats.totalScans} color="text-violet-400" icon={<BarChart3 size={24} />} />
+              <StatCard title="Total AI Tokens" value={(stats.totalTokensUsed / 1000).toFixed(1) + 'k'} color="text-[#5B5FEF]" icon={<Activity size={24} />} />
+              <StatCard title="Monthly Revenue" value={`₹${stats.revenue || 0}`} color="text-[#3DEBA6]" icon={<IndianRupee size={24} />} />
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
               {/* SCAN ACTIVITY COMPOSED CHART */}
-              <div className="bg-[#13131A]/80 backdrop-blur-xl p-8 rounded-[32px] border border-white/5 shadow-xl">
-                <p className="text-xs font-mono text-gray-500 uppercase tracking-widest mb-8 flex items-center justify-between">
+              <div className="card p-6 sm:p-8">
+                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-8 flex items-center justify-between">
                   <span className="flex items-center gap-2">
                     <TrendingUp size={14} className="text-[#5B5FEF]" /> Scan Activity (7 Days)
                   </span>
-                  <span className="text-[10px] text-gray-600">Scan Volume vs Avg Score</span>
+                  <span className="text-[9px] text-gray-500 bg-white/5 px-2 py-1 rounded-md">Scan Volume vs Avg Score</span>
                 </p>
                 <div style={{ height: 280, width: '100%' }}>
                   {!stats.chartData || stats.chartData.length === 0 ? (
                     <div className="h-full flex flex-col items-center justify-center border border-dashed border-white/10 rounded-2xl bg-white/[0.02]">
                       <Activity size={24} className="text-gray-700 mb-2 opacity-50" />
-                      <span className="text-gray-600 text-xs font-mono uppercase">No Scan Data Found</span>
+                      <span className="text-gray-500 text-[10px] font-bold uppercase tracking-wider">No Scan Data Found</span>
                     </div>
                   ) : (
                     <ResponsiveContainer>
                       <ComposedChart data={stats.chartData}>
                         <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.03)" vertical={false} />
-                        <XAxis dataKey="_id" axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: '#4b5563' }} />
-                        <YAxis yAxisId="left" axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: '#4b5563' }} />
-                        <YAxis yAxisId="right" orientation="right" axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: '#3DEBA6' }} />
-                        <Tooltip cursor={{ fill: 'rgba(255,255,255,0.02)' }} contentStyle={{ backgroundColor: '#0D0D14', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px' }} />
-                        <Legend wrapperStyle={{ paddingTop: '20px', fontSize: '10px', textTransform: 'uppercase' }} />
+                        <XAxis dataKey="_id" axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: '#6b7280' }} dy={10} />
+                        <YAxis yAxisId="left" axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: '#6b7280' }} dx={-10} />
+                        <YAxis yAxisId="right" orientation="right" axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: '#3DEBA6' }} dx={10} />
+                        <Tooltip cursor={{ fill: 'rgba(255,255,255,0.02)' }} contentStyle={{ backgroundColor: '#0A0A0F', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px', fontSize: '12px' }} />
+                        <Legend wrapperStyle={{ paddingTop: '20px', fontSize: '10px', textTransform: 'uppercase', fontWeight: 'bold', color: '#9ca3af' }} />
                         <Bar yAxisId="left" dataKey="scans" fill="#5B5FEF" name="Total Scans" radius={[4, 4, 0, 0]} barSize={24} />
                         <Line yAxisId="right" type="monotone" dataKey="avgScore" stroke="#3DEBA6" strokeWidth={2} name="Avg Score" dot={{ r: 3, fill: '#3DEBA6' }} />
                       </ComposedChart>
@@ -293,8 +293,8 @@ export default function AdminPage() {
               </div>
 
               {/* PLAN DISTRIBUTION CHART */}
-              <div className="bg-[#13131A]/80 backdrop-blur-xl p-8 rounded-[32px] border border-white/5 shadow-xl">
-                <p className="text-xs font-mono text-gray-500 uppercase tracking-widest mb-8 flex items-center justify-between">
+              <div className="card p-6 sm:p-8">
+                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-8 flex items-center justify-between">
                   <span className="flex items-center gap-2">
                     <ShieldAlert size={14} className="text-[#F0C060]" /> Tier Distribution
                   </span>
@@ -302,21 +302,21 @@ export default function AdminPage() {
                 <div style={{ height: 280, width: '100%' }}>
                   {!stats.planDistribution || stats.planDistribution.length === 0 ? (
                     <div className="h-full flex flex-col items-center justify-center border border-dashed border-white/10 rounded-2xl bg-white/[0.02]">
-                      <span className="text-gray-600 text-xs font-mono uppercase">No Plan Data</span>
+                      <span className="text-gray-500 text-[10px] font-bold uppercase tracking-wider">No Plan Data</span>
                     </div>
                   ) : (
                     <ResponsiveContainer>
                       <ComposedChart data={stats.planDistribution.sort((a,b) => b.count - a.count)} layout="vertical" margin={{ top: 0, right: 0, left: 20, bottom: 0 }}>
-                        <XAxis type="number" axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: '#4b5563' }} />
+                        <XAxis type="number" axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: '#6b7280' }} />
                         <YAxis 
                           type="category" 
                           dataKey="_id" 
                           axisLine={false} 
                           tickLine={false} 
-                          tick={{ fontSize: 10, fill: '#fff' }} 
+                          tick={{ fontSize: 10, fill: '#9ca3af', fontWeight: 'bold' }} 
                           tickFormatter={(value) => String(value).toUpperCase()}
                         />
-                        <Tooltip cursor={{ fill: 'rgba(255,255,255,0.02)' }} contentStyle={{ backgroundColor: '#0D0D14', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px' }} />
+                        <Tooltip cursor={{ fill: 'rgba(255,255,255,0.02)' }} contentStyle={{ backgroundColor: '#0A0A0F', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px', fontSize: '12px' }} />
                         <Bar dataKey="count" fill="#F0C060" radius={[0, 4, 4, 0]} barSize={24} />
                       </ComposedChart>
                     </ResponsiveContainer>
@@ -326,18 +326,20 @@ export default function AdminPage() {
             </div>
 
             {/* Skill Gap Trends */}
-            <div className="bg-[#13131A]/80 backdrop-blur-xl p-8 rounded-[32px] border border-white/5 shadow-xl">
-              <p className="text-xs font-mono text-gray-500 uppercase tracking-widest mb-8">Skill Gap Trends</p>
-              <div className="space-y-5">
+            <div className="card p-6 sm:p-8">
+              <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-8 flex items-center gap-2">
+                <Activity size={14} className="text-[#3DEBA6]" /> Skill Gap Trends
+              </p>
+              <div className="space-y-6">
                 {stats.topKeywords.map((kw) => (
                   <div key={kw._id} className="group">
-                    <div className="flex justify-between text-xs mb-2">
-                      <span className="font-bold text-gray-300 group-hover:text-white transition-colors">{kw._id}</span>
-                      <span className="text-[#5B5FEF] font-mono">{kw.count} detections</span>
+                    <div className="flex justify-between text-xs mb-2.5">
+                      <span className="font-bold text-gray-300 group-hover:text-white transition-colors tracking-wide">{kw._id}</span>
+                      <span className="text-[#5B5FEF] font-bold text-[10px] bg-[#5B5FEF]/10 px-2 py-0.5 rounded-full">{kw.count} missing</span>
                     </div>
-                    <div className="w-full bg-white/5 h-1.5 rounded-full overflow-hidden">
+                    <div className="w-full bg-[#0A0A0F] border border-white/5 h-2 rounded-full overflow-hidden shadow-inner">
                       <div
-                        className="h-full bg-gradient-to-r from-[#5B5FEF] to-[#8E91FF] transition-all duration-1000"
+                        className="h-full bg-gradient-to-r from-[#5B5FEF] to-[#8E91FF] transition-all duration-1000 rounded-full"
                         style={{ width: `${(kw.count / maxKeywordCount) * 100}%` }}
                       />
                     </div>
@@ -350,88 +352,98 @@ export default function AdminPage() {
 
         {/* User Management Tab */}
         {tab === 'users' && (
-          <div className="bg-[#13131A]/80 backdrop-blur-xl border border-white/5 shadow-xl rounded-[32px] overflow-hidden animate-in slide-in-from-bottom-4 duration-500">
-            <div className="p-6 border-b border-white/5 flex items-center gap-4 bg-white/[0.01]">
-              <Search size={18} className="text-gray-500" />
-              <input
-                className="bg-transparent text-sm text-gray-200 placeholder-gray-600 outline-none flex-1"
-                placeholder="Search user name or email..."
-                value={search}
-                onChange={e => setSearch(e.target.value)}
-              />
+          <div className="card overflow-hidden animate-in slide-in-from-bottom-4 duration-500 p-0">
+            <div className="p-4 sm:p-6 border-b border-white/5 flex flex-col sm:flex-row sm:items-center gap-4 bg-white/[0.01]">
+              <div className="flex-1 flex items-center gap-3 bg-[#0A0A0F] border border-white/10 px-4 py-2.5 rounded-xl focus-within:border-[#5B5FEF] focus-within:ring-1 focus-within:ring-[#5B5FEF]/50 transition-all">
+                <Search size={16} className="text-gray-500" />
+                <input
+                  className="bg-transparent text-sm text-gray-200 placeholder-gray-600 outline-none flex-1"
+                  placeholder="Search user by name or email..."
+                  value={search}
+                  onChange={e => setSearch(e.target.value)}
+                />
+              </div>
             </div>
-            <div className="divide-y divide-white/[0.04] overflow-x-auto">
+            <div className="overflow-x-auto custom-scrollbar">
               <table className="w-full min-w-[800px]">
                 <thead>
-                  <tr className="bg-white/[0.02]">
-                    <th className="px-6 py-4 text-left text-[10px] font-mono text-gray-500 uppercase tracking-wider">User</th>
-                    <th className="px-6 py-4 text-left text-[10px] font-mono text-gray-500 uppercase tracking-wider">Role</th>
-                    <th className="px-6 py-4 text-left text-[10px] font-mono text-gray-500 uppercase tracking-wider">Plan</th>
-                    <th className="px-6 py-4 text-left text-[10px] font-mono text-gray-500 uppercase tracking-wider">AI Tokens</th>
-                    <th className="px-6 py-4 text-left text-[10px] font-mono text-gray-500 uppercase tracking-wider">Status</th>
-                    <th className="px-6 py-4 text-right text-[10px] font-mono text-gray-500 uppercase tracking-wider">Actions</th>
+                  <tr className="bg-white/[0.02] border-b border-white/5">
+                    <th className="px-6 py-4 text-left text-[10px] font-bold text-gray-500 uppercase tracking-widest whitespace-nowrap">User</th>
+                    <th className="px-6 py-4 text-left text-[10px] font-bold text-gray-500 uppercase tracking-widest whitespace-nowrap">Role</th>
+                    <th className="px-6 py-4 text-left text-[10px] font-bold text-gray-500 uppercase tracking-widest whitespace-nowrap">Plan</th>
+                    <th className="px-6 py-4 text-left text-[10px] font-bold text-gray-500 uppercase tracking-widest whitespace-nowrap">Tokens Used</th>
+                    <th className="px-6 py-4 text-left text-[10px] font-bold text-gray-500 uppercase tracking-widest whitespace-nowrap">Status</th>
+                    <th className="px-6 py-4 text-right text-[10px] font-bold text-gray-500 uppercase tracking-widest whitespace-nowrap">Actions</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-white/[0.04]">
                   {users.map(u => (
-                    <tr key={u._id} className="hover:bg-white/[0.01] transition-colors">
-                      <td className="px-6 py-4">
-                        <div className="flex items-center gap-3">
-                          <div className="w-8 h-8 rounded-full bg-[#5B5FEF]/10 border border-[#5B5FEF]/20 flex items-center justify-center text-[#5B5FEF] font-bold text-xs">
+                    <tr key={u._id} className="hover:bg-white/[0.02] transition-colors group">
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="flex items-center gap-4">
+                          <div className="w-9 h-9 rounded-xl bg-[#5B5FEF]/10 border border-[#5B5FEF]/20 flex items-center justify-center text-[#5B5FEF] font-black text-sm shadow-inner group-hover:border-[#5B5FEF]/40 transition-colors">
                             {u.name?.charAt(0).toUpperCase()}
                           </div>
                           <div>
                             <p className="text-sm font-bold text-gray-200">{u.name}</p>
-                            <p className="text-xs text-gray-500 font-mono">{u.email}</p>
+                            <p className="text-[11px] text-gray-500">{u.email}</p>
                           </div>
                         </div>
                       </td>
-                      <td className="px-6 py-4">
+                      <td className="px-6 py-4 whitespace-nowrap">
                         <select 
                           value={u.role} 
                           onChange={(e) => handleRoleChange(u._id, e.target.value)}
-                          className="bg-[#0A0A0F] border border-white/10 text-xs rounded-md px-2 py-1 outline-none focus:border-[#5B5FEF]"
+                          className="bg-[#0A0A0F] border border-white/10 text-xs text-gray-300 rounded-lg px-3 py-1.5 outline-none focus:border-[#5B5FEF] focus:ring-1 focus:ring-[#5B5FEF]/50 transition-all font-medium"
                         >
                           <option value="user">User</option>
                           <option value="admin">Admin</option>
                         </select>
                       </td>
-                      <td className="px-6 py-4">
+                      <td className="px-6 py-4 whitespace-nowrap">
                         <select 
                           value={u.plan} 
                           onChange={(e) => handlePlanChange(u._id, e.target.value)}
-                          className="bg-[#0A0A0F] border border-white/10 text-xs rounded-md px-2 py-1 outline-none focus:border-[#5B5FEF]"
+                          className="bg-[#0A0A0F] border border-white/10 text-xs text-[#F0C060] rounded-lg px-3 py-1.5 outline-none focus:border-[#F0C060] focus:ring-1 focus:ring-[#F0C060]/50 transition-all font-bold uppercase tracking-wide"
                         >
                           <option value="free">Free</option>
                           <option value="pro">Pro</option>
                           <option value="career+">Career+</option>
                         </select>
                       </td>
-                      <td className="px-6 py-4 text-xs font-mono text-gray-400">
-                        {u.tokensUsed || 0}
+                      <td className="px-6 py-4 text-xs font-mono text-gray-400 whitespace-nowrap">
+                        <span className="bg-white/5 px-2 py-1 rounded-md border border-white/10">{u.tokensUsed || 0}</span>
                       </td>
-                      <td className="px-6 py-4">
+                      <td className="px-6 py-4 whitespace-nowrap">
                         <button 
                           onClick={() => handleToggleStatus(u._id)}
-                          className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider transition-colors ${
-                            u.isActive ? 'bg-[#3DEBA6]/10 text-[#3DEBA6] hover:bg-[#3DEBA6]/20' : 'bg-red-500/10 text-red-400 hover:bg-red-500/20'
+                          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[10px] font-black uppercase tracking-wider transition-colors border ${
+                            u.isActive ? 'bg-[#3DEBA6]/10 text-[#3DEBA6] border-[#3DEBA6]/20 hover:bg-[#3DEBA6]/20' : 'bg-red-500/10 text-red-400 border-red-500/20 hover:bg-red-500/20'
                           }`}
                         >
                           {u.isActive ? <CheckCircle2 size={12} /> : <XCircle size={12} />}
                           {u.isActive ? 'Active' : 'Suspended'}
                         </button>
                       </td>
-                      <td className="px-6 py-4 text-right">
+                      <td className="px-6 py-4 text-right whitespace-nowrap">
                         <button 
                           onClick={() => handleDeleteUser(u._id)}
-                          className="p-2 text-gray-500 hover:text-red-400 hover:bg-red-400/10 rounded-lg transition-colors"
-                          title="Delete User"
+                          className="p-2.5 text-gray-500 hover:text-red-400 hover:bg-red-400/10 rounded-xl transition-all border border-transparent hover:border-red-400/20"
+                          title="Delete User Permanently"
                         >
                           <Trash2 size={16} />
                         </button>
                       </td>
                     </tr>
                   ))}
+                  {users.length === 0 && (
+                    <tr>
+                      <td colSpan={6} className="px-6 py-10 text-center">
+                        <Users size={24} className="mx-auto text-gray-600 mb-2 opacity-50" />
+                        <p className="text-gray-500 text-sm font-medium">No users found.</p>
+                      </td>
+                    </tr>
+                  )}
                 </tbody>
               </table>
             </div>
@@ -440,57 +452,65 @@ export default function AdminPage() {
 
         {/* Global Scans Tab */}
         {tab === 'scans' && (
-          <div className="bg-[#13131A]/80 backdrop-blur-xl border border-white/5 shadow-xl rounded-[32px] overflow-hidden animate-in slide-in-from-bottom-4 duration-500">
-            <div className="p-6 border-b border-white/5 bg-white/[0.01] flex items-center justify-between">
+          <div className="card overflow-hidden animate-in slide-in-from-bottom-4 duration-500 p-0">
+            <div className="p-6 border-b border-white/5 bg-white/[0.01] flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <div>
-                <h2 className="text-lg font-bold">Global Scans Record</h2>
-                <p className="text-xs text-gray-500">View all resume scans performed across the platform.</p>
+                <h2 className="text-xl font-black">Global Scans Record</h2>
+                <p className="text-xs text-gray-500 mt-1">View all resume scans performed across the platform.</p>
               </div>
-              <button 
-                onClick={exportScansToCSV}
-                className="flex items-center gap-2 px-4 py-2 bg-white/5 hover:bg-white/10 text-white rounded-xl text-xs font-bold font-mono tracking-widest uppercase transition-colors border border-white/10"
-              >
-                <Save size={14} /> Export CSV
-              </button>
+              <div className="text-right">
+                <button 
+                  onClick={exportScansToCSV}
+                  className="btn-ghost flex items-center justify-center gap-2 text-xs w-full sm:w-auto"
+                >
+                  <Save size={16} className="text-gray-400" /> Export Safe CSV
+                </button>
+                <p className="text-[9px] text-gray-500 mt-2 max-w-[150px] sm:ml-auto">Includes Email, Job Title, Company, Score, Date.</p>
+              </div>
             </div>
-            <div className="divide-y divide-white/[0.04] overflow-x-auto">
+            <div className="overflow-x-auto custom-scrollbar">
               <table className="w-full min-w-[800px]">
                 <thead>
-                  <tr className="bg-white/[0.02]">
-                    <th className="px-6 py-4 text-left text-[10px] font-mono text-gray-500 uppercase tracking-wider">User Email</th>
-                    <th className="px-6 py-4 text-left text-[10px] font-mono text-gray-500 uppercase tracking-wider">Target Job</th>
-                    <th className="px-6 py-4 text-center text-[10px] font-mono text-gray-500 uppercase tracking-wider">ATS Score</th>
-                    <th className="px-6 py-4 text-right text-[10px] font-mono text-gray-500 uppercase tracking-wider">Date</th>
+                  <tr className="bg-white/[0.02] border-b border-white/5">
+                    <th className="px-6 py-4 text-left text-[10px] font-bold text-gray-500 uppercase tracking-widest whitespace-nowrap">User Email</th>
+                    <th className="px-6 py-4 text-left text-[10px] font-bold text-gray-500 uppercase tracking-widest whitespace-nowrap">Target Job</th>
+                    <th className="px-6 py-4 text-center text-[10px] font-bold text-gray-500 uppercase tracking-widest whitespace-nowrap">ATS Score</th>
+                    <th className="px-6 py-4 text-right text-[10px] font-bold text-gray-500 uppercase tracking-widest whitespace-nowrap">Date</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-white/[0.04]">
                   {scans.map(s => (
-                    <tr key={s._id} className="hover:bg-white/[0.01] transition-colors">
-                      <td className="px-6 py-4 text-sm font-medium text-gray-300">
+                    <tr key={s._id} className="hover:bg-white/[0.02] transition-colors group">
+                      <td className="px-6 py-4 text-sm font-medium text-gray-300 whitespace-nowrap">
                         {s.userId?.email || 'Unknown User'}
                       </td>
-                      <td className="px-6 py-4">
+                      <td className="px-6 py-4 whitespace-nowrap">
                         <p className="text-sm font-bold text-gray-200">{s.jobId?.jobTitle || 'N/A'}</p>
-                        <p className="text-xs text-gray-500 font-mono">{s.jobId?.companyName || 'N/A'}</p>
+                        <p className="text-[11px] text-gray-500">{s.jobId?.companyName || 'N/A'}</p>
                       </td>
-                      <td className="px-6 py-4 text-center">
-                        <span className={`px-3 py-1 rounded-full text-xs font-mono font-bold border ${
-                          s.atsScore >= 80 ? 'bg-[#3DEBA6]/10 border-[#3DEBA6]/25 text-[#3DEBA6]' :
-                          s.atsScore >= 60 ? 'bg-[#F0C060]/10 border-[#F0C060]/25 text-[#F0C060]' :
-                          'bg-[#ef4444]/10 border-[#ef4444]/25 text-[#ef4444]'
+                      <td className="px-6 py-4 text-center whitespace-nowrap">
+                        <span className={`px-3 py-1.5 rounded-lg text-xs font-mono font-bold border inline-block min-w-[60px] ${
+                          s.atsScore >= 80 ? 'bg-[#3DEBA6]/10 border-[#3DEBA6]/20 text-[#3DEBA6]' :
+                          s.atsScore >= 60 ? 'bg-[#F0C060]/10 border-[#F0C060]/20 text-[#F0C060]' :
+                          'bg-[#ef4444]/10 border-[#ef4444]/20 text-[#ef4444]'
                         }`}>
                           {s.atsScore}%
                         </span>
                       </td>
-                      <td className="px-6 py-4 text-right text-xs text-gray-500 font-mono flex items-center justify-end gap-1">
-                        <Clock size={12} />
-                        {new Date(s.createdAt).toLocaleDateString()}
+                      <td className="px-6 py-4 text-right text-xs text-gray-500 font-mono whitespace-nowrap">
+                        <div className="flex items-center justify-end gap-1.5 opacity-70 group-hover:opacity-100 transition-opacity">
+                          <Clock size={12} />
+                          {new Date(s.createdAt).toLocaleDateString()}
+                        </div>
                       </td>
                     </tr>
                   ))}
                   {scans.length === 0 && (
                     <tr>
-                      <td colSpan={4} className="px-6 py-8 text-center text-gray-500 text-sm">No scans found.</td>
+                      <td colSpan={4} className="px-6 py-10 text-center">
+                        <FileText size={24} className="mx-auto text-gray-600 mb-2 opacity-50" />
+                        <p className="text-gray-500 text-sm font-medium">No scans found.</p>
+                      </td>
                     </tr>
                   )}
                 </tbody>
@@ -578,12 +598,12 @@ export default function AdminPage() {
 
 function StatCard({ title, value, color, icon }: { title: string, value: string | number, color: string, icon: React.ReactNode }) {
   return (
-    <div className="bg-[#13131A]/80 backdrop-blur-xl p-8 rounded-[32px] border border-white/5 relative overflow-hidden group shadow-xl">
-      <div className="absolute right-6 top-8 text-white/5 group-hover:text-white/10 transition-colors">
+    <div className="card p-6 sm:p-8 group">
+      <div className="absolute right-6 top-8 text-white/5 group-hover:text-white/10 group-hover:scale-110 transition-all duration-300">
         {icon}
       </div>
-      <p className="text-[10px] font-mono font-black text-gray-500 uppercase tracking-[0.2em] mb-4">{title}</p>
-      <div className={`text-4xl font-black ${color} tracking-tighter`}>{value}</div>
+      <p className="text-[10px] font-bold text-gray-500 uppercase tracking-[0.15em] mb-4">{title}</p>
+      <div className={`text-3xl sm:text-4xl font-black ${color} tracking-tight`}>{value}</div>
     </div>
   );
 }
