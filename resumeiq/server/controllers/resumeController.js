@@ -192,7 +192,8 @@ exports.magicRewrite = async (req, res) => {
       });
     }
   } catch (error) {
-    res.status(500).json({ message: 'Error generating magic rewrite', error: error.message });
+    console.error('[magicRewrite] Error:', error);
+    res.status(500).json({ success: false, message: 'AI generation engine encountered a runtime failure.' });
   }
 };
 
@@ -218,7 +219,7 @@ exports.importLinkedInPDF = async (req, res, next) => {
     });
   } catch (error) {
     console.error('LinkedIn Parsing Error:', error);
-    return res.status(500).json({ success: false, message: 'Extraction engine encountered a parsing layout failure.', error: error.message });
+    return res.status(500).json({ success: false, message: 'Unable to process this PDF. Please upload a valid LinkedIn PDF and try again.' });
   }
 };
 
@@ -247,6 +248,6 @@ exports.generateCoverLetter = async (req, res, next) => {
     return res.end();
   } catch (error) {
     console.error('Cover Letter Generation Error:', error);
-    return res.status(500).json({ success: false, message: 'AI generation engine encountered a critical compilation error.', error: error.message });
+    return res.status(500).json({ success: false, message: 'AI generation engine encountered a critical compilation error.' });
   }
 };
