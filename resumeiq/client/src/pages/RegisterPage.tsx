@@ -20,9 +20,18 @@ export default function RegisterPage() {
     try {
       const plan = searchParams.get('plan') || undefined;
       const utr = searchParams.get('utr') || undefined;
+      const checkout = searchParams.get('checkout') === 'true';
+      const pendingPlan = localStorage.getItem('pendingCheckoutPlan');
+      
       await register(form.name, form.email, form.password, plan, utr)
-      navigate('/dashboard')
-      toast.success('Account created!')
+      
+      if (checkout || pendingPlan) {
+        navigate(`/pricing?checkout=true`)
+        toast.success('Account created! Continue to payment.')
+      } else {
+        navigate('/dashboard')
+        toast.success('Account created!')
+      }
     } catch (err: any) {
       toast.error(err?.response?.data?.message || 'Registration failed')
     } finally { setLoading(false) }
@@ -295,7 +304,7 @@ export default function RegisterPage() {
               {/* Login link */}
               <p className="text-center text-sm text-gray-400 font-medium">
                 Already have an account?{' '}
-                <Link to="/login" className="text-[#3DEBA6] hover:text-[#3DEBA6]/80 font-bold transition-colors">
+                <Link to={`/login${searchParams.toString() ? '?' + searchParams.toString() : ''}`} className="text-[#3DEBA6] hover:text-[#3DEBA6]/80 font-bold transition-colors">
                   Sign in
                 </Link>
               </p>

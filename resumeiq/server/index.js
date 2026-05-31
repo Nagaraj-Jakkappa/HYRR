@@ -21,6 +21,8 @@ const resumeRoutes = require('./routes/resumeRoutes');
 const scanRoutes = require('./routes/scanRoutes');
 const adminRoutes = require('./routes/adminRoutes');
 const coverLetterRoutes = require('./routes/coverLetterRoutes');
+const paymentRoutes = require('./routes/paymentRoutes');
+const paymentController = require('./controllers/paymentController');
 
 const app = express();
 
@@ -64,6 +66,12 @@ app.use(cors(corsOptions));
 // Handle Preflight requests explicitly for all routes
 app.options('*', cors(corsOptions));
 app.use(cookieParser());
+
+// Webhook must be parsed as raw body before express.json intercepts it
+app.post('/api/payments/webhook', express.raw({ type: 'application/json' }), (req, res, next) => {
+  req.rawBody = req.body;
+  next();
+}, paymentController.handleWebhook);
 
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
@@ -123,6 +131,7 @@ app.use('/api/resumes', resumeRoutes);
 app.use('/api/scans', scanRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/cover-letters', coverLetterRoutes);
+app.use('/api/payments', paymentRoutes);
 
 app.get('/api/health', (req, res) => {
   res.json({

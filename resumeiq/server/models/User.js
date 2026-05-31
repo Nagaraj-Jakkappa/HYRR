@@ -6,7 +6,7 @@ const userSchema = new mongoose.Schema({
   email: { type: String, required: true, unique: true, lowercase: true, trim: true },
   passwordHash: { type: String, required: true },
   role: { type: String, enum: ['user', 'admin'], default: 'user' },
-  plan: { type: String, enum: ['free', 'pro', 'career+'], default: 'free' },
+  plan: { type: String, enum: ['free', 'pro', 'careerPlus', 'career+'], default: 'free' },
   scansUsed: { type: Number, default: 0 },
   scansLimit: { type: Number, default: 3 },
   tokensUsed: { type: Number, default: 0 },

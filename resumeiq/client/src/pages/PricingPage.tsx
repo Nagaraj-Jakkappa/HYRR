@@ -1,21 +1,116 @@
-import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import React, { useState, useEffect, useRef } from 'react';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import Footer from '../components/ui/Footer';
-import { ShieldCheck, Check, Copy, Zap } from 'lucide-react';
+import { ShieldCheck, Check, Zap } from 'lucide-react';
+import toast from 'react-hot-toast';
+import { useAuth } from '../context/AuthContext';
+import api from '../services/api';
+
+declare global {
+  interface Window {
+    Razorpay: any;
+  }
+}
 
 export default function PricingPage() {
     const navigate = useNavigate();
-    const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
-    const [selectedPlan, setSelectedPlan] = useState<{ title: string, price: string } | null>(null);
-    const [utrNumber, setUtrNumber] = useState('');
-    const [copied, setCopied] = useState(false);
+    const [searchParams, setSearchParams] = useSearchParams();
+    const { user, loading } = useAuth();
+    const [isLoading, setIsLoading] = useState(false);
+    const [pendingPlanToConfirm, setPendingPlanToConfirm] = useState<{title: string, price: string, key: string} | null>(null);
 
-    const handlePlanSelect = (title: string, price: string) => {
-        if (title.toLowerCase() === 'free') {
+    useEffect(() => {
+        const scriptId = 'razorpay-checkout-js';
+        if (!document.getElementById(scriptId)) {
+            const script = document.createElement('script');
+            script.id = scriptId;
+            script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+            script.async = true;
+            document.body.appendChild(script);
+        }
+    }, []);
+
+    useEffect(() => {
+        if (loading) return;
+
+        const queryPlan = searchParams.get('plan');
+        const checkout = searchParams.get('checkout');
+        const storedPlan = localStorage.getItem('pendingCheckoutPlan');
+
+        const plan = queryPlan || storedPlan;
+
+        if (!checkout && !storedPlan) return;
+        if (!plan) return;
+
+        if (user) {
+            const title = plan === 'careerPlus' ? 'Career+' : 'Pro';
+            const price = plan === 'careerPlus' ? '₹2999' : '₹1499';
+            setPendingPlanToConfirm({ title, price, key: plan });
+        }
+    }, [loading, user, searchParams]);
+
+    const handlePlanSelect = async (title: string, price: string) => {
+        const planKey = title.toLowerCase() === 'career+' ? 'careerPlus' : title.toLowerCase();
+        
+        if (planKey === 'free') {
             navigate('/register');
-        } else {
-            setSelectedPlan({ title, price });
-            setIsPaymentModalOpen(true);
+            return;
+        }
+
+        if (loading) return;
+
+        if (!user) {
+            localStorage.setItem('pendingCheckoutPlan', planKey);
+            navigate(`/register?plan=${planKey}&checkout=true`);
+            return;
+        }
+
+        try {
+            setIsLoading(true);
+            const { data: orderData } = await api.post('/payments/create-order', { plan: planKey });
+
+            const options = {
+                key: import.meta.env.VITE_RAZORPAY_KEY_ID,
+                amount: orderData.data.amount,
+                currency: orderData.data.currency,
+                name: "HYRR",
+                description: `Upgrade to ${title}`,
+                order_id: orderData.data.order_id,
+                handler: async function (response: any) {
+                    try {
+                        const { data: verifyData } = await api.post('/payments/verify', {
+                            razorpay_order_id: response.razorpay_order_id,
+                            razorpay_payment_id: response.razorpay_payment_id,
+                            razorpay_signature: response.razorpay_signature
+                        });
+                        
+                        if (verifyData.success) {
+                            toast.success(`Successfully upgraded to ${title}!`);
+                            localStorage.removeItem('pendingCheckoutPlan');
+                            setSearchParams({});
+                            setPendingPlanToConfirm(null);
+                            navigate('/dashboard?upgrade=success');
+                        } else {
+                            throw new Error(verifyData.message || 'Payment verification failed');
+                        }
+                    } catch (err: any) {
+                        toast.error(err.response?.data?.message || err.message || 'Payment verification failed');
+                    }
+                },
+                theme: {
+                    color: "#5B5FEF"
+                }
+            };
+
+            const rzp = new window.Razorpay(options);
+            rzp.on('payment.failed', function (response: any) {
+                toast.error(response.error.description || 'Payment failed');
+            });
+            rzp.open();
+        } catch (err: any) {
+            toast.error(err.response?.data?.message || err.message || 'Error initializing payment');
+        } finally {
+            setIsLoading(false);
         }
     };
 
@@ -50,6 +145,24 @@ export default function PricingPage() {
                     </p>
                 </div>
 
+                {pendingPlanToConfirm && (
+                    <div className="max-w-3xl mx-auto mb-16">
+                        <div className="bg-gradient-to-r from-[#5B5FEF]/20 to-[#8E5BEF]/20 border border-[#5B5FEF]/30 rounded-2xl p-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+                            <div>
+                                <h3 className="text-xl font-bold text-white mb-1">Your {pendingPlanToConfirm.title} plan is ready</h3>
+                                <p className="text-sm text-gray-300">Continue to secure payment to upgrade your account.</p>
+                            </div>
+                            <button 
+                                disabled={isLoading}
+                                onClick={() => handlePlanSelect(pendingPlanToConfirm.title, pendingPlanToConfirm.price)}
+                                className="px-8 py-3 bg-[#5B5FEF] hover:bg-[#6c70fc] text-white rounded-xl font-bold transition-all whitespace-nowrap disabled:opacity-50"
+                            >
+                                {isLoading ? 'Loading...' : 'Continue to Payment'}
+                            </button>
+                        </div>
+                    </div>
+                )}
+
                 <div className="grid lg:grid-cols-3 gap-8">
                     <PricingCard 
                         title="Free" 
@@ -57,6 +170,7 @@ export default function PricingPage() {
                         desc="Get started, no credit card required." 
                         items={['3 ATS scans per month', 'Basic AI Magic Rewrite', '1 resume template', 'PDF export', 'Shareable scan reports']} 
                         onSelect={handlePlanSelect} 
+                        isLoading={isLoading}
                     />
                     <PricingCard 
                         featured 
@@ -65,6 +179,7 @@ export default function PricingPage() {
                         desc="For active job seekers." 
                         items={['Unlimited ATS scans', 'Unlimited AI rewrites', 'AI cover letter generator', 'All 10 resume templates', 'LinkedIn PDF import', 'PDF & DOCX export', 'Scan comparison', 'Priority AI inference']} 
                         onSelect={handlePlanSelect} 
+                        isLoading={isLoading}
                     />
                     <PricingCard 
                         title="Career+" 
@@ -72,84 +187,12 @@ export default function PricingPage() {
                         desc="For power users & career coaches." 
                         items={['Everything in Pro', 'Dashboard analytics', 'Version history tracking', 'Optimized resume downloads', 'Priority support']} 
                         onSelect={handlePlanSelect} 
+                        isLoading={isLoading}
                     />
                 </div>
             </section>
 
-            {/* PAYMENT MODAL */}
-            {isPaymentModalOpen && selectedPlan && (
-                <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
-                    <div className="bg-[#13131A]/90 backdrop-blur-2xl border border-white/10 rounded-3xl p-8 max-w-md w-full text-center shadow-[0_20px_60px_rgba(0,0,0,0.8)] transform transition-all relative">
-                        <button
-                            onClick={() => setIsPaymentModalOpen(false)}
-                            className="absolute top-4 right-4 text-gray-500 hover:text-white transition"
-                        >
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-6 h-6">
-                                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-                            </svg>
-                        </button>
 
-                        <div className="w-16 h-16 bg-[#3DEBA6]/20 border border-[#3DEBA6]/30 rounded-full flex items-center justify-center mx-auto mb-6">
-                            <ShieldCheck className="text-[#3DEBA6]" size={28} />
-                        </div>
-
-                        <h2 className="text-2xl font-black mb-2 text-white">Upgrade to {selectedPlan.title}</h2>
-                        <p className="text-gray-400 text-sm mb-6">Complete your payment of <strong className="text-white">{selectedPlan.price}</strong> via UPI</p>
-
-                        <div className="bg-white p-4 rounded-2xl inline-block mb-4 shadow-xl">
-                            <img 
-                                src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(`upi://pay?pa=nagupoojary33-3@oksbi&pn=HYRR ${selectedPlan.title}&am=${selectedPlan.price.replace(/[^0-9.]/g, '')}`)}`} 
-                                alt="UPI QR Code" 
-                                className="w-48 h-48"
-                            />
-                        </div>
-
-                        <div className="bg-black/40 border border-white/5 rounded-xl p-4 mb-6 flex items-center justify-between">
-                            <div className="text-left">
-                                <p className="text-xs text-gray-500 mb-1">UPI ID</p>
-                                <p className="font-mono text-[#3DEBA6] font-bold tracking-tight">nagupoojary33-3@oksbi</p>
-                            </div>
-                            <button
-                                onClick={() => {
-                                    navigator.clipboard.writeText('nagupoojary33-3@oksbi');
-                                    setCopied(true);
-                                    setTimeout(() => setCopied(false), 2000);
-                                }}
-                                className="p-2 bg-white/5 hover:bg-white/10 rounded-lg transition text-gray-400 hover:text-white flex items-center gap-2 text-xs font-bold"
-                            >
-                                {copied ? <Check size={14} className="text-[#3DEBA6]" /> : <Copy size={14} />}
-                                {copied ? 'Copied' : 'Copy'}
-                            </button>
-                        </div>
-                        
-                        <div className="bg-black/40 border border-white/5 rounded-xl p-4 mb-6 text-left">
-                            <label className="block text-xs font-bold text-gray-400 mb-2 uppercase tracking-wider">
-                                Enter 12-Digit UTR / Transaction ID
-                            </label>
-                            <input
-                                type="text"
-                                placeholder="e.g. 312345678901"
-                                value={utrNumber}
-                                onChange={(e) => setUtrNumber(e.target.value.replace(/[^0-9]/g, '').slice(0, 12))}
-                                className="w-full bg-[#0A0A0F] border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-[#3DEBA6] transition-colors font-mono"
-                            />
-                            <p className="text-[10px] text-gray-500 mt-2">Required to verify your payment automatically.</p>
-                        </div>
-                        
-                        <button
-                            disabled={utrNumber.length !== 12}
-                            onClick={() => {
-                                setIsPaymentModalOpen(false);
-                                setUtrNumber('');
-                                navigate(`/register?plan=${selectedPlan.title.toLowerCase()}&utr=${utrNumber}`);
-                            }}
-                            className="w-full bg-gradient-to-r from-[#5B5FEF] to-[#8E5BEF] hover:from-[#6c70fc] hover:to-[#9f6dfc] disabled:opacity-50 disabled:from-gray-600 disabled:to-gray-700 disabled:cursor-not-allowed text-white font-bold py-4 rounded-[16px] transition-all shadow-[0_0_20px_rgba(91,95,239,0.3)] hover:shadow-[0_0_30px_rgba(91,95,239,0.5)] active:scale-[0.98] disabled:shadow-none"
-                        >
-                            {utrNumber.length === 12 ? "I have made the payment" : "Enter UTR to Continue"}
-                        </button>
-                    </div>
-                </div>
-            )}
 
             <div className="w-full">
                 <Footer />
@@ -158,7 +201,7 @@ export default function PricingPage() {
     );
 }
 
-function PricingCard({ title, price, desc, items, featured = false, onSelect }: any) {
+function PricingCard({ title, price, desc, items, featured = false, onSelect, isLoading = false }: any) {
     return (
         <div className={`rounded-[40px] p-10 border transition-all ${featured ? 'bg-[#13131A] border-[#5B5FEF]/40 ring-1 ring-[#5B5FEF]/20 shadow-[0_20px_80px_rgba(91,95,239,0.15)]' : 'bg-[#13131A] border-white/[0.05]'}`}>
             <div className="flex items-center justify-between mb-8">
@@ -181,8 +224,8 @@ function PricingCard({ title, price, desc, items, featured = false, onSelect }: 
                     </li>
                 ))}
             </ul>
-            <button onClick={() => onSelect && onSelect(title, price)} className={`w-full block text-center py-4 rounded-2xl font-bold transition-all ${featured ? 'bg-gradient-to-r from-[#5B5FEF] to-[#8E5BEF] hover:from-[#6c70fc] hover:to-[#9f6dfc] shadow-[0_0_20px_rgba(91,95,239,0.3)] hover:shadow-[0_0_30px_rgba(91,95,239,0.5)] active:scale-[0.98]' : 'bg-white/[0.04] hover:bg-white/[0.08]'}`}>
-                Get Started
+            <button disabled={isLoading} onClick={() => onSelect && onSelect(title, price)} className={`w-full block text-center py-4 rounded-2xl font-bold transition-all ${featured ? 'bg-gradient-to-r from-[#5B5FEF] to-[#8E5BEF] hover:from-[#6c70fc] hover:to-[#9f6dfc] shadow-[0_0_20px_rgba(91,95,239,0.3)] hover:shadow-[0_0_30px_rgba(91,95,239,0.5)] active:scale-[0.98]' : 'bg-white/[0.04] hover:bg-white/[0.08]'} disabled:opacity-50 disabled:cursor-not-allowed`}>
+                {isLoading ? 'Loading...' : 'Get Started'}
             </button>
         </div>
     );

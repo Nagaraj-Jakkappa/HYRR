@@ -8,6 +8,10 @@ class UserRepository {
   async incrementTokensUsed(userId, tokensCount) {
     return await User.findByIdAndUpdate(userId, { $inc: { tokensUsed: tokensCount } });
   }
+
+  async findById(userId) {
+    return await User.findById(userId);
+  }
 }
 
 module.exports = new UserRepository();

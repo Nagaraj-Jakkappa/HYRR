@@ -1,5 +1,5 @@
 import { useState, FormEvent } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { Eye, EyeOff, ArrowRight, ScanSearch, Sparkles, FileText, ShieldCheck, Zap } from 'lucide-react'
 import Footer from '../components/ui/Footer'
@@ -8,6 +8,7 @@ import toast from 'react-hot-toast'
 export default function LoginPage() {
   const { login } = useAuth()
   const navigate = useNavigate()
+  const [searchParams] = useSearchParams()
   const [form, setForm] = useState({ email: '', password: '' })
   const [show, setShow] = useState(false)
   const [loading, setLoading] = useState(false)
@@ -17,7 +18,15 @@ export default function LoginPage() {
     setLoading(true)
     try {
       await login(form.email, form.password)
-      navigate('/dashboard')
+      const checkout = searchParams.get('checkout') === 'true';
+      const pendingPlan = localStorage.getItem('pendingCheckoutPlan');
+      
+      if (checkout || pendingPlan) {
+        navigate(`/pricing?checkout=true`)
+        toast.success('Login successful! Continue to payment.')
+      } else {
+        navigate('/dashboard')
+      }
     } catch (err: any) {
       toast.error(err?.response?.data?.message || 'Login failed')
     } finally {
@@ -239,7 +248,7 @@ export default function LoginPage() {
               {/* Register link */}
               <p className="text-center text-sm text-gray-400 font-medium">
                 Don't have an account?{' '}
-                <Link to="/register" className="text-[#3DEBA6] hover:text-[#3DEBA6]/80 font-bold transition-colors">
+                <Link to={`/register${searchParams.toString() ? '?' + searchParams.toString() : ''}`} className="text-[#3DEBA6] hover:text-[#3DEBA6]/80 font-bold transition-colors">
                   Sign up free
                 </Link>
               </p>
