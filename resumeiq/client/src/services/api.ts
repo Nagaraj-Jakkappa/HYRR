@@ -113,7 +113,8 @@ export const scanAPI = {
 export const adminAPI = {
   getStats: () => api.get('/admin/stats'),
   getUsers: (page = 1, search = '') => api.get(`/admin/users?page=${page}&search=${search}`),
-  updateRole: (id: string, data: { role?: string; plan?: string }) => api.patch(`/admin/users/${id}/role`, data),
+  updateRole: (id: string, data: { role?: string }) => api.patch(`/admin/users/${id}/role`, data),
+  updatePlan: (id: string, data: { plan: string }) => api.patch(`/admin/users/${id}/plan`, data),
   toggleStatus: (id: string) => api.put(`/admin/users/${id}/status`),
   deleteUser: (id: string) => api.delete(`/admin/users/${id}`),
   getAllScans: (page = 1) => api.get(`/admin/scans?page=${page}`),

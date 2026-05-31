@@ -86,9 +86,10 @@ const SettingsPage: React.FC = () => {
     };
 
     const getPlanBadgeColor = (plan: string) => {
+        if (user?.role === 'admin') return 'bg-[#5B5FEF]/10 text-[#5B5FEF] border-[#5B5FEF]/30 shadow-[0_0_10px_rgba(91,95,239,0.2)]';
         switch(plan?.toLowerCase()) {
             case 'pro': return 'bg-amber-500/10 text-amber-500 border-amber-500/30 shadow-[0_0_10px_rgba(245,158,11,0.2)]';
-            case 'career+': return 'bg-[#3DEBA6]/10 text-[#3DEBA6] border-[#3DEBA6]/30 shadow-[0_0_10px_rgba(61,235,166,0.2)]';
+            case 'careerplus': return 'bg-[#3DEBA6]/10 text-[#3DEBA6] border-[#3DEBA6]/30 shadow-[0_0_10px_rgba(61,235,166,0.2)]';
             default: return 'bg-white/5 text-gray-400 border-white/10';
         }
     };
@@ -146,7 +147,7 @@ const SettingsPage: React.FC = () => {
                                         <h3 className="text-2xl font-black mb-1">{user?.name}</h3>
                                         <p className="text-sm text-[#6B6B7E] mb-3 font-medium">{user?.email}</p>
                                         <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider border backdrop-blur-md ${getPlanBadgeColor(user?.plan || 'free')}`}>
-                                            {user?.plan || 'Free'} Plan
+                                            {user?.role === 'admin' ? 'Admin' : `${user?.plan || 'Free'} Plan`}
                                         </span>
                                     </div>
                                 </div>
@@ -243,38 +244,51 @@ const SettingsPage: React.FC = () => {
                                 <div className="p-8 rounded-[32px] border relative overflow-hidden bg-[#13131A]/80 backdrop-blur-xl border-white/5 shadow-xl">
                                     <div className="absolute -top-10 -right-10 w-32 h-32 bg-[#3DEBA6]/10 blur-3xl rounded-full"></div>
                                     <h4 className="text-[11px] font-black text-[#6B6B7E] uppercase tracking-widest mb-6">Current Plan</h4>
-                                    <div className="text-4xl font-black tracking-tighter capitalize mb-2">{user?.plan || 'Free'}</div>
-                                    <p className="text-sm text-[#6B6B7E] mb-8 font-medium">Optimal for getting started with AI resume optimization.</p>
+                                    <div className="text-4xl font-black tracking-tighter capitalize mb-2">{user?.role === 'admin' ? 'Admin' : (user?.plan || 'Free')}</div>
+                                    <p className="text-sm text-[#6B6B7E] mb-8 font-medium">{user?.role === 'admin' ? 'Full platform access' : 'Optimal for getting started with AI resume optimization.'}</p>
                                     
-                                    <button 
-                                        onClick={() => navigate('/pricing')}
-                                        className="w-full bg-[#5B5FEF]/10 hover:bg-[#5B5FEF]/20 text-[#5B5FEF] border border-[#5B5FEF]/30 font-black uppercase tracking-wider text-xs py-4 rounded-xl transition-all shadow-[inset_0_0_15px_rgba(91,95,239,0.1)]">
-                                        Upgrade Plan
-                                    </button>
+                                    {user?.role !== 'admin' && (
+                                        <button 
+                                            onClick={() => navigate('/pricing')}
+                                            className="w-full bg-[#5B5FEF]/10 hover:bg-[#5B5FEF]/20 text-[#5B5FEF] border border-[#5B5FEF]/30 font-black uppercase tracking-wider text-xs py-4 rounded-xl transition-all shadow-[inset_0_0_15px_rgba(91,95,239,0.1)]">
+                                            Upgrade Plan
+                                        </button>
+                                    )}
                                 </div>
 
                                 {/* Usage Stats */}
                                 <div className="p-8 rounded-[32px] border bg-[#13131A]/80 backdrop-blur-xl border-white/5 shadow-xl">
                                     <h4 className="text-[11px] font-black text-[#6B6B7E] uppercase tracking-widest mb-6">Usage Limits</h4>
                                     
-                                    <div className="flex justify-between items-end mb-3">
-                                        <div>
-                                            <span className="text-3xl font-black">{user?.scansUsed || 0}</span>
-                                            <span className="text-[#6B6B7E] ml-1 font-bold">/ {scanLimit} scans</span>
+                                    {user?.role === 'admin' ? (
+                                        <div className="flex justify-center items-center h-full py-6">
+                                            <div className="text-center text-[#3DEBA6]">
+                                                <ShieldAlert size={48} className="mx-auto mb-4 opacity-50" />
+                                                <span className="text-lg font-black uppercase tracking-widest">Unlimited Access</span>
+                                            </div>
                                         </div>
-                                        <span className={`text-xs font-black uppercase tracking-widest ${usagePercent > 90 ? 'text-red-500' : 'text-[#3DEBA6]'}`}>
-                                            {Math.round(usagePercent)}% Used
-                                        </span>
-                                    </div>
-                                    
-                                    <div className="w-full h-3 rounded-full overflow-hidden bg-[#0A0A0F] border border-white/5 shadow-inner">
-                                        <div className={`h-full transition-all duration-1000 ${barColor}`} style={{ width: `${usagePercent}%` }} />
-                                    </div>
-                                    
-                                    {usagePercent > 90 && (
-                                        <p className="text-xs text-red-500 mt-5 flex items-center gap-1.5 font-bold bg-red-500/10 px-3 py-2 rounded-lg border border-red-500/20">
-                                            <AlertTriangle size={14} /> You are approaching your scan limit.
-                                        </p>
+                                    ) : (
+                                        <>
+                                            <div className="flex justify-between items-end mb-3">
+                                                <div>
+                                                    <span className="text-3xl font-black">{user?.scansUsed || 0}</span>
+                                                    <span className="text-[#6B6B7E] ml-1 font-bold">/ {scanLimit} scans</span>
+                                                </div>
+                                                <span className={`text-xs font-black uppercase tracking-widest ${usagePercent > 90 ? 'text-red-500' : 'text-[#3DEBA6]'}`}>
+                                                    {Math.round(usagePercent)}% Used
+                                                </span>
+                                            </div>
+                                            
+                                            <div className="w-full h-3 rounded-full overflow-hidden bg-[#0A0A0F] border border-white/5 shadow-inner">
+                                                <div className={`h-full transition-all duration-1000 ${barColor}`} style={{ width: `${usagePercent}%` }} />
+                                            </div>
+                                            
+                                            {usagePercent > 90 && (
+                                                <p className="text-xs text-red-500 mt-5 flex items-center gap-1.5 font-bold bg-red-500/10 px-3 py-2 rounded-lg border border-red-500/20">
+                                                    <AlertTriangle size={14} /> You are approaching your scan limit.
+                                                </p>
+                                            )}
+                                        </>
                                     )}
                                 </div>
                             </div>

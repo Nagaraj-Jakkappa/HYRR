@@ -55,6 +55,6 @@ router.get('/:id', scanController.getScan);
  * @desc    Generate and download an AI-optimized PDF or DOCX resume
  * @access  Private
  */
-router.post('/:id/download', requirePlan('pro', 'career+'), checkTokenBudget, scanController.downloadResume);
+router.post('/:id/download', requirePlan('pro', 'careerPlus'), checkTokenBudget, scanController.downloadResume);
 
 module.exports = router;

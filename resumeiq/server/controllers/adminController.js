@@ -213,6 +213,42 @@ exports.updateUserRole = async (req, res, next) => {
 };
 
 /**
+ * 3.b UPDATE USER PLAN
+ */
+exports.updateUserPlan = async (req, res, next) => {
+  try {
+    const { plan } = req.body;
+    
+    if (!['free', 'pro', 'careerPlus'].includes(plan)) {
+      return res.status(400).json({ success: false, message: 'Invalid plan selected' });
+    }
+
+    const updateData = { plan };
+    
+    if (plan === 'free') {
+      updateData.scansLimit = 3;
+      updateData.tokensLimit = 50000;
+    } else if (plan === 'pro') {
+      updateData.scansLimit = 9999;
+      updateData.tokensLimit = 500000;
+    } else if (plan === 'careerPlus') {
+      updateData.scansLimit = 99999;
+      updateData.tokensLimit = 2000000;
+    }
+
+    const user = await User.findByIdAndUpdate(
+      req.params.id,
+      updateData,
+      { new: true, runValidators: true }
+    ).select('-passwordHash');
+
+    if (!user) return res.status(404).json({ success: false, message: 'User not found' });
+
+    res.json({ success: true, data: { user } });
+  } catch (err) { next(err); }
+};
+
+/**
  * 4. TOGGLE USER STATUS (Ban/Unban)
  * This was missing and likely causing your server crash.
  */

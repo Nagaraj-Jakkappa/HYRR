@@ -10,7 +10,8 @@ const {
     deleteUser,
     getAllScans,
     getSettings,
-    updateSettings
+    updateSettings,
+    updateUserPlan
 } = require('../controllers/adminController');
 
 // Import authentication middleware
@@ -39,6 +40,10 @@ router.get('/users', getAllUsers);
 
 // Update specific user details (Role/Plan)
 router.patch('/users/:id/role', updateUserRole);
+
+// @route   PATCH /api/admin/users/:id/plan
+// @desc    Update user plan and limits
+router.patch('/users/:id/plan', updateUserPlan);
 
 // Ban or Unban a user (Toggles isActive status)
 router.put('/users/:id/status', toggleUserStatus);

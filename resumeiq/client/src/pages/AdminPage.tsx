@@ -117,7 +117,7 @@ export default function AdminPage() {
 
   const handlePlanChange = async (id: string, newPlan: string) => {
     try {
-      await adminAPI.updateRole(id, { plan: newPlan });
+      await adminAPI.updatePlan(id, { plan: newPlan });
       toast.success('User plan updated');
       fetchUsers();
     } catch (e) { toast.error('Failed to update plan'); }
@@ -408,7 +408,7 @@ export default function AdminPage() {
                         >
                           <option value="free">Free</option>
                           <option value="pro">Pro</option>
-                          <option value="career+">Career+</option>
+                          <option value="careerPlus">Career+</option>
                         </select>
                       </td>
                       <td className="px-6 py-4 text-xs font-mono text-gray-400 whitespace-nowrap">

@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useCallback, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { scanAPI } from '../services/api';
+import { useAuth } from '../context/AuthContext';
 import { useSocket } from '../hooks/useSocket';
 import {
   AreaChart,
@@ -119,6 +120,7 @@ const StatusIcon = ({ status }: { status: string }) => {
 };
 
 export default function DashboardPage() {
+  const { user } = useAuth();
   const [stats, setStats] = useState<Stats | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -181,7 +183,7 @@ export default function DashboardPage() {
     );
   }
 
-  const limitReached = stats.scansUsed >= stats.scansLimit;
+  const limitReached = user?.role !== 'admin' && stats.scansUsed >= stats.scansLimit;
 
   return (
     <div className="bg-[#0A0A0F] text-[#EEEEF0] p-6 lg:p-12 font-sans flex-1">

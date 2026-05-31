@@ -60,7 +60,7 @@ router.get('/', getMyResumes);
 // --- LinkedIn Automation Data Parser Ingestion (Pro+ only) ---
 router.post(
   '/import-linkedin',
-  requirePlan('pro', 'career+'),
+  requirePlan('pro', 'careerPlus'),
   (req, res, next) => {
     memoryUpload.single('file')(req, res, (err) => {
       if (err) return handleMulterError(err, req, res, next);

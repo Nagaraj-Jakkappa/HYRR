@@ -81,7 +81,7 @@ exports.createScan = async (req, res, next) => {
     }
 
     const user = req.user;
-    if (user.plan === 'free' && user.scansUsed >= user.scansLimit) {
+    if (user.role !== 'admin' && user.plan === 'free' && user.scansUsed >= user.scansLimit) {
       return res.status(403).json({
         success: false,
         message: `You've used all ${user.scansLimit} scans on the Free plan this month. Upgrade to Pro for unlimited scans.`,

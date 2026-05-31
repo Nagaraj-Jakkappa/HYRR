@@ -44,19 +44,18 @@ exports.register = async (req, res, next) => {
       return res.status(400).json({ success: false, message: 'All fields required' });
     }
 
-    if (password.length < 6) {
-      return res.status(400).json({ success: false, message: 'Password must be at least 6 characters' });
-    }
-
     const existing = await User.findOne({ email: email.trim().toLowerCase() });
     if (existing) {
       return res.status(400).json({ success: false, message: 'Email already registered' });
     }
 
     // Creating user instance initializes the schema pre-save hook perfectly exactly once
-    const validPlans = ['free', 'pro', 'career+'];
+    const validPlans = ['free', 'pro', 'careerPlus'];
     const requestedPlan = req.body.plan?.toLowerCase() || 'free';
     const plan = validPlans.includes(requestedPlan) ? requestedPlan : 'free';
+    if (req.body.plan && !validPlans.includes(req.body.plan)) {
+      return res.status(400).json({ success: false, message: 'Invalid plan selected' });
+    }
     const scansLimit = getScansLimitForPlan(plan);
     const user = await User.create({ name, email: email.trim().toLowerCase(), passwordHash: password, plan, scansLimit });
 

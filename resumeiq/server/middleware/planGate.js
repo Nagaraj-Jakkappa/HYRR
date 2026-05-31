@@ -5,9 +5,9 @@
  * Usage: router.post('/cover-letter', requirePlan('pro', 'career+'), generateCoverLetter);
  * 
  * Plan Hierarchy:
- *   free     → Basic features only (3 scans/mo, 1 template, basic rewrite, PDF export)
- *   pro      → All features (unlimited scans, cover letters, LinkedIn import, all templates, DOCX export)
- *   career+  → Everything in Pro + dashboard analytics, version tracking, optimized downloads, priority support
+ *   free       → Basic features only (3 scans/mo, 1 template, basic rewrite, PDF export)
+ *   pro        → All features (unlimited scans, cover letters, LinkedIn import, all templates, DOCX export)
+ *   careerPlus → Everything in Pro + dashboard analytics, version tracking, optimized downloads, priority support
  */
 
 const PLAN_FEATURES = {
@@ -23,9 +23,9 @@ const PLAN_FEATURES = {
     tokensLimit: 500000,
     features: ['basic_rewrite', 'pdf_export', 'shareable_reports', 'cover_letter', 'linkedin_import', 'docx_export', 'all_templates', 'scan_compare', 'unlimited_rewrites', 'optimized_download'],
   },
-  'career+': {
+  'careerPlus': {
     label: 'Career+',
-    scansLimit: 999,
+    scansLimit: 99999,
     tokensLimit: 2000000,
     features: ['basic_rewrite', 'pdf_export', 'shareable_reports', 'cover_letter', 'linkedin_import', 'docx_export', 'all_templates', 'scan_compare', 'unlimited_rewrites', 'optimized_download', 'dashboard_analytics', 'version_tracking', 'priority_support'],
   },
@@ -33,10 +33,14 @@ const PLAN_FEATURES = {
 
 /**
  * Middleware factory — restricts route access to users with one of the specified plans.
- * @param  {...string} allowedPlans - Plan names that can access this endpoint (e.g., 'pro', 'career+')
+ * @param  {...string} allowedPlans - Plan names that can access this endpoint (e.g., 'pro', 'careerPlus')
  */
 const requirePlan = (...allowedPlans) => {
   return (req, res, next) => {
+    if (req.user?.role === 'admin') {
+      return next();
+    }
+
     const userPlan = req.user?.plan || 'free';
 
     if (allowedPlans.includes(userPlan)) {
@@ -81,6 +85,7 @@ const getTokensLimitForPlan = (plan) => {
 const checkTokenBudget = (req, res, next) => {
   const user = req.user;
   if (!user) return next();
+  if (user.role === 'admin') return next();
 
   const limit = getTokensLimitForPlan(user.plan);
   if (user.tokensUsed >= limit) {
