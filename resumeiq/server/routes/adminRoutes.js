@@ -60,7 +60,7 @@ router.get('/scans', getAllScans);
 /**
  * Settings Routes
  */
-router.get('/settings', getSettings);
-router.put('/settings', updateSettings);
+router.get('/platform-config', getSettings);
+router.put('/platform-config', updateSettings);
 
 module.exports = router;

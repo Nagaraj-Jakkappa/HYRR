@@ -118,8 +118,8 @@ export const adminAPI = {
   toggleStatus: (id: string) => api.put(`/admin/users/${id}/status`),
   deleteUser: (id: string) => api.delete(`/admin/users/${id}`),
   getAllScans: (page = 1) => api.get(`/admin/scans?page=${page}`),
-  getSettings: () => api.get('/admin/settings'),
-  updateSettings: (data: any) => api.put('/admin/settings', data),
+  getSettings: () => api.get('/admin/platform-config'),
+  updateSettings: (data: any) => api.put('/admin/platform-config', data),
 };
 
 export default api;
