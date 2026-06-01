@@ -3,8 +3,8 @@ const rateLimit = require('express-rate-limit');
 // Strict limits for production security
 exports.authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 min
-  max: 10, // Max 10 failed login/auth attempts
-  message: { success: false, message: 'Too many login attempts, try again later' },
+  max: 20,
+  message: "Too many authentication attempts. Please try again later.",
   standardHeaders: true,
   legacyHeaders: false,
 });

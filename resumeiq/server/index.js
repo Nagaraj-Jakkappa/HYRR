@@ -35,9 +35,13 @@ const server = http.createServer(app);
 
 // --- CORS CONFIGURATION ---
 const allowedOrigins = [
-  'https://hyrr-blue.vercel.app',
-  'http://localhost:5173'
+  'https://hyrr-blue.vercel.app'
 ];
+
+if (process.env.NODE_ENV === 'development') {
+  allowedOrigins.push('http://localhost:5173');
+  allowedOrigins.push('http://localhost:5174');
+}
 
 if (process.env.CLIENT_URL) {
   allowedOrigins.push(process.env.CLIENT_URL.replace(/\/$/, ""));
@@ -45,10 +49,10 @@ if (process.env.CLIENT_URL) {
 
 const corsOptions = {
   origin: function (origin, callback) {
-    // Allow non-browser requests (e.g., Postman/Mobile) or dev mode
-    if (!origin || process.env.NODE_ENV === 'development') return callback(null, true);
+    // Allow non-browser requests (e.g., Postman/Mobile)
+    if (!origin) return callback(null, true);
 
-    // Check if origin is allowed or is a Vercel preview branch
+    // Check if origin is allowed exactly, or if it's a Vercel preview branch
     if (allowedOrigins.includes(origin) || origin.endsWith('.vercel.app')) {
       callback(null, true);
     } else {
