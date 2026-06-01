@@ -207,7 +207,7 @@ export default function AdminPage() {
   return (
     <div className="flex-1 bg-[#0A0A0F] text-[#EEEEF0] flex font-sans">
       {/* Sidebar */}
-      <aside className="w-64 border-r border-white/5 bg-[#0D0D14] p-6 flex flex-col hidden md:flex">
+      <aside className="w-64 border-r border-white/5 bg-[#0D0D14] p-6 hidden md:flex flex-col">
         <div className="flex items-center gap-3 mb-12 px-2">
           <div className="w-8 h-8 bg-[#5B5FEF] rounded-lg flex items-center justify-center">
             <span className="font-black text-xs text-white">NJ</span>

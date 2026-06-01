@@ -137,7 +137,7 @@ export default function FeedbackPage() {
                 </div>
 
                 <div>
-                  <label className="block text-[11px] font-black text-[#6B6B7E] uppercase tracking-widest mb-2.5 flex justify-between">
+                  <label className="text-[11px] font-black text-[#6B6B7E] uppercase tracking-widest mb-2.5 flex justify-between">
                     <span>Message</span>
                     <span className="text-gray-600">{formData.message.length}/2000</span>
                   </label>
