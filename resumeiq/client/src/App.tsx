@@ -20,6 +20,8 @@ import SettingsPage from './pages/SettingsPage';
 import ReportPage from './pages/ReportPage';
 import NotFoundPage from './pages/NotFoundPage';
 import FeedbackPage from './pages/FeedbackPage';
+import FeaturesPage from './pages/FeaturesPage';
+import FAQPage from './pages/FAQPage';
 
 // Components
 import Layout from './components/ui/Layout';
@@ -100,6 +102,8 @@ const App = () => {
         <Route path="/refund-policy" element={<RefundPolicyPage />} />
         <Route path="/vulnerability-disclosure" element={<VulnerabilityDisclosurePage />} />
         <Route path="/feedback" element={<FeedbackPage />} />
+        <Route path="/features" element={<FeaturesPage />} />
+        <Route path="/faq" element={<FAQPage />} />
 
         {/* --- PROTECTED ROUTES --- */}
         <Route element={<Protected><Layout /></Protected>}>

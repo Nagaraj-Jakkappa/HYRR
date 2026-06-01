@@ -48,9 +48,9 @@ export default function Footer() {
             <h4 className="text-white font-bold text-[15px] mb-6 tracking-wide">Product</h4>
             <div className="space-y-2">
               <FooterLink to="/demo">How it works</FooterLink>
-              <FooterLink to="/#features">Features</FooterLink>
+              <FooterLink to="/features">Features</FooterLink>
               <FooterLink to="/pricing">Pricing</FooterLink>
-              <FooterLink to="/#faq">FAQs</FooterLink>
+              <FooterLink to="/faq">FAQs</FooterLink>
             </div>
           </div>
           <div>
