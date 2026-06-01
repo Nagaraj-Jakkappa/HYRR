@@ -16,7 +16,8 @@ import {
   Save,
   Clock,
   MessageSquare,
-  X
+  X,
+  Menu
 } from 'lucide-react';
 import {
   ComposedChart,
@@ -85,6 +86,7 @@ export default function AdminPage() {
   
   const [search, setSearch] = useState('');
   const [tab, setTab] = useState<'stats' | 'users' | 'scans' | 'settings' | 'feedback'>('stats');
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const fetchUsers = () => {
     adminAPI.getUsers(1, search)
@@ -251,11 +253,69 @@ export default function AdminPage() {
         </nav>
       </aside>
 
+      {/* Mobile Drawer */}
+      {mobileMenuOpen && (
+        <div className="fixed inset-0 z-50 flex md:hidden">
+          <div className="fixed inset-0 bg-black/60 backdrop-blur-sm transition-opacity" onClick={() => setMobileMenuOpen(false)} />
+          <div className="relative w-64 bg-[#0D0D14] border-r border-white/5 h-full p-6 flex flex-col shadow-2xl animate-in slide-in-from-left duration-300">
+            <button onClick={() => setMobileMenuOpen(false)} className="absolute top-6 right-4 p-2 text-gray-500 hover:text-white bg-white/5 rounded-lg">
+              <X size={20} />
+            </button>
+            <div className="flex items-center gap-3 mb-12 px-2">
+              <div className="w-8 h-8 bg-[#5B5FEF] rounded-lg flex items-center justify-center">
+                <span className="font-black text-xs text-white">NJ</span>
+              </div>
+              <span className="font-black text-xl tracking-tight uppercase">
+                Hyrr <span className="text-[10px] text-[#5B5FEF]">Admin</span>
+              </span>
+            </div>
+
+            <nav className="space-y-2">
+              <button
+                onClick={() => { setTab('stats'); setMobileMenuOpen(false); }}
+                className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${tab === 'stats' ? 'bg-[#5B5FEF] text-white shadow-lg shadow-[#5B5FEF]/20' : 'text-gray-500 hover:bg-white/5'}`}
+              >
+                <Activity size={18} /> <span className="text-sm font-bold">Analytics</span>
+              </button>
+              <button
+                onClick={() => { setTab('users'); setMobileMenuOpen(false); }}
+                className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${tab === 'users' ? 'bg-[#5B5FEF] text-white shadow-lg shadow-[#5B5FEF]/20' : 'text-gray-500 hover:bg-white/5'}`}
+              >
+                <Users size={18} /> <span className="text-sm font-bold">User Management</span>
+              </button>
+              <button
+                onClick={() => { setTab('scans'); setMobileMenuOpen(false); }}
+                className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${tab === 'scans' ? 'bg-[#5B5FEF] text-white shadow-lg shadow-[#5B5FEF]/20' : 'text-gray-500 hover:bg-white/5'}`}
+              >
+                <FileText size={18} /> <span className="text-sm font-bold">Global Scans</span>
+              </button>
+              <button
+                onClick={() => { setTab('feedback'); setMobileMenuOpen(false); }}
+                className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${tab === 'feedback' ? 'bg-[#5B5FEF] text-white shadow-lg shadow-[#5B5FEF]/20' : 'text-gray-500 hover:bg-white/5'}`}
+              >
+                <MessageSquare size={18} /> <span className="text-sm font-bold">Feedback</span>
+              </button>
+              <button
+                onClick={() => { setTab('settings'); setMobileMenuOpen(false); }}
+                className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${tab === 'settings' ? 'bg-[#5B5FEF] text-white shadow-lg shadow-[#5B5FEF]/20' : 'text-gray-500 hover:bg-white/5'}`}
+              >
+                <SettingsIcon size={18} /> <span className="text-sm font-bold">Settings</span>
+              </button>
+            </nav>
+          </div>
+        </div>
+      )}
+
       {/* Main Content */}
-      <main className="flex-1 p-8 lg:p-12 overflow-y-auto">
-        <header className="mb-10 flex items-center justify-between">
+      <main className="flex-1 p-6 md:p-8 lg:p-12 overflow-y-auto">
+        <header className="mb-10 flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
-            <h1 className="text-2xl sm:text-3xl font-black tracking-tight mb-1">Infrastructure Control</h1>
+            <h1 className="text-2xl sm:text-3xl font-black tracking-tight mb-1 flex items-center gap-3">
+              <button onClick={() => setMobileMenuOpen(true)} className="md:hidden p-2 bg-white/5 hover:bg-white/10 rounded-lg text-white transition-colors">
+                <Menu size={20} />
+              </button>
+              Infrastructure Control
+            </h1>
             {stats?.systemHealth ? (
               <div className="flex flex-wrap items-center gap-3 mt-3">
                 <div className={`flex items-center gap-2 text-[10px] font-bold uppercase tracking-wider px-3 py-1.5 rounded-full border ${stats.systemHealth.mongodb === 'connected' ? 'bg-[#3DEBA6]/10 border-[#3DEBA6]/20 text-[#3DEBA6]' : 'bg-red-500/10 border-red-500/20 text-red-500'}`}>
