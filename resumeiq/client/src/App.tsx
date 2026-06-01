@@ -99,6 +99,7 @@ const App = () => {
         <Route path="/support" element={<SupportPage />} />
         <Route path="/cover-letter-templates" element={<CoverLetterTemplatesPage />} />
         <Route path="/cookie-policy" element={<CookiePolicyPage />} />
+        <Route path="/cookies" element={<Navigate to="/cookie-policy" replace />} />
         <Route path="/refund-policy" element={<RefundPolicyPage />} />
         <Route path="/vulnerability-disclosure" element={<VulnerabilityDisclosurePage />} />
         <Route path="/feedback" element={<FeedbackPage />} />
