@@ -197,7 +197,11 @@ exports.updateUserRole = async (req, res, next) => {
     if (role) updateData.role = role;
     if (plan) {
       updateData.plan = plan;
-      updateData.scansLimit = getScansLimitForPlan(plan);
+      const settings = await Settings.getGlobalSettings();
+      if (plan === 'free') updateData.scansLimit = settings.freePlanScans;
+      else if (plan === 'pro') updateData.scansLimit = settings.proPlanScans;
+      else if (plan === 'careerPlus') updateData.scansLimit = settings.careerPlusPlanScans;
+      else updateData.scansLimit = getScansLimitForPlan(plan);
     }
 
     const user = await User.findByIdAndUpdate(
@@ -224,15 +228,16 @@ exports.updateUserPlan = async (req, res, next) => {
     }
 
     const updateData = { plan };
+    const settings = await Settings.getGlobalSettings();
     
     if (plan === 'free') {
-      updateData.scansLimit = 3;
+      updateData.scansLimit = settings.freePlanScans;
       updateData.tokensLimit = 50000;
     } else if (plan === 'pro') {
-      updateData.scansLimit = 9999;
+      updateData.scansLimit = settings.proPlanScans;
       updateData.tokensLimit = 500000;
     } else if (plan === 'careerPlus') {
-      updateData.scansLimit = 99999;
+      updateData.scansLimit = settings.careerPlusPlanScans;
       updateData.tokensLimit = 2000000;
     }
 
@@ -333,13 +338,41 @@ exports.updateSettings = async (req, res, next) => {
     const settings = await Settings.getGlobalSettings();
     const allowedUpdates = ['maintenanceMode', 'freePlanScans', 'proPlanScans', 'careerPlusPlanScans', 'allowNewRegistrations'];
     
+    let freeUpdated = false;
+    let proUpdated = false;
+    let careerPlusUpdated = false;
+
     allowedUpdates.forEach(field => {
       if (req.body[field] !== undefined) {
+        if (field === 'freePlanScans' && settings.freePlanScans !== req.body[field]) freeUpdated = true;
+        if (field === 'proPlanScans' && settings.proPlanScans !== req.body[field]) proUpdated = true;
+        if (field === 'careerPlusPlanScans' && settings.careerPlusPlanScans !== req.body[field]) careerPlusUpdated = true;
+        
         settings[field] = req.body[field];
       }
     });
 
     await settings.save();
+
+    if (freeUpdated) {
+      await User.updateMany(
+        { role: 'user', plan: 'free' },
+        { $set: { scansLimit: settings.freePlanScans } }
+      );
+    }
+    if (proUpdated) {
+      await User.updateMany(
+        { role: 'user', plan: 'pro' },
+        { $set: { scansLimit: settings.proPlanScans } }
+      );
+    }
+    if (careerPlusUpdated) {
+      await User.updateMany(
+        { role: 'user', plan: 'careerPlus' },
+        { $set: { scansLimit: settings.careerPlusPlanScans } }
+      );
+    }
+
     res.json({ success: true, data: settings, message: 'Settings updated' });
   } catch (err) { next(err); }
 };

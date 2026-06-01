@@ -174,8 +174,9 @@ export default function AdminPage() {
     e.preventDefault();
     if (!settings) return;
     try {
-      await adminAPI.updateSettings(settings);
-      toast.success('Settings updated successfully');
+      const { data } = await adminAPI.updateSettings(settings);
+      setSettings(data.data);
+      toast.success('Free plan limits updated for existing free users.');
     } catch (e) { toast.error('Failed to update settings'); }
   };
 

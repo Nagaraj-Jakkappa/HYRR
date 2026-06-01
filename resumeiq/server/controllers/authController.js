@@ -8,6 +8,7 @@ const {
   verifyRefreshToken
 } = require('../utils/tokenUtils');
 const { getScansLimitForPlan } = require('../middleware/planGate');
+const Settings = require('../models/Settings');
 
 // --- COOKIE CONFIGURATION ---
 const COOKIE_OPTIONS = {
@@ -56,7 +57,12 @@ exports.register = async (req, res, next) => {
     if (req.body.plan && !validPlans.includes(req.body.plan)) {
       return res.status(400).json({ success: false, message: 'Invalid plan selected' });
     }
-    const scansLimit = getScansLimitForPlan(plan);
+    const settings = await Settings.getGlobalSettings();
+    let scansLimit = getScansLimitForPlan(plan);
+    if (plan === 'free') scansLimit = settings.freePlanScans;
+    else if (plan === 'pro') scansLimit = settings.proPlanScans;
+    else if (plan === 'careerPlus') scansLimit = settings.careerPlusPlanScans;
+
     const user = await User.create({ name, email: email.trim().toLowerCase(), passwordHash: password, plan, scansLimit });
 
     const accessToken = generateAccessToken(user._id);
