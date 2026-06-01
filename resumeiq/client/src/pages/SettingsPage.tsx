@@ -12,7 +12,8 @@ import {
     LogOut,
     CheckCircle2,
     AlertTriangle,
-    Trash2
+    Trash2,
+    MessageSquare
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 
@@ -111,6 +112,19 @@ const SettingsPage: React.FC = () => {
                     <SidebarItem active={tab === 'security'} onClick={() => setTab('security')} icon={<KeyRound size={18} />} label="Security" />
                     <SidebarItem active={tab === 'billing'} onClick={() => setTab('billing')} icon={<CreditCard size={18} />} label="Billing" />
                     
+                    <div className="pt-4 mt-4 border-t border-white/5">
+                        <button 
+                            onClick={() => navigate('/feedback')}
+                            className="w-full flex items-center justify-between px-4 py-3 rounded-xl transition-all text-gray-500 hover:bg-white/5 hover:text-white"
+                        >
+                            <div className="flex items-center gap-3">
+                                <MessageSquare size={18} />
+                                <span className="text-sm font-bold">Submit Feedback</span>
+                            </div>
+                            <ChevronRight size={16} className="opacity-50" />
+                        </button>
+                    </div>
+
                     <div className="pt-4 mt-4 border-t border-white/5">
                         <button 
                             onClick={() => setTab('danger')}

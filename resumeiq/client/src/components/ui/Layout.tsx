@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Outlet, NavLink, useNavigate, Link } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
-import { LayoutDashboard, FileText, Sparkles, Search, Clock, Shield, LogOut, ChevronRight, Settings } from 'lucide-react'
+import { LayoutDashboard, FileText, Sparkles, Search, Clock, Shield, LogOut, ChevronRight, Settings, MessageSquare } from 'lucide-react'
 import toast from 'react-hot-toast'
 import Footer from './Footer'
 
@@ -11,6 +11,7 @@ const nav = [
   { to: '/builder', icon: Sparkles, label: 'Resume Builder' }, // --- NEW: Connected Feature 3 Entrypoint Link ---
   { to: '/history', icon: Clock, label: 'History' },
   { to: '/scan', icon: Search, label: 'New Scan' },
+  { to: '/feedback', icon: MessageSquare, label: 'Feedback' },
 ]
 
 export default function Layout() {

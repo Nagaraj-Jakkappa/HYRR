@@ -81,9 +81,6 @@ exports.admin = (req, res, next) => {
   }
 };
 
-/**
- * RESTRICT TO: Flexible role-based access for multiple roles
- */
 exports.restrictTo = (...roles) => {
   return (req, res, next) => {
     if (!roles.includes(req.user.role)) {
@@ -94,4 +91,27 @@ exports.restrictTo = (...roles) => {
     }
     next();
   };
+};
+
+/**
+ * OPTIONAL AUTH: Tries to read token, attaches user if valid, but never blocks execution.
+ */
+exports.optionalAuth = async (req, res, next) => {
+  try {
+    let token;
+    if (req.cookies?.accessToken) {
+      token = req.cookies.accessToken;
+    } else if (req.headers.authorization?.startsWith('Bearer ')) {
+      token = req.headers.authorization.split(' ')[1];
+    }
+    if (!token) return next();
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const user = await User.findById(decoded.id).select('-passwordHash -refreshToken');
+    if (user && user.isActive !== false) {
+      req.user = user;
+    }
+  } catch (err) {
+    // Ignore errors for optional auth
+  }
+  next();
 };

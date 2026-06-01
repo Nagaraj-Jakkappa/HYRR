@@ -19,6 +19,7 @@ import ComparePage from './pages/ComparePage';
 import SettingsPage from './pages/SettingsPage';
 import ReportPage from './pages/ReportPage';
 import NotFoundPage from './pages/NotFoundPage';
+import FeedbackPage from './pages/FeedbackPage';
 
 // Components
 import Layout from './components/ui/Layout';
@@ -98,6 +99,7 @@ const App = () => {
         <Route path="/cookie-policy" element={<CookiePolicyPage />} />
         <Route path="/refund-policy" element={<RefundPolicyPage />} />
         <Route path="/vulnerability-disclosure" element={<VulnerabilityDisclosurePage />} />
+        <Route path="/feedback" element={<FeedbackPage />} />
 
         {/* --- PROTECTED ROUTES --- */}
         <Route element={<Protected><Layout /></Protected>}>

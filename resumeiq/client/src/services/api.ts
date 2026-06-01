@@ -122,4 +122,11 @@ export const adminAPI = {
   updateSettings: (data: any) => api.put('/admin/platform-config', data),
 };
 
+export const feedbackAPI = {
+  submit: (data: any) => api.post('/feedback', data),
+  getMyFeedback: () => api.get('/feedback/my'),
+  getAdminFeedback: (params: any) => api.get('/feedback/admin', { params }),
+  updateStatus: (id: string, status: string) => api.patch(`/feedback/admin/${id}/status`, { status })
+};
+
 export default api;

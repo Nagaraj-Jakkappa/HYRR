@@ -14,7 +14,9 @@ import {
   CheckCircle2,
   XCircle,
   Save,
-  Clock
+  Clock,
+  MessageSquare,
+  X
 } from 'lucide-react';
 import {
   ComposedChart,
@@ -28,7 +30,7 @@ import {
   Legend
 } from 'recharts';
 import toast from 'react-hot-toast';
-import { adminAPI } from '../services/api';
+import { adminAPI, feedbackAPI } from '../services/api';
 
 interface KeywordStat {
   _id: string;
@@ -77,15 +79,23 @@ export default function AdminPage() {
   const [stats, setStats] = useState<AdminStats | null>(null);
   const [users, setUsers] = useState<User[]>([]);
   const [scans, setScans] = useState<Scan[]>([]);
+  const [feedbacks, setFeedbacks] = useState<any[]>([]);
+  const [selectedFeedback, setSelectedFeedback] = useState<any | null>(null);
   const [settings, setSettings] = useState<SettingsConfig | null>(null);
   
   const [search, setSearch] = useState('');
-  const [tab, setTab] = useState<'stats' | 'users' | 'scans' | 'settings'>('stats');
+  const [tab, setTab] = useState<'stats' | 'users' | 'scans' | 'settings' | 'feedback'>('stats');
 
   const fetchUsers = () => {
     adminAPI.getUsers(1, search)
       .then(({ data }) => setUsers(data.data.users))
       .catch(() => toast.error('Failed to load users'));
+  };
+
+  const fetchFeedbacks = () => {
+    feedbackAPI.getAdminFeedback({ page: 1, limit: 100 })
+      .then(({ data }) => setFeedbacks(data.data.feedback))
+      .catch(() => toast.error('Failed to load feedback'));
   };
 
   useEffect(() => {
@@ -103,6 +113,8 @@ export default function AdminPage() {
       adminAPI.getSettings()
         .then(({ data }) => setSettings(data.data))
         .catch(() => toast.error('Failed to load settings'));
+    } else if (tab === 'feedback') {
+      fetchFeedbacks();
     }
   }, [tab, search]);
 
@@ -169,6 +181,16 @@ export default function AdminPage() {
     toast.success('CSV Export downloaded successfully');
   };
 
+  const handleFeedbackStatusChange = async (id: string, status: string) => {
+    try {
+      await feedbackAPI.updateStatus(id, status);
+      toast.success('Feedback status updated');
+      fetchFeedbacks();
+    } catch (e) {
+      toast.error('Failed to update status');
+    }
+  };
+
   // Settings Actions
   const handleSettingsSave = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -213,6 +235,12 @@ export default function AdminPage() {
             className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${tab === 'scans' ? 'bg-[#5B5FEF] text-white shadow-lg shadow-[#5B5FEF]/20' : 'text-gray-500 hover:bg-white/5'}`}
           >
             <FileText size={18} /> <span className="text-sm font-bold">Global Scans</span>
+          </button>
+          <button
+            onClick={() => setTab('feedback')}
+            className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${tab === 'feedback' ? 'bg-[#5B5FEF] text-white shadow-lg shadow-[#5B5FEF]/20' : 'text-gray-500 hover:bg-white/5'}`}
+          >
+            <MessageSquare size={18} /> <span className="text-sm font-bold">Feedback</span>
           </button>
           <button
             onClick={() => setTab('settings')}
@@ -520,6 +548,146 @@ export default function AdminPage() {
           </div>
         )}
 
+      {/* Feedback Tab */}
+        {tab === 'feedback' && (
+          <div className="card overflow-hidden animate-in slide-in-from-bottom-4 duration-500 p-0 flex flex-col">
+            <div className="p-6 border-b border-white/5 bg-white/[0.01]">
+              <h2 className="text-xl font-black">User Feedback</h2>
+              <p className="text-xs text-gray-500 mt-1">Review feedback, bug reports, and feature requests.</p>
+            </div>
+            
+            {/* Mobile / Tablet Card View */}
+            <div className="block lg:hidden p-4 space-y-4 bg-white/[0.01]">
+              {feedbacks.map(f => (
+                <div key={f._id} className="bg-[#0A0A0F] border border-white/5 rounded-2xl p-5 shadow-lg relative cursor-pointer hover:border-white/10 transition-colors" onClick={() => setSelectedFeedback(f)}>
+                  <div className="flex justify-between items-start mb-3">
+                    <span className={`px-2.5 py-1 rounded-md text-[10px] uppercase font-bold border ${
+                      f.type === 'bug' ? 'bg-red-500/10 text-red-400 border-red-500/20' :
+                      f.type === 'feature' ? 'bg-purple-500/10 text-purple-400 border-purple-500/20' :
+                      f.type === 'payment' ? 'bg-amber-500/10 text-amber-400 border-amber-500/20' :
+                      f.type === 'ai_result' ? 'bg-cyan-500/10 text-cyan-400 border-cyan-500/20' :
+                      'bg-white/5 text-gray-400 border-white/10'
+                    }`}>
+                      {f.type}
+                    </span>
+                    <span className="text-[#F0C060] font-black text-sm flex items-center gap-1"><span className="text-gray-500 text-[10px]">RATING</span> {f.rating}/5</span>
+                  </div>
+                  <h3 className="font-bold text-gray-200 text-sm mb-1 line-clamp-1">{f.title}</h3>
+                  <p className="text-xs text-gray-500 mb-4 line-clamp-2">{f.message}</p>
+                  <div className="flex items-center justify-between border-t border-white/5 pt-4">
+                    <div className="text-xs truncate max-w-[120px]">
+                      {f.userId ? <span className="font-bold text-gray-300">{f.userId.name}</span> : <span className="text-gray-500 italic">{f.email || 'Guest'}</span>}
+                    </div>
+                    <select 
+                      value={f.status}
+                      onClick={(e) => e.stopPropagation()}
+                      onChange={(e) => handleFeedbackStatusChange(f._id, e.target.value)}
+                      className={`bg-[#13131A] border border-white/10 text-[10px] rounded-lg px-2 py-1 outline-none font-bold uppercase tracking-wide
+                        ${f.status === 'open' ? 'text-blue-400' : f.status === 'reviewed' ? 'text-amber-400' : 'text-[#3DEBA6]'}`}
+                    >
+                      <option value="open">Open</option>
+                      <option value="reviewed">Reviewed</option>
+                      <option value="resolved">Resolved</option>
+                    </select>
+                  </div>
+                </div>
+              ))}
+              {feedbacks.length === 0 && (
+                <div className="py-10 text-center">
+                  <MessageSquare size={24} className="mx-auto text-gray-600 mb-2 opacity-50" />
+                  <p className="text-gray-500 text-sm font-medium">No feedback yet.</p>
+                </div>
+              )}
+            </div>
+
+            {/* Desktop Table View */}
+            <div className="hidden lg:block overflow-x-auto custom-scrollbar">
+              <table className="w-full min-w-[800px] table-fixed">
+                <colgroup>
+                  <col className="w-[120px]" />
+                  <col className="w-[180px]" />
+                  <col className="w-auto" />
+                  <col className="w-[100px]" />
+                  <col className="w-[120px]" />
+                  <col className="w-[120px]" />
+                </colgroup>
+                <thead>
+                  <tr className="bg-white/[0.02] border-b border-white/5">
+                    <th className="px-6 py-4 text-left text-[10px] font-bold text-gray-500 uppercase tracking-widest">Type</th>
+                    <th className="px-6 py-4 text-left text-[10px] font-bold text-gray-500 uppercase tracking-widest">User</th>
+                    <th className="px-6 py-4 text-left text-[10px] font-bold text-gray-500 uppercase tracking-widest">Details</th>
+                    <th className="px-6 py-4 text-center text-[10px] font-bold text-gray-500 uppercase tracking-widest">Rating</th>
+                    <th className="px-6 py-4 text-center text-[10px] font-bold text-gray-500 uppercase tracking-widest">Status</th>
+                    <th className="px-6 py-4 text-right text-[10px] font-bold text-gray-500 uppercase tracking-widest">Date</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-white/[0.04]">
+                  {feedbacks.map(f => (
+                    <tr key={f._id} className="hover:bg-white/[0.02] transition-colors group cursor-pointer" onClick={() => setSelectedFeedback(f)}>
+                      <td className="px-6 py-4">
+                        <span className={`px-2.5 py-1 rounded-md text-[10px] uppercase font-bold border ${
+                          f.type === 'bug' ? 'bg-red-500/10 text-red-400 border-red-500/20' :
+                          f.type === 'feature' ? 'bg-purple-500/10 text-purple-400 border-purple-500/20' :
+                          f.type === 'payment' ? 'bg-amber-500/10 text-amber-400 border-amber-500/20' :
+                          f.type === 'ai_result' ? 'bg-cyan-500/10 text-cyan-400 border-cyan-500/20' :
+                          'bg-white/5 text-gray-400 border-white/10'
+                        }`}>
+                          {f.type}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 truncate">
+                        {f.userId ? (
+                          <>
+                            <p className="text-sm font-bold text-gray-200 truncate">{f.userId.name}</p>
+                            <p className="text-[11px] text-gray-500 truncate">{f.email || f.userId.email}</p>
+                          </>
+                        ) : (
+                          <p className="text-sm font-bold text-gray-400 truncate">{f.email || 'Anonymous Guest'}</p>
+                        )}
+                      </td>
+                      <td className="px-6 py-4 pr-10">
+                        <div className="max-w-md">
+                          <p className="text-sm font-bold text-gray-200 mb-1 truncate">{f.title}</p>
+                          <p className="text-xs text-gray-500 line-clamp-2">{f.message}</p>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 text-center">
+                        <span className="text-[#F0C060] font-black text-sm">{f.rating}/5</span>
+                      </td>
+                      <td className="px-6 py-4 text-center">
+                        <select 
+                          value={f.status}
+                          onClick={(e) => e.stopPropagation()}
+                          onChange={(e) => handleFeedbackStatusChange(f._id, e.target.value)}
+                          className={`bg-[#0A0A0F] border text-xs rounded-lg px-3 py-1.5 outline-none font-bold uppercase tracking-wide
+                            ${f.status === 'open' ? 'text-blue-400 border-blue-500/30 bg-blue-500/10' : 
+                              f.status === 'reviewed' ? 'text-amber-400 border-amber-500/30 bg-amber-500/10' : 
+                              'text-[#3DEBA6] border-[#3DEBA6]/30 bg-[#3DEBA6]/10'}`}
+                        >
+                          <option value="open">Open</option>
+                          <option value="reviewed">Reviewed</option>
+                          <option value="resolved">Resolved</option>
+                        </select>
+                      </td>
+                      <td className="px-6 py-4 text-right text-xs text-gray-500 font-mono">
+                        {new Date(f.createdAt).toLocaleDateString()}
+                      </td>
+                    </tr>
+                  ))}
+                  {feedbacks.length === 0 && (
+                    <tr>
+                      <td colSpan={6} className="px-6 py-10 text-center">
+                        <MessageSquare size={24} className="mx-auto text-gray-600 mb-2 opacity-50" />
+                        <p className="text-gray-500 text-sm font-medium">No feedback yet.</p>
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
+
         {/* Settings Tab */}
         {tab === 'settings' && settings && (
           <div className="max-w-2xl bg-[#13131A]/80 backdrop-blur-xl shadow-xl border border-white/5 rounded-[32px] p-8 animate-in slide-in-from-bottom-4 duration-500">
@@ -593,6 +761,95 @@ export default function AdminPage() {
           </div>
         )}
       </main>
+
+      {/* Feedback Details Modal */}
+      {selectedFeedback && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="bg-[#13131A] border border-white/10 rounded-2xl w-full max-w-2xl max-h-[90vh] flex flex-col shadow-2xl relative overflow-hidden">
+            <div className="absolute top-0 right-0 w-64 h-64 bg-[#5B5FEF]/10 blur-[80px] rounded-full pointer-events-none"></div>
+            
+            <div className="p-6 border-b border-white/5 flex items-start justify-between relative z-10">
+              <div>
+                <div className="flex items-center gap-3 mb-2">
+                  <span className={`px-2.5 py-1 rounded-md text-[10px] uppercase font-bold border ${
+                    selectedFeedback.type === 'bug' ? 'bg-red-500/10 text-red-400 border-red-500/20' :
+                    selectedFeedback.type === 'feature' ? 'bg-purple-500/10 text-purple-400 border-purple-500/20' :
+                    selectedFeedback.type === 'payment' ? 'bg-amber-500/10 text-amber-400 border-amber-500/20' :
+                    selectedFeedback.type === 'ai_result' ? 'bg-cyan-500/10 text-cyan-400 border-cyan-500/20' :
+                    'bg-white/5 text-gray-400 border-white/10'
+                  }`}>
+                    {selectedFeedback.type}
+                  </span>
+                  <span className="text-[#F0C060] font-black text-sm flex items-center gap-1">
+                    <span className="text-gray-500 text-[10px] tracking-widest">RATING</span> {selectedFeedback.rating}/5
+                  </span>
+                </div>
+                <h3 className="text-xl font-bold text-white">{selectedFeedback.title}</h3>
+              </div>
+              <button 
+                onClick={() => setSelectedFeedback(null)}
+                className="text-gray-500 hover:text-white p-2 hover:bg-white/10 rounded-xl transition-colors"
+              >
+                <X size={20} />
+              </button>
+            </div>
+            
+            <div className="p-6 overflow-y-auto custom-scrollbar relative z-10 flex-1">
+              <div className="mb-6">
+                <p className="text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-2">User Details</p>
+                {selectedFeedback.userId ? (
+                  <div className="bg-[#0A0A0F] border border-white/5 rounded-xl p-4 flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-xl bg-[#5B5FEF]/10 border border-[#5B5FEF]/20 flex items-center justify-center text-[#5B5FEF] font-black text-sm">
+                      {selectedFeedback.userId.name.charAt(0)}
+                    </div>
+                    <div>
+                      <p className="text-sm font-bold text-gray-200">{selectedFeedback.userId.name}</p>
+                      <p className="text-[11px] text-gray-500">{selectedFeedback.email || selectedFeedback.userId.email}</p>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="bg-[#0A0A0F] border border-white/5 rounded-xl p-4">
+                    <p className="text-sm font-bold text-gray-400">Anonymous Guest</p>
+                    {selectedFeedback.email && <p className="text-[11px] text-gray-500">{selectedFeedback.email}</p>}
+                  </div>
+                )}
+              </div>
+              
+              <div>
+                <p className="text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-2">Message</p>
+                <div className="bg-[#0A0A0F] border border-white/5 rounded-xl p-5 text-sm text-gray-300 leading-relaxed whitespace-pre-wrap">
+                  {selectedFeedback.message}
+                </div>
+              </div>
+            </div>
+            
+            <div className="p-6 border-t border-white/5 bg-[#0A0A0F]/50 flex items-center justify-between relative z-10">
+              <div className="text-xs text-gray-500 font-mono">
+                Submitted: {new Date(selectedFeedback.createdAt).toLocaleString()}
+              </div>
+              <div className="flex items-center gap-3">
+                <span className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Update Status:</span>
+                <select 
+                  value={selectedFeedback.status}
+                  onChange={(e) => {
+                    handleFeedbackStatusChange(selectedFeedback._id, e.target.value);
+                    setSelectedFeedback({...selectedFeedback, status: e.target.value});
+                  }}
+                  className={`bg-[#13131A] border text-xs rounded-xl px-3 py-2 outline-none font-bold uppercase tracking-wide
+                    ${selectedFeedback.status === 'open' ? 'text-blue-400 border-blue-500/30 bg-blue-500/10' : 
+                      selectedFeedback.status === 'reviewed' ? 'text-amber-400 border-amber-500/30 bg-amber-500/10' : 
+                      'text-[#3DEBA6] border-[#3DEBA6]/30 bg-[#3DEBA6]/10'}`}
+                >
+                  <option value="open">Open</option>
+                  <option value="reviewed">Reviewed</option>
+                  <option value="resolved">Resolved</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 }

@@ -72,12 +72,13 @@ export default function Footer() {
             </div>
           </div>
           <div>
-            <h4 className="text-white font-semibold text-[17px] mb-5 tracking-wide">Cover Letter</h4>
-            <div className="space-y-1">
-              <FooterLink to="/builder">Cover Letter Builder</FooterLink>
-              <FooterLink to="/builder">Cover Letter Templates</FooterLink>
+              <h3 className="text-white font-bold mb-6">Support</h3>
+              <ul className="space-y-4">
+                <li><Link to="/contact" className="hover:text-white transition-colors">Contact Us</Link></li>
+                <li><Link to="/support" className="hover:text-white transition-colors">Help Center</Link></li>
+                <li><Link to="/feedback" className="hover:text-[#3DEBA6] transition-colors flex items-center gap-2">Share Feedback <span className="px-1.5 py-0.5 rounded bg-white/10 text-[9px] uppercase tracking-wider font-bold">New</span></Link></li>
+              </ul>
             </div>
-          </div>
           <div>
             <h4 className="text-white font-semibold text-[17px] mb-5 tracking-wide">Policy</h4>
             <div className="space-y-1">

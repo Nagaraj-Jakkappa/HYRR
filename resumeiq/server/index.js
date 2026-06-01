@@ -23,6 +23,7 @@ const adminRoutes = require('./routes/adminRoutes');
 const coverLetterRoutes = require('./routes/coverLetterRoutes');
 const paymentRoutes = require('./routes/paymentRoutes');
 const paymentController = require('./controllers/paymentController');
+const feedbackRoutes = require('./routes/feedbackRoutes');
 
 const app = express();
 
@@ -132,6 +133,7 @@ app.use('/api/scans', scanRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/cover-letters', coverLetterRoutes);
 app.use('/api/payments', paymentRoutes);
+app.use('/api/feedback', feedbackRoutes);
 
 app.get('/api/health', (req, res) => {
   res.json({

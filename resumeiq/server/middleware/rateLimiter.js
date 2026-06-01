@@ -32,3 +32,11 @@ exports.adminLimiter = rateLimit({
   standardHeaders: true,
   legacyHeaders: false,
 });
+
+exports.feedbackLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 10,
+  message: { success: false, message: 'You have submitted too much feedback. Please try again later.' },
+  standardHeaders: true,
+  legacyHeaders: false,
+});

@@ -100,10 +100,24 @@ const scanResumeSchema = z.object({
   companyName: nonEmptyString('Company name', 2),
 });
 
+const createFeedbackSchema = z.object({
+  type: z.enum(['bug', 'feature', 'payment', 'ai_result', 'general']),
+  title: nonEmptyString('Title', 3).max(120),
+  message: nonEmptyString('Message', 10).max(2000),
+  rating: z.number().min(1).max(5),
+  email: z.string().email('Invalid email').optional().or(z.literal(''))
+});
+
+const updateFeedbackStatusSchema = z.object({
+  status: z.enum(['open', 'reviewed', 'resolved'])
+});
+
 module.exports = {
   magicRewriteSchema,
   generateCoverLetterSchema,
   saveCoverLetterSchema,
   updateCoverLetterSchema,
   scanResumeSchema,
+  createFeedbackSchema,
+  updateFeedbackStatusSchema,
 };
