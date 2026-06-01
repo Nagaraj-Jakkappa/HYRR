@@ -51,37 +51,40 @@ export default function Footer() {
     <footer className="bg-[#21242c] border-t border-white/[0.04] relative z-10 font-sans pt-16">
       <div className="max-w-7xl mx-auto px-6 md:px-12">
         {/* ROW 1 */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-8 gap-y-12 pb-12">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-x-8 gap-y-12 pb-12">
           <div>
-            <h4 className="text-white font-semibold text-[17px] mb-5 tracking-wide">Top</h4>
-            <div className="space-y-1">
+            <h4 className="text-white font-bold text-[15px] mb-6 tracking-wide">Product</h4>
+            <div className="space-y-2">
               <FooterLink to="/#how-it-works">How it works</FooterLink>
-              <FooterLink to="/contact">Contact</FooterLink>
-              <FooterLink to="/support">Support</FooterLink>
               <FooterLink to="/#features">Features</FooterLink>
-              <FooterLink to="/#faq">FAQs</FooterLink>
               <FooterLink to="/pricing">Pricing</FooterLink>
+              <FooterLink to="/#faq">FAQs</FooterLink>
             </div>
           </div>
           <div>
-            <h4 className="text-white font-semibold text-[17px] mb-5 tracking-wide">Resume</h4>
-            <div className="space-y-1">
+            <h4 className="text-white font-bold text-[15px] mb-6 tracking-wide">Resume</h4>
+            <div className="space-y-2">
               <FooterLink to="/builder">Resume Templates</FooterLink>
               <FooterLink to="/builder">AI Resume Builder</FooterLink>
               <FooterLink to="/scan">ATS Resume Scanner</FooterLink>
             </div>
           </div>
           <div>
-              <h3 className="text-white font-bold mb-6">Support</h3>
-              <ul className="space-y-4">
-                <li><Link to="/contact" className="hover:text-white transition-colors">Contact Us</Link></li>
-                <li><Link to="/support" className="hover:text-white transition-colors">Help Center</Link></li>
-                <li><Link to="/feedback" className="hover:text-[#3DEBA6] transition-colors flex items-center gap-2">Share Feedback <span className="px-1.5 py-0.5 rounded bg-white/10 text-[9px] uppercase tracking-wider font-bold">New</span></Link></li>
-              </ul>
+            <h4 className="text-white font-bold text-[15px] mb-6 tracking-wide">Support</h4>
+            <div className="space-y-2">
+              <FooterLink to="/contact">Contact Us</FooterLink>
+              <FooterLink to="/support">Help Center</FooterLink>
+              <Link to="/feedback" className="text-[#8b92a5] hover:text-[#3DEBA6] transition-colors text-[14px] leading-8 font-medium flex items-center gap-2 group">
+                Share Feedback 
+                <span className="px-1.5 py-0.5 rounded-md bg-[#3DEBA6]/10 border border-[#3DEBA6]/20 text-[#3DEBA6] text-[9px] uppercase tracking-wider font-black group-hover:bg-[#3DEBA6]/20 transition-colors">
+                  New
+                </span>
+              </Link>
             </div>
+          </div>
           <div>
-            <h4 className="text-white font-semibold text-[17px] mb-5 tracking-wide">Policy</h4>
-            <div className="space-y-1">
+            <h4 className="text-white font-bold text-[15px] mb-6 tracking-wide">Legal</h4>
+            <div className="space-y-2">
               <FooterLink to="/terms">Terms of Use</FooterLink>
               <FooterLink to="/privacy">Privacy Policy</FooterLink>
               <FooterLink to="/cookie-policy">Cookie Policy</FooterLink>
