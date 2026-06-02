@@ -97,7 +97,21 @@ HYRR is built with production-grade security standards:
 
 ## 📸 Screenshots
 
-Screenshots coming soon.
+| Landing Page | Demo Page |
+|--------------|-----------|
+| ![Landing Page](./docs/screenshots/landing.png) | ![Demo Page](./docs/screenshots/demo.png) |
+
+| Features Page | Pricing Page |
+|---------------|--------------|
+| ![Features Page](./docs/screenshots/features.png) | ![Pricing Page](./docs/screenshots/pricing.png) |
+
+| ATS Scanner | Resume Builder |
+|-------------|----------------|
+| ![ATS Scanner](./docs/screenshots/scanner.png) | ![Resume Builder](./docs/screenshots/builder.png) |
+
+| Admin Dashboard | Feedback System |
+|-----------------|-----------------|
+| ![Admin Dashboard](./docs/screenshots/admin.png) | ![Feedback System](./docs/screenshots/feedback.png) |
 
 ---
 
