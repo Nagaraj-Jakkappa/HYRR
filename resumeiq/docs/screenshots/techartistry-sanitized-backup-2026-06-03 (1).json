@@ -1,0 +1,491 @@
+{
+  "exportedAt": "2026-06-03T11:11:07.254Z",
+  "version": "1.0",
+  "mode": "sanitized",
+  "data": {
+    "projects": [
+      {
+        "_id": "69eb5c1f6dc94314f35a5dd6",
+        "title": "Pothole Detection using Deep Learning",
+        "description": "A system designed to detect road anomalies using CNNs and image processing to improve road safety.",
+        "longDescription": "",
+        "techStack": [
+          "Python",
+          "TensorFlow/Keras",
+          "OpenCV",
+          "React (MERN Stack)."
+        ],
+        "imageUrl": "https://res.cloudinary.com/dxww1ojqo/image/upload/f_auto,q_auto/Pothole_detection_svegme",
+        "liveUrl": "https://github.com/Nagraj-Jakkappa/pothole_detection",
+        "githubUrl": "https://github.com/Nagaraj-Jakkappa/pothole_detection",
+        "featured": true,
+        "order": 1,
+        "category": "ml",
+        "createdAt": "2026-04-24T12:03:43.714Z",
+        "updatedAt": "2026-05-12T16:42:37.977Z",
+        "__v": 0
+      },
+      {
+        "_id": "69eb63976dc94314f35a5e0b",
+        "title": "ThinkFast Quiz App",
+        "description": "An interactive, fast-paced quiz application built to test user knowledge across various topics with a focus on smooth UI transitions and real-time scoring.",
+        "longDescription": "",
+        "techStack": [
+          "React.js",
+          "Tailwind CSS",
+          "JavaScript",
+          "Vite"
+        ],
+        "imageUrl": "https://res.cloudinary.com/dxww1ojqo/image/upload/v1777033878/ThinkFast_jcjajh.png",
+        "liveUrl": "https://nagaraj-jakkappa.github.io/ThinkFast-Quiz/",
+        "githubUrl": "https://github.com/Nagaraj-Jakkappa/ThinkFast-Quiz",
+        "featured": true,
+        "order": 2,
+        "category": "web",
+        "createdAt": "2026-04-24T12:35:35.795Z",
+        "updatedAt": "2026-04-24T12:35:35.795Z",
+        "__v": 0
+      },
+      {
+        "_id": "69eb67be6dc94314f35a5e40",
+        "title": "Mood-Based Travel Explorer",
+        "description": "A personalized travel recommendation engine that suggests destinations based on the user's current mood and preferences, featuring a clean interactive interface.",
+        "longDescription": "",
+        "techStack": [
+          "React",
+          "Node.js",
+          "Express",
+          "MongoDB",
+          "Tailwind CSS"
+        ],
+        "imageUrl": "https://res.cloudinary.com/dxww1ojqo/image/upload/v1777035126/Mood_travel_explorer_kqduho.png",
+        "liveUrl": "https://nagaraj-jakkappa.github.io/Mood-Based-Travel-Explorer/",
+        "githubUrl": "https://github.com/Nagaraj-Jakkappa/Mood-Based-Travel-Explorer",
+        "featured": true,
+        "order": 3,
+        "category": "fullstack",
+        "createdAt": "2026-04-24T12:53:18.975Z",
+        "updatedAt": "2026-04-24T12:53:18.975Z",
+        "__v": 0
+      },
+      {
+        "_id": "69eb68ca6dc94314f35a5e48",
+        "title": "TaskFlow To-Do List",
+        "description": "A streamlined task management application featuring a clean UI, persistent storage, and category filtering to help users stay organized.",
+        "longDescription": "",
+        "techStack": [
+          "JavaScript",
+          "HTML5",
+          "CSS3",
+          "LocalStorage"
+        ],
+        "imageUrl": "https://res.cloudinary.com/dxww1ojqo/image/upload/v1777035448/To_Do_ebvy6p.png",
+        "liveUrl": "https://nagaraj-jakkappa.github.io/to-do-list/",
+        "githubUrl": "https://github.com/Nagaraj-Jakkappa/to-do-list",
+        "featured": true,
+        "order": 4,
+        "category": "web",
+        "createdAt": "2026-04-24T12:57:46.397Z",
+        "updatedAt": "2026-04-24T12:57:46.397Z",
+        "__v": 0
+      },
+      {
+        "_id": "69eb69736dc94314f35a5e50",
+        "title": "SkyCast Weather Forecast",
+        "description": ": A real-time weather application that fetches live meteorological data from a global API, featuring dynamic backgrounds and detailed forecasts for any location.",
+        "longDescription": "",
+        "techStack": [
+          "React",
+          "OpenWeatherMap API",
+          "Axios",
+          "Tailwind CSS"
+        ],
+        "imageUrl": "https://res.cloudinary.com/dxww1ojqo/image/upload/v1777035672/Weather_aoi0hj.png",
+        "liveUrl": "https://nagaraj-jakkappa.github.io/Weather-Forecast/",
+        "githubUrl": "https://github.com/Nagaraj-Jakkappa/Weather-Forecast",
+        "featured": true,
+        "order": 5,
+        "category": "web",
+        "createdAt": "2026-04-24T13:00:35.062Z",
+        "updatedAt": "2026-04-24T13:01:23.747Z",
+        "__v": 0
+      },
+      {
+        "_id": "69eb71196dc94314f35a5e98",
+        "title": "Techartistry.in Portfolio",
+        "description": "A professional-grade, full-stack portfolio engine featuring a secure MERN dashboard for dynamic project management, JWT-based authentication, and optimized image delivery.",
+        "longDescription": "",
+        "techStack": [
+          "React",
+          "Node.js",
+          "Express",
+          "MongoDB",
+          "Tailwind CSS",
+          "JWT"
+        ],
+        "imageUrl": "https://res.cloudinary.com/dxww1ojqo/image/upload/v1777037692/6ca99894-3948-47d2-b919-7b8847d3ff2d_azssoe.jpg",
+        "liveUrl": "https://techartistry.in/",
+        "githubUrl": "https://github.com/Nagaraj-Jakkappa/Portfolio-Website",
+        "featured": true,
+        "order": 1,
+        "category": "fullstack",
+        "createdAt": "2026-04-24T13:33:13.256Z",
+        "updatedAt": "2026-05-09T09:04:03.768Z",
+        "__v": 0
+      }
+    ],
+    "skills": [
+      {
+        "_id": "69ecac225b3df84321e24ae6",
+        "name": "React.js",
+        "category": "Frontend",
+        "level": 80,
+        "__v": 0
+      },
+      {
+        "_id": "69ecac3a5b3df84321e24aeb",
+        "name": "TypeScript",
+        "category": "Frontend",
+        "level": 80,
+        "__v": 0
+      },
+      {
+        "_id": "69ecac445b3df84321e24af0",
+        "name": "JavaScript (ES6+)",
+        "category": "Frontend",
+        "level": 80,
+        "__v": 0
+      },
+      {
+        "_id": "69ecac4b5b3df84321e24af5",
+        "name": "Tailwind CSS",
+        "category": "Frontend",
+        "level": 80,
+        "__v": 0
+      },
+      {
+        "_id": "69ecac555b3df84321e24afa",
+        "name": "HTML5 / CSS3",
+        "category": "Frontend",
+        "level": 80,
+        "__v": 0
+      },
+      {
+        "_id": "69ecac5d5b3df84321e24aff",
+        "name": "React Router",
+        "category": "Frontend",
+        "level": 80,
+        "__v": 0
+      },
+      {
+        "_id": "69ecac655b3df84321e24b04",
+        "name": "Responsive Design",
+        "category": "Frontend",
+        "level": 80,
+        "__v": 0
+      },
+      {
+        "_id": "69ecac755b3df84321e24b09",
+        "name": "Node.js",
+        "category": "Backend",
+        "level": 80,
+        "__v": 0
+      },
+      {
+        "_id": "69ecac805b3df84321e24b0e",
+        "name": "Express.js",
+        "category": "Backend",
+        "level": 80,
+        "__v": 0
+      },
+      {
+        "_id": "69ecac8b5b3df84321e24b13",
+        "name": "MongoDB",
+        "category": "Backend",
+        "level": 80,
+        "__v": 0
+      },
+      {
+        "_id": "69ecac945b3df84321e24b18",
+        "name": "REST APIs",
+        "category": "Frontend",
+        "level": 80,
+        "__v": 0
+      },
+      {
+        "_id": "69ecaca05b3df84321e24b1d",
+        "name": "JWT Auth",
+        "category": "Backend",
+        "level": 80,
+        "__v": 0
+      },
+      {
+        "_id": "69ecacaa5b3df84321e24b22",
+        "name": "Mongoose",
+        "category": "Backend",
+        "level": 80,
+        "__v": 0
+      },
+      {
+        "_id": "69ecb5d480da8a7c9f05f110",
+        "name": "Python",
+        "category": "ML / AI",
+        "icon": "code",
+        "level": 85,
+        "__v": 0
+      },
+      {
+        "_id": "69ecb60980da8a7c9f05f115",
+        "name": "YOLOv8",
+        "category": "ML / AI",
+        "icon": "code",
+        "level": 85,
+        "__v": 0
+      },
+      {
+        "_id": "69ecb61480da8a7c9f05f11a",
+        "name": "OpenCV",
+        "category": "ML / AI",
+        "icon": "code",
+        "level": 85,
+        "__v": 0
+      },
+      {
+        "_id": "69ecb61d80da8a7c9f05f11f",
+        "name": "Flask",
+        "category": "ML / AI",
+        "icon": "code",
+        "level": 85,
+        "__v": 0
+      },
+      {
+        "_id": "69ecb62a80da8a7c9f05f124",
+        "name": "TensorFlow (basics)",
+        "category": "ML / AI",
+        "icon": "code",
+        "level": 85,
+        "__v": 0
+      },
+      {
+        "_id": "69ecb63380da8a7c9f05f129",
+        "name": "NumPy / Pandas",
+        "category": "ML / AI",
+        "icon": "code",
+        "level": 85,
+        "__v": 0
+      },
+      {
+        "_id": "69ecb64280da8a7c9f05f12e",
+        "name": "Git & GitHub",
+        "category": "Tools",
+        "icon": "code",
+        "level": 85,
+        "__v": 0
+      },
+      {
+        "_id": "69ecb64d80da8a7c9f05f133",
+        "name": "VS Code",
+        "category": "Tools",
+        "icon": "code",
+        "level": 85,
+        "__v": 0
+      },
+      {
+        "_id": "69ecb65780da8a7c9f05f138",
+        "name": "Postman",
+        "category": "Tools",
+        "icon": "code",
+        "level": 85,
+        "__v": 0
+      },
+      {
+        "_id": "69ecb66080da8a7c9f05f13d",
+        "name": "Figma",
+        "category": "Tools",
+        "icon": "code",
+        "level": 85,
+        "__v": 0
+      },
+      {
+        "_id": "69ecb66a80da8a7c9f05f142",
+        "name": "GitHub Pages",
+        "category": "Tools",
+        "icon": "code",
+        "level": 85,
+        "__v": 0
+      },
+      {
+        "_id": "69ecb67380da8a7c9f05f147",
+        "name": "Vite",
+        "category": "Tools",
+        "icon": "code",
+        "level": 85,
+        "__v": 0
+      }
+    ],
+    "certificates": [
+      {
+        "_id": "69ecb6b580da8a7c9f05f155",
+        "title": "Verified Front End Development Specialist",
+        "organization": "Simplilearn  SkillUP",
+        "date": "2025-08-21",
+        "description": "Successfully mastered the foundational pillars of modern web development through Simplilearn's professional curriculum. Demonstrated a commitment to building high-quality user interfaces and demonstrated initiative in advancing technical skills for creating responsive, user-centric web applications.",
+        "createdAt": "2026-04-25T12:42:29.276Z",
+        "__v": 0,
+        "link": "https://drive.google.com/file/d/1XYkpijn8r6Fvp7cANwWmByaYIMYolLXh/view?usp=drive_link",
+        "organizationLogo": "https://cdn.brandfetch.io/idpUTNegtm/w/397/h/397/theme/dark/icon.jpeg?c=1bxid64Mup7aczewSAYMX&t=1770218833545"
+      },
+      {
+        "_id": "69ecb6de80da8a7c9f05f15a",
+        "title": "Microsoft Certified Python Programmer",
+        "organization": "Skill India Digital Hub (Microsoft Collaboration)",
+        "date": "2025-08-19",
+        "description": "Successfully completed a comprehensive 40-hour technical skilling course in Python Programming offered by Microsoft. Validated core programming logic and the ability to develop efficient, scalable scripts and backend solutions using industry-standard Python practices.",
+        "createdAt": "2026-04-25T12:43:10.293Z",
+        "__v": 0,
+        "link": "https://drive.google.com/file/d/1DlQnjs14SGDOvMHn9OsajtJhyW2hgBdw/view?usp=drive_link",
+        "organizationLogo": "https://mailmeteor.com/logos/assets/PNG/Microsoft_Logo_512px.png"
+      },
+      {
+        "_id": "69ecb6fe80da8a7c9f05f15f",
+        "title": "HackerRank Certified CSS Developer",
+        "organization": "HackerRank",
+        "date": "2025-08-21",
+        "description": "Successfully completed a rigorous technical evaluation on HackerRank, validating foundational skills in Cascading Style Sheets (CSS). This certification confirms my ability to implement clean, responsive designs and effectively manage website aesthetics through standard-compliant code.",
+        "createdAt": "2026-04-25T12:43:42.356Z",
+        "__v": 0,
+        "link": "https://drive.google.com/file/d/1O0FucowgwMa8KzGowVkwf11B7s5nwOca/view?usp=drive_link",
+        "organizationLogo": "https://upload.wikimedia.org/wikipedia/commons/4/40/HackerRank_Icon-1000px.png"
+      }
+    ],
+    "messages": [
+      {
+        "_id": "69ee44f4b607932293ca0d82",
+        "subject": "full stack",
+        "read": true,
+        "createdAt": "2026-04-26T17:01:40.807Z"
+      },
+      {
+        "_id": "69fef7b4c74d4771e95a841d",
+        "subject": "fullstack",
+        "read": true,
+        "createdAt": "2026-05-09T09:00:36.303Z"
+      },
+      {
+        "_id": "6a020229a3ea59528ab3ae85",
+        "subject": "fullstack",
+        "read": false,
+        "createdAt": "2026-05-11T16:22:01.098Z"
+      },
+      {
+        "_id": "6a02026ca3ea59528ab3ae87",
+        "subject": "fullstack",
+        "read": false,
+        "createdAt": "2026-05-11T16:23:08.748Z"
+      },
+      {
+        "_id": "6a0202bd287953e506a29b3f",
+        "subject": "fullstack",
+        "read": true,
+        "createdAt": "2026-05-11T16:24:29.897Z"
+      },
+      {
+        "_id": "6a0356468519f27754aeed61",
+        "subject": "fullstack",
+        "read": false,
+        "createdAt": "2026-05-12T16:33:10.171Z"
+      },
+      {
+        "_id": "6a04ac3827a7a99beb8154f6",
+        "subject": "fullstack",
+        "read": false,
+        "archived": false,
+        "createdAt": "2026-05-13T16:52:08.937Z"
+      },
+      {
+        "_id": "6a0c07e4028e048fa31fb1e3",
+        "subject": "fullstack",
+        "read": true,
+        "archived": false,
+        "createdAt": "2026-05-19T06:49:08.915Z"
+      }
+    ],
+    "siteContent": {
+      "_id": "6a1fbd1cf1e89b20151a19c1",
+      "__v": 0,
+      "about": {
+        "title": "",
+        "intro": "",
+        "imageUrl": "https://res.cloudinary.com/dxww1ojqo/image/upload/v1780465299/IMG_20250525_211232_wfo7yk.jpg",
+        "location": "",
+        "experienceLabel": "",
+        "highlights": []
+      },
+      "createdAt": "2026-06-03T05:35:24.541Z",
+      "currentlyBuilding": [],
+      "hero": {
+        "headline": "",
+        "subtitle": "",
+        "role": "",
+        "primaryCtaText": "",
+        "primaryCtaHref": "",
+        "secondaryCtaText": "",
+        "secondaryCtaHref": ""
+      },
+      "resume": {
+        "resumeUrl": "",
+        "updatedAtText": ""
+      },
+      "socialLinks": {
+        "github": "",
+        "linkedin": "",
+        "location": ""
+      },
+      "updatedAt": "2026-06-03T06:01:56.458Z"
+    },
+    "notifications": [
+      {
+        "_id": "6a048d7fad1dfb84aa2bdaa5",
+        "title": "System Test",
+        "type": "system",
+        "read": true,
+        "createdAt": "2026-05-13T14:41:03.050Z"
+      },
+      {
+        "_id": "6a048db8ad1dfb84aa2bdab5",
+        "title": "System Test",
+        "type": "system",
+        "read": true,
+        "createdAt": "2026-05-13T14:42:00.208Z"
+      },
+      {
+        "_id": "6a048dfbad1dfb84aa2bdac5",
+        "title": "System Test",
+        "type": "system",
+        "read": true,
+        "createdAt": "2026-05-13T14:43:07.069Z"
+      },
+      {
+        "_id": "6a04ac3927a7a99beb8154f8",
+        "title": "New Contact Message",
+        "type": "message",
+        "read": true,
+        "createdAt": "2026-05-13T16:52:09.146Z"
+      },
+      {
+        "_id": "6a04b3c4f3bed05b6ddfdee1",
+        "title": "Server Warning",
+        "type": "warning",
+        "read": true,
+        "createdAt": "2026-05-13T17:24:20.899Z"
+      },
+      {
+        "_id": "6a0c07e5028e048fa31fb1e5",
+        "title": "New Contact Message",
+        "type": "message",
+        "read": true,
+        "createdAt": "2026-05-19T06:49:09.078Z"
+      }
+    ]
+  }
+}

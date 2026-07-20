@@ -19,7 +19,7 @@ export const connectSocket = (): Socket => {
   })
 
   socket.on('connect', () => {
-    console.log('🚀 Socket connected to Railway')
+    console.log('🚀 Socket connected to backend')
   })
 
   socket.on('connect_error', (error) => {

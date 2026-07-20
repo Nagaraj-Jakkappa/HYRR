@@ -35,34 +35,38 @@ const server = http.createServer(app);
 
 // --- CORS CONFIGURATION ---
 const allowedOrigins = [
-  'https://hyrr-blue.vercel.app'
-];
-
-if (process.env.NODE_ENV === 'development') {
-  allowedOrigins.push('http://localhost:5173');
-  allowedOrigins.push('http://localhost:5174');
-}
-
-if (process.env.CLIENT_URL) {
-  allowedOrigins.push(process.env.CLIENT_URL.replace(/\/$/, ""));
-}
+  "http://localhost:5173",
+  "http://localhost:5174",
+  "https://hyrr-blue.vercel.app",
+  process.env.CLIENT_URL,
+  process.env.FRONTEND_URL
+]
+  .filter(Boolean)
+  .map((origin) => origin.replace(/\/$/, ""));
 
 const corsOptions = {
-  origin: function (origin, callback) {
-    // Allow non-browser requests (e.g., Postman/Mobile)
+  origin(origin, callback) {
     if (!origin) return callback(null, true);
 
-    // Check if origin is allowed exactly, or if it's a Vercel preview branch
-    if (allowedOrigins.includes(origin) || origin.endsWith('.vercel.app')) {
-      callback(null, true);
-    } else {
-      callback(new Error('Not allowed by CORS'));
+    const normalizedOrigin = origin.replace(/\/$/, "");
+
+    if (allowedOrigins.includes(normalizedOrigin)) {
+      return callback(null, true);
     }
+
+    console.warn("CORS blocked origin:", origin);
+    return callback(new Error("Not allowed by CORS"));
   },
   credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept'],
-  optionsSuccessStatus: 200
+  methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+  allowedHeaders: [
+    "Content-Type",
+    "Authorization",
+    "X-Requested-With",
+    "x-razorpay-signature",
+    "Accept"
+  ],
+  optionsSuccessStatus: 204
 };
 
 // --- MIDDLEWARE ---
